@@ -1,11 +1,11 @@
-package model;
+package elevatorsim.model;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import enums.Direction;
-import enums.Floor;
+import elevatorsim.enums.Direction;
+import elevatorsim.enums.Floor;
 
 public class Lobby {
 	

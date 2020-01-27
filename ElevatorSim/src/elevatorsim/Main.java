@@ -1,4 +1,4 @@
-import enums.Floor;
+package elevatorsim;
 
 public class Main {
 

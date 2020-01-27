@@ -1,9 +1,9 @@
-package util;
+package elevatorsim.util;
 
 import org.json.JSONObject;
 
-import enums.Direction;
-import enums.Floor;
+import elevatorsim.enums.Direction;
+import elevatorsim.enums.Floor;
 
 public class Validator {
 	

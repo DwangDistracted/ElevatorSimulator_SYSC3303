@@ -1,4 +1,4 @@
-package enums;
+package elevatorsim.enums;
 
 public enum Floor {
 	ONE,

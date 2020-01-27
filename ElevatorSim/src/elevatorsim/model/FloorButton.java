@@ -1,4 +1,4 @@
-package model;
+package elevatorsim.model;
 
 public class FloorButton {
 	private boolean upFloorButton;

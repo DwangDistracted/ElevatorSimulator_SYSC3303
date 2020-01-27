@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.json.JSONObject;
 
-import enums.Direction;
-import enums.Floor;
-import model.ElevatorRequest;
-import model.Lobby;
-import util.FileParser;
-import util.Validator;
+import elevatorsim.enums.Direction;
+import elevatorsim.enums.Floor;
+import elevatorsim.model.ElevatorRequest;
+import elevatorsim.model.Lobby;
+import elevatorsim.util.FileParser;
+import elevatorsim.util.Validator;
 
 /**
  * notes:
