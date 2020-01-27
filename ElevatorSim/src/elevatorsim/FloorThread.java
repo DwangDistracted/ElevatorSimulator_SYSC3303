@@ -1,7 +1,9 @@
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import org.json.*;
+
+import org.json.JSONObject;
 
 import enums.Direction;
 import enums.Floor;
@@ -23,54 +25,50 @@ import util.Validator;
 public class FloorThread extends Thread {
 	
 	private static final String path = "C:\\Users\\micha\\Desktop\\";
-	private Lobby lobby;
-	private boolean arrivalSensor;
-	private Direction directionLamp;
-	private Floor arrivalFloor;
+	private List<ElevatorRequest> elevatorRequests;
+	private HashMap<Floor, Lobby> lobbys;
 	
 	public FloorThread(String name) {
 		super(name);
-		this.lobby = new Lobby();
-		this.arrivalSensor = false;
-		this.directionLamp = null;
+		this. elevatorRequests = new ArrayList<ElevatorRequest>();
+		
+		//Initialize Lobby
+		lobbys = new HashMap<Floor, Lobby>();
+		for(Floor floor : Floor.values()) {
+			lobbys.put(floor, new Lobby(floor));
+		}
 	}
 	
 	public void run()
 	{
 		while(true) {
-		    List<JSONObject> inputs = FileParser.parseFiles(path);
-		    List<ElevatorRequest> elevatorRequests = new ArrayList<ElevatorRequest>();
+			List<JSONObject> inputs = FileParser.parseFiles(path);
 		    for(JSONObject input : inputs) {
 		    	if(Validator.validateElevInput(input)) {
-		    		elevatorRequests.add(new ElevatorRequest(input));
+		    		ElevatorRequest request = new ElevatorRequest(input);
+		    		lobbys.get(request.getStartFloor()).addToLobby(request);
 		    	} else {
 		    		System.out.println("Received Invalid Input");
 		    	}
 		    }
 		    
-		    //add people to lobby and send data to scheduler
-		    if(!elevatorRequests.isEmpty()) {
-		    	Lobby.addToLobby(elevatorRequests);
-		    	//send to scheduler
-		    }
-		    //receive data from scheduler and remove people to lobby
-		    if(arrivalSensor) {
-		    	Lobby.removeFromLobby(arrivalFloor, directionLamp);
-		    	this.arrivalSensor = false;
-		    }
-		    
-			/*try {
+			try {
 				Thread.sleep(500);
 			} catch (InterruptedException ex) {
-				ex.printStackTrace();
-			}*/
+			}
 		}
 	}
 	
 	public void notifyArrivalSensor(Floor arrivalfloor, Direction directionLamp) {
-		this.arrivalSensor = true;
-		this.directionLamp = directionLamp;
-		this.arrivalFloor = arrivalfloor;
+		lobbys.get(arrivalfloor).RemoveFromLobby(directionLamp);
+	}
+
+	public List<ElevatorRequest> getElevatorRequests() {
+		return elevatorRequests;
+	}
+
+	public void setElevatorRequests(List<ElevatorRequest> elevatorRequests) {
+		this.elevatorRequests = elevatorRequests;
 	}
 
 }
