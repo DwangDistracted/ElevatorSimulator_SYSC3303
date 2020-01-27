@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import elevatorsim.enums.Direction;
 import elevatorsim.enums.Floor;
 import elevatorsim.model.ElevatorRequest;
-import elevatorsim.model.Lobby;
+import elevatorsim.model.Floor;
 import elevatorsim.util.FileParser;
 import elevatorsim.util.Validator;
 
@@ -26,16 +26,16 @@ public class FloorThread extends Thread {
 	
 	private static final String path = "C:\\Users\\micha\\Desktop\\";
 	private List<ElevatorRequest> elevatorRequests;
-	private HashMap<Floor, Lobby> lobbys;
+	private HashMap<Floor, Floor> lobbys;
 	
 	public FloorThread(String name) {
 		super(name);
 		this. elevatorRequests = new ArrayList<ElevatorRequest>();
 		
 		//Initialize Lobby
-		lobbys = new HashMap<Floor, Lobby>();
+		lobbys = new HashMap<Floor, Floor>();
 		for(Floor floor : Floor.values()) {
-			lobbys.put(floor, new Lobby(floor));
+			lobbys.put(floor, new Floor(floor));
 		}
 	}
 	

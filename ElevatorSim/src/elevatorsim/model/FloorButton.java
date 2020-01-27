@@ -4,6 +4,11 @@ public class FloorButton {
 	private boolean upFloorButton;
 	private boolean downFloorButton;
 	
+	public FloorButton() {
+		upFloorButton = false;
+		downFloorButton = false;
+	}
+	
 	public FloorButton(boolean upFloorButton, boolean downFloorButton) {
 		this.upFloorButton = upFloorButton;
 		this.downFloorButton = downFloorButton;
