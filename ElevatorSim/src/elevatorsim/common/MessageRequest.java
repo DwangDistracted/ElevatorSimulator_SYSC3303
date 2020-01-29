@@ -1,4 +1,4 @@
-package elevatorsim.model;
+package elevatorsim.common;
 
 import java.time.LocalTime;
 

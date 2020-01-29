@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import elevatorsim.model.MessageRequest;
+import elevatorsim.common.MessageRequest;
 
 public class MessageRequestUtil {
 

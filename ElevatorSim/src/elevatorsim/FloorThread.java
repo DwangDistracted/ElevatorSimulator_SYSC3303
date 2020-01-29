@@ -7,8 +7,7 @@ import org.json.JSONObject;
 
 import elevatorsim.enums.Direction;
 import elevatorsim.enums.Floor;
-import elevatorsim.model.ElevatorRequest;
-import elevatorsim.model.Floor;
+import elevatorsim.floor.ElevatorRequest;
 import elevatorsim.util.FileParser;
 import elevatorsim.util.Validator;
 

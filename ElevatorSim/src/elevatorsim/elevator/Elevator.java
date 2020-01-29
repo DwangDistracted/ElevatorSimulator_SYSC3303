@@ -1,9 +1,11 @@
 package elevatorsim.elevator;
 
+import elevatorsim.common.MessageReciever;
+import elevatorsim.common.MessageRequest;
 import elevatorsim.enums.ElevatorDoorState;
 import elevatorsim.enums.ElevatorMotorState;
 
-public class Elevator extends Thread {
+public class Elevator extends Thread implements MessageReciever {
 	private int floorIndex;
 	private ElevatorButton[] elevatorButtons;
 	private ElevatorLamp[] elevatorLamps;
@@ -76,5 +78,11 @@ public class Elevator extends Thread {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void recieve(MessageRequest message) {
+		// TODO Auto-generated method stub
+		
 	}
 }
