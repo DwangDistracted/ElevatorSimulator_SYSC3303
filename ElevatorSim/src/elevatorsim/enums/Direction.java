@@ -2,7 +2,8 @@ package elevatorsim.enums;
 
 public enum Direction {
 	UP,
-	DOWN;
+	DOWN,
+	INVALID;
 	
 	public static boolean contains(String value) {
 
