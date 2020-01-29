@@ -1,11 +1,13 @@
-package elevatorsim.model;
+package elevatorsim.floor;
 
 import java.util.HashMap;
 import java.util.Set;
 
+import elevatorsim.common.MessageReciever;
+import elevatorsim.common.MessageRequest;
 import elevatorsim.enums.Direction;
 
-public class Floor {
+public class Floor implements MessageReciever {
 	private Integer floorNumber;
 	private FloorButton dirButtons;
 	private HashMap<Integer, Set<Integer>> activeRequests; // A map of requestId and floorNumber
@@ -60,5 +62,11 @@ public class Floor {
 	 */
 	public Integer getFloorNumber() {
 		return floorNumber;
+	}
+
+	@Override
+	public void recieve(MessageRequest message) {
+		// TODO Auto-generated method stub
+		
 	}
 }

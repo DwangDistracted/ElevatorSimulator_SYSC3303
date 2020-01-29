@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import elevatorsim.common.MessageReciever;
+import elevatorsim.common.MessageRequest;
+import elevatorsim.elevator.Elevator;
+import elevatorsim.enums.MessageDestination;
+import elevatorsim.floor.Floor;
+
 /**
  * This is the scheduler for the elevator simulator. 
  * 
@@ -15,11 +21,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author David Wang and Thomas Leung
  */
 public class Scheduler extends Thread {
-	public enum Destination {
-		ELEVATORS,
-		FLOORS
-	}
-	
 	private List<Floor> floors;
 	private List<Elevator> elevators;
 	
@@ -56,7 +57,7 @@ public class Scheduler extends Thread {
 	 * @param destination - the intended destination of the message
 	 * @param message - the message
 	 */
-	public void sendMessage(Destination destination, MessageRequest message) {
+	public void sendMessage(MessageDestination destination, MessageRequest message) {
 		messageRequests.add(new MessageRequestWrapper(destination, message));
 	}
 	
@@ -71,11 +72,11 @@ public class Scheduler extends Thread {
 				
 				// determine the destination of the message
 				// WATCH - as this gets more complex, we may need to move this to another method/class
-				MessageRequester target;
-				if (message.destination == Destination.ELEVATORS) {
+				MessageReciever target;
+				if (message.destination == MessageDestination.ELEVATORS) {
 					// iteration one - only one elevator
 					target = elevators.get(0);
-				} else if (message.destination == Destination.FLOORS) {
+				} else if (message.destination == MessageDestination.FLOORS) {
 					// iteration one - only one floor
 					target = floors.get(0);
 				} else {
@@ -96,10 +97,10 @@ public class Scheduler extends Thread {
 	 *
 	 */
 	private class MessageRequestWrapper {
-		public final Destination destination;
+		public final MessageDestination destination;
 		public final MessageRequest message;
 		
-		MessageRequestWrapper(Destination destination, MessageRequest message) {
+		MessageRequestWrapper(MessageDestination destination, MessageRequest message) {
 			this.destination = destination;
 			this.message = message;
 		}

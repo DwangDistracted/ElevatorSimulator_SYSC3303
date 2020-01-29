@@ -2,7 +2,7 @@ package elevatorsim;
 
 import java.util.HashMap;
 
-import elevatorsim.model.MessageRequest;
+import elevatorsim.common.MessageRequest;
 import elevatorsim.util.FileParser;
 import elevatorsim.util.MessageRequestUtil;
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import elevatorsim.model.MessageRequest;
+import elevatorsim.common.MessageRequest;
 
 /**
  * File parser to parse the inputs for the system
