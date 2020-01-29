@@ -25,14 +25,22 @@ public class Scheduler extends Thread {
 	private List<Elevator> elevators;
 	
 	private BlockingQueue<MessageRequestWrapper> messageRequests;
+	private static Scheduler instance;
 	
 	/**
 	 * Creates a Scheduler Object with no floors and elevators configured yet.
 	 */
-	public Scheduler() {
+	private Scheduler() {
 		floors = new ArrayList<>();
 		elevators = new ArrayList<>();
 		messageRequests = new LinkedBlockingQueue<>();
+	}
+	
+	public static Scheduler getInstance() {
+		if (instance == null) {
+			instance = new Scheduler(); 
+		}
+		return instance;
 	}
 	
 	/**
