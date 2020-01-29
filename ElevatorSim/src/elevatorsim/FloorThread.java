@@ -30,7 +30,7 @@ public class FloorThread extends Thread {
 	
 	public FloorThread(String name) {
 		super(name);
-		this. elevatorRequests = new ArrayList<ElevatorRequest>();
+		this.MessageRequests = new ArrayList<ElevatorRequest>();
 		
 		//Initialize Lobby
 		lobbys = new HashMap<Floor, Floor>();
