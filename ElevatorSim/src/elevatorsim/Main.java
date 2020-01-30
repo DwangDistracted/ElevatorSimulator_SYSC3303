@@ -1,25 +1,31 @@
 package elevatorsim;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import elevatorsim.common.MessageRequest;
+import elevatorsim.floor.Floor;
 import elevatorsim.util.FileParser;
 import elevatorsim.util.MessageRequestUtil;
 
 public class Main {
-
+	
+	//Change to user input/ config file later
+	private static final int numOfFloors = 4;
+	//Change to user input/ config file later
+	private static final String path = "placeholder";
+	
 	public static void main(String[] args) {
-		//Just test stuff to try out some manipulations with the Messaging structure
-		/*
-		HashMap<Integer, MessageRequest> requestMap = FileParser.parseInputFile("C:\\Users\\Micro\\Documents\\school\\SYSC3303\\Project\\ElevatorSimulator_SYSC3303\\ElevatorSim\\Resources\\test.txt");
-		//MessageRequestUtil.removeMessage(requestMap, 3);
-		//System.out.println(MessageRequestUtil.getSingleMessage(requestMap, 3).toString());
-		System.out.println(MessageRequestUtil.getSingleMessage(requestMap, 4).toString() +"\n----------\n");
 		
-		HashMap<Integer, MessageRequest> newMap = MessageRequestUtil.getRequestMapByFloor(requestMap, 7);
-		for(Integer key: newMap.keySet()) {
-			System.out.println(newMap.get(key).toString());
-		}*/
+		ArrayList<MessageRequest> requests = (ArrayList<MessageRequest>) FileParser.parseInputFile(path).values();
+		
+		//Initialize Floors
+		HashMap<Integer, Floor> floors = new HashMap<Integer, Floor>();
+		for(int i = 0; i < numOfFloors; i++ ) {
+			floors.put(i, new Floor(i));
+		}
+		
+		FloorController floorController = new FloorController("floorController", floors, requests);
 	}
 
 }
