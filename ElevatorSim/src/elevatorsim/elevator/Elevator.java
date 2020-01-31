@@ -21,7 +21,7 @@ public class Elevator extends Thread implements MessageReciever {
 	 */
 	public Elevator ( int floorAmount ) {
 		this.floorAmount = floorAmount;
-		scheduler = Scheduler.getInstance();
+		this.scheduler = Scheduler.getInstance();
 	}
 
 	/**
