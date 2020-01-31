@@ -9,6 +9,8 @@ import elevatorsim.scheduler.Scheduler;
  * The elevator class
  * Currently this is just used to receive messages from the scheduler
  * and redirect them to the floors
+ * 
+ * @author Trevor Bivi (101045460)
  */
 public class Elevator extends Thread implements MessageReciever {
 	private Scheduler scheduler;
@@ -34,7 +36,6 @@ public class Elevator extends Thread implements MessageReciever {
 			try {
 				Thread.sleep(0);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -49,7 +50,6 @@ public class Elevator extends Thread implements MessageReciever {
 	 */
 	@Override
 	public void recieve(MessageRequest message) {
-		// TODO Auto-generated method stub
 		System.out.println("Elevator received message: " + message.toString() );
 		scheduler.sendMessage(MessageDestination.FLOORS, message);
 	}
