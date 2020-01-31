@@ -75,7 +75,8 @@ public class Floor {
 	 * @return the list of messages
 	 */
 	public List<MessageRequest> getActiveUpRequests() {
-		return activeUpRequests;
+		List<MessageRequest> list = activeUpRequests;
+		return list;
 	}
 
 	/**
@@ -83,6 +84,7 @@ public class Floor {
 	 * @return the list of messages
 	 */
 	public List<MessageRequest> getActiveDownRequests() {
-		return activeDownRequests;
+		List<MessageRequest> list = activeDownRequests;
+		return list;
 	}
 }
