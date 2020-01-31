@@ -1,19 +1,13 @@
 package elevatorsim.enums;
 
+/**
+ * An enum to model the directions the elevator travels and the requests made on a floor
+ * @author Michael Patsula
+ * 
+ */
 public enum Direction {
 	UP,
 	DOWN,
 	INVALID;
-	
-	public static boolean contains(String value) {
-
-	    for (Direction d : Direction.values()) {
-	        if (d.name().equals(value)) {
-	            return true;
-	        }
-	    }
-
-	    return false;
-	}
 }
 

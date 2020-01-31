@@ -11,8 +11,9 @@ import elevatorsim.scheduler.Scheduler;
 /**
  * Takes in arrival sensor singles, and client requests
  * and then distributes them wherever necessary. 
+ * 
+ * @author Michael Patsula, David Wang
  */
-
 public class FloorController extends Thread implements MessageReciever {
 	private HashMap<Integer, Floor> floors;
 	private Map<Integer, MessageRequest> requests;
