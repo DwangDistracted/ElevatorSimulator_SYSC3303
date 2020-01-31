@@ -69,4 +69,20 @@ public class Floor {
 	public Integer getFloorNumber() {
 		return floorNumber;
 	}
+	
+	/**
+	 * Get the list of going up messages from this floor
+	 * @return the list of messages
+	 */
+	public List<MessageRequest> getActiveUpRequests() {
+		return activeUpRequests;
+	}
+
+	/**
+	 * Get the list going down messages from this floor
+	 * @return the list of messages
+	 */
+	public List<MessageRequest> getActiveDownRequests() {
+		return activeDownRequests;
+	}
 }
