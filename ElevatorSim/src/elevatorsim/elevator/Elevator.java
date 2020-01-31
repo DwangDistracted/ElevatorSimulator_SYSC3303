@@ -18,7 +18,7 @@ public class Elevator extends Thread implements MessageReciever {
 		while (true) {
 			try {
 				//get message
-				wait();
+				Thread.sleep(0);
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

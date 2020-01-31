@@ -1,6 +1,6 @@
 package elevatorsim.floor;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import elevatorsim.common.MessageRequest;
@@ -13,12 +13,14 @@ import elevatorsim.enums.Direction;
 public class Floor {
 	private Integer floorNumber;
 	private FloorButton dirButtons;
-	private HashMap<Direction, List<MessageRequest>> activeRequests; 
+	private List<MessageRequest> activeUpRequests;
+	private List<MessageRequest> activeDownRequests;
 
 	public Floor(int floorNumber) {
 		this.floorNumber = floorNumber;
 		this.dirButtons = new FloorButton();
-		activeRequests = new HashMap<Direction, List<MessageRequest>>();
+		activeUpRequests = new ArrayList<>();
+		activeDownRequests = new ArrayList<>();
 	}
 	
 	/**
@@ -28,14 +30,14 @@ public class Floor {
 	 * @param request the request made by the user/elevator requester
 	 */
 	public void readRequest(MessageRequest request) {
-		List<MessageRequest> requests = activeRequests.get(request.getDirection());
-		requests.add(request);
-		activeRequests.replace(request.getDirection(), requests);
-		
 		if(request.getDirection() == Direction.UP) {
+			activeUpRequests.add(request);
 			dirButtons.setUpFloorButton(true);
-		} else {
+		} else if (request.getDirection() == Direction.DOWN) {
+			activeDownRequests.add(request);
 			dirButtons.setDownFloorButton(true);
+		} else {
+			// INVALID Direction - ignore request
 		}
 	}
 
@@ -49,11 +51,13 @@ public class Floor {
 		if (directionLamp == Direction.UP) {
 			dirButtons.setUpFloorButton(false);
 			System.out.println("Elevator has arrived going up");
-			activeRequests.get(Direction.UP).clear();
-		} else {
+			activeUpRequests.clear();
+		} else if (directionLamp == Direction.DOWN) {
 			dirButtons.setDownFloorButton(false);
 			System.out.println("Elevator has arrived going down");
-			activeRequests.get(Direction.DOWN).clear();
+			activeDownRequests.clear();
+		} else {
+			// INVALID Direction - ignore request
 		}
 	}
 

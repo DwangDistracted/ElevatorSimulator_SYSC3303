@@ -1,17 +1,12 @@
-package elevatorsim;
+package elevatorsim.floor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import elevatorsim.common.MessageReciever;
 import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.Direction;
 import elevatorsim.enums.MessageDestination;
-import elevatorsim.floor.ArrivalSignal;
-import elevatorsim.floor.Floor;
 import elevatorsim.scheduler.Scheduler;
-import elevatorsim.util.FileParser;
 
 /**
  * Takes in arrival sensor singles, and client requests
@@ -20,11 +15,17 @@ import elevatorsim.util.FileParser;
 
 public class FloorController extends Thread implements MessageReciever {
 	private HashMap<Integer, Floor> floors;
-	private List<MessageRequest> requests;
+	private Map<Integer, MessageRequest> requests;
 	
-	public FloorController(String name, HashMap<Integer, Floor> floors, List<MessageRequest> requests) {
+	public FloorController(String name, int numOfFloors, Map<Integer, MessageRequest> requests) {
 		super(name);
-		this.floors = floors;
+		
+		this.floors = new HashMap<>();
+		//Initialize Floors
+		for(int i = 0; i < numOfFloors; i++ ) {
+			floors.put(i, new Floor(i));
+		}
+
 		this.requests = requests;
 	}
 	
@@ -34,9 +35,16 @@ public class FloorController extends Thread implements MessageReciever {
 	 */
 	public void run() {
 		Scheduler scheduler = Scheduler.getInstance();
-		for(MessageRequest request : requests) {
+		
+		for(MessageRequest request : requests.values()) {
+			System.out.println("Floor Sending Request to Scheduler");
 			floors.get(request.getStartFloor()).readRequest(request);
 			scheduler.sendMessage(MessageDestination.ELEVATORS, request);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -48,7 +56,6 @@ public class FloorController extends Thread implements MessageReciever {
 	@Override
 	public void recieve(MessageRequest message) {
 		floors.get(message.getDestFloor()).loadPassengers(message.getDirection());
-		
 	}
 	
 }

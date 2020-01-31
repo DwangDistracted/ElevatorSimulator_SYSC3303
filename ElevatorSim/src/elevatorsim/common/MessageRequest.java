@@ -158,9 +158,9 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 */
 	@Override
 	public String toString() {
-		String status = "\nRequestId: " + getRequestId() + " | Timestamp: " + getTimeStamp().toString()
+		String status = "RequestId: " + getRequestId() + " | Timestamp: " + getTimeStamp().toString()
 				+ " | StartFloor: " + getStartFloor() + " | Direction: " + getDirection().toString()
-				+ " | DestinationFloor: " + getDestFloor() + "\n";
+				+ " | DestinationFloor: " + getDestFloor();
 		return status;
 	}
 

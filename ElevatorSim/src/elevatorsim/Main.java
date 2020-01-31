@@ -4,26 +4,29 @@ import java.io.File;
 import java.util.HashMap;
 
 import elevatorsim.common.MessageRequest;
-import elevatorsim.floor.Floor;
+import elevatorsim.elevator.Elevator;
+import elevatorsim.floor.FloorController;
+import elevatorsim.scheduler.Scheduler;
 import elevatorsim.util.FileParser;
-import elevatorsim.util.MessageRequestUtil;
 
 public class Main {
 	//Change to user input/ config file later
-	private static final int numOfFloors = 4;
+	private static final int numOfFloors = 10;
 	//Change to user input/ config file later
-	private static final String testFilePath = "resources/test.txt";
+	private static final String inputFilePath = "resources/test.txt";
 	
 	public static void main(String[] args) {
-		String path = new File(testFilePath).getAbsolutePath();
+		String path = new File(inputFilePath).getAbsolutePath();
 		HashMap<Integer, MessageRequest> requestMap = FileParser.parseInputFile(path);
-		ArrayList<MessageRequest> requests = (ArrayList<MessageRequest>) requestMap.values();
 		
-		//Initialize Floors
-		HashMap<Integer, Floor> floors = new HashMap<Integer, Floor>();
-		for(int i = 0; i < numOfFloors; i++ ) {
-			floors.put(i, new Floor(i));
-		}
-		FloorController floorController = new FloorController("floorController", floors, requests);
+		FloorController floorController = new FloorController("floorController", numOfFloors, requestMap);
+		Elevator elevator = new Elevator(numOfFloors);
+		Scheduler scheduler = Scheduler.getInstance();
+		scheduler.setFloorController(floorController);
+		scheduler.addElevator(elevator);
+		
+		scheduler.start();
+		elevator.start();
+		floorController.start();
 	}
 }
