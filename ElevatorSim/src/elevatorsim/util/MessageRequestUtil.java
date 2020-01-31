@@ -22,9 +22,7 @@ public class MessageRequestUtil {
 		int requestId = 0;
 		for (MessageRequest request : list) {
 			request.setRequestId(requestId);
-			System.out.println("Item#" + requestId);
 			requestMap.put(requestId, request);
-			System.out.println(requestMap.get(requestId).toString()); // TODO remove later
 			requestId++;
 		}
 		return requestMap;

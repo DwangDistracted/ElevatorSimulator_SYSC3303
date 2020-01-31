@@ -9,7 +9,7 @@ import elevatorsim.common.MessageReciever;
 import elevatorsim.common.MessageRequest;
 import elevatorsim.elevator.Elevator;
 import elevatorsim.enums.MessageDestination;
-import elevatorsim.floor.Floor;
+import elevatorsim.floor.FloorController;
 
 /**
  * This is the scheduler for the elevator simulator. 
@@ -21,7 +21,7 @@ import elevatorsim.floor.Floor;
  * @author David Wang and Thomas Leung
  */
 public class Scheduler extends Thread {
-	private List<Floor> floors;
+	private FloorController floorSystem;
 	private List<Elevator> elevators;
 	
 	private BlockingQueue<MessageRequestWrapper> messageRequests;
@@ -31,7 +31,6 @@ public class Scheduler extends Thread {
 	 * Creates a Scheduler Object with no floors and elevators configured yet.
 	 */
 	private Scheduler() {
-		floors = new ArrayList<>();
 		elevators = new ArrayList<>();
 		messageRequests = new LinkedBlockingQueue<>();
 	}
@@ -47,8 +46,8 @@ public class Scheduler extends Thread {
 	 * Adds a floor to this scheduler to manage
 	 * @param floor - the floor to add
 	 */
-	public void addFloor(Floor floor) {
-		floors.add(floor);
+	public void setFloorController(FloorController floorSystem) {
+		this.floorSystem = floorSystem;
 	}
 
 	/**
@@ -74,7 +73,7 @@ public class Scheduler extends Thread {
 	 */
 	@Override
 	public void run() {
-		while (!floors.isEmpty() && !elevators.isEmpty()) {
+		while (floorSystem != null && !elevators.isEmpty()) {
 			try {
 				MessageRequestWrapper message = messageRequests.take();
 				
@@ -85,8 +84,7 @@ public class Scheduler extends Thread {
 					// iteration one - only one elevator
 					target = elevators.get(0);
 				} else if (message.destination == MessageDestination.FLOORS) {
-					// iteration one - only one floor
-					target = floors.get(0);
+					target = floorSystem;
 				} else {
 					throw new IllegalArgumentException();
 				}
