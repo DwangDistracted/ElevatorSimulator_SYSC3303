@@ -8,7 +8,7 @@ import elevatorsim.enums.Direction;
  * This is the message object which is passed by the different subsystems in
  * order to communicate the user input to the different components
  * 
- * @author Rahul, Michael, David, Trevor, Thomas
+ * @author Rahul Anilkumar
  *
  */
 public class MessageRequest implements Comparable<MessageRequest> {

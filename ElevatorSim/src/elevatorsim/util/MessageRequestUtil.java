@@ -7,13 +7,18 @@ import java.util.Set;
 
 import elevatorsim.common.MessageRequest;
 
+/**
+ * A utility class to help with manipulating the MessageRequest DataStructures
+ * @author Rahul Anilkumar
+ *
+ */
 public class MessageRequestUtil {
 
 	/**
-	 * Returns a Hashmap with the key value of a unique request id and messages
+	 * Returns a HashMap with the key value of a unique request id and messages
 	 * sorted by the time of input
 	 * 
-	 * @return
+	 * @return a Hashmap containing all the messages read from a list
 	 */
 	public static HashMap<Integer, MessageRequest> sortByTimestamp(ArrayList<MessageRequest> requestList) {
 		HashMap<Integer, MessageRequest> requestMap = new HashMap<Integer, MessageRequest>();
@@ -87,7 +92,12 @@ public class MessageRequestUtil {
 		return requestMap.keySet();
 	}
 	
-	
+	/**
+	 * Gets a map of all the requests for a specified starting floor number
+	 * @param requestMap the map that the requests are gathered from
+	 * @param floorNumber the floor number that the requests are being aggregated for
+	 * @return the aggregated map of requests
+	 */
 	public static HashMap<Integer, MessageRequest> getRequestMapByFloor(HashMap<Integer, MessageRequest> requestMap, int floorNumber){
 		HashMap<Integer, MessageRequest> newMap = new HashMap<Integer, MessageRequest>();
 		for(Integer key: requestMap.keySet()) {
@@ -96,20 +106,6 @@ public class MessageRequestUtil {
 			}
 		}
 		return newMap;
-		
-	}
-
-	// TODO remove later for testing only.
-	public static void main(String[] args) {
-		HashMap<Integer, MessageRequest> mess = new HashMap<Integer, MessageRequest>();
-		MessageRequest request = new MessageRequest("14:05:15.0", "2", "Up", "5");
-		MessageRequest request2 = new MessageRequest("05:05:23.0", "1", "Up", "3");
-		ArrayList<MessageRequest> requestL = new ArrayList<MessageRequest>();
-		requestL.add(request);
-		requestL.add(request2);
-		System.out.println(requestL.size());
-		mess = sortByTimestamp(requestL);
-		System.out.println(getSingleMessage(mess, 0).toString() + " " + getSingleMessage(mess, 1).toString());
 	}
 
 }
