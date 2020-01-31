@@ -2,7 +2,7 @@ package elevatorsim.common;
 
 /**
  * An interface for the Messages being sent between the different components
- *
+ * @author David Wang
  */
 public interface MessageReciever {
 	/**
