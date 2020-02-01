@@ -82,7 +82,7 @@ class FloorTest {
 	@Test
 	void getFloorNumbertest() {
 		// Check that the correct floor number has been set
-		assertEquals(flr.getFloorNumber(), 1);
+		assertTrue(flr.getFloorNumber() == 1);
 	}
 
 }
