@@ -23,7 +23,7 @@ class FileParserTest {
 	/**
 	 * Sets up the test by instantiating the path string with its absolute path
 	 * to the test file
-	 * @throws Exception any execption that may occur during testing
+	 * @throws Exception any exception that may occur during testing
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
