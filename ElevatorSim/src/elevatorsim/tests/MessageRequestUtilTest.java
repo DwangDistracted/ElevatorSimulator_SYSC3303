@@ -24,7 +24,7 @@ class MessageRequestUtilTest {
 	
 	/**
 	 * Setup for each of the tests
-	 * @throws Exception any excpetions that may occur
+	 * @throws Exception any exceptions that may occur
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
@@ -72,7 +72,7 @@ class MessageRequestUtilTest {
 		assertFalse(mess.isEmpty());
 		// Check if the expected value is returned;
 		assertTrue(MessageRequestUtil.getSingleMessage(mess,2).equals(request3));
-		//Check that the value is null if a vlaue outside of the map is requested
+		//Check that the value is null if a value outside of the map is requested
 		assertTrue(MessageRequestUtil.getSingleMessage(mess,10) == null);		
 	}
 	
