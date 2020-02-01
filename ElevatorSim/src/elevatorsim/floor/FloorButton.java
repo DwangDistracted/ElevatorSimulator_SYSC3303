@@ -2,7 +2,7 @@ package elevatorsim.floor;
 
 /**
  * An object to model the buttons on the floor
- * @author Michael
+ * @author Michael Patsula
  *
  */
 public class FloorButton {

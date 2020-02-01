@@ -8,7 +8,7 @@ import elevatorsim.enums.Direction;
 
 /**
  * A floor object to model the individual floors of a building
- *	@author Michael Patsula, Rahul Anilkumar
+ *	@author Michael Patsula, Rahul Anilkumar, David Wang
  */
 public class Floor {
 	private Integer floorNumber;

@@ -9,6 +9,10 @@ import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;
 import elevatorsim.util.FileParser;
 
+/**
+ * The Entry Point for the elevator simulator
+ * @author David Wang
+ */
 public class Main {
 	//Change to user input/ config file later
 	private static final int numOfFloors = 10;
