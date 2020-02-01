@@ -1,6 +1,7 @@
 package elevatorsim.floor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import elevatorsim.common.MessageRequest;
@@ -68,5 +69,21 @@ public class Floor {
 	 */
 	public Integer getFloorNumber() {
 		return floorNumber;
+	}
+	
+	/**
+	 * Get the list of going up messages from this floor
+	 * @return the list of messages
+	 */
+	public List<MessageRequest> getActiveUpRequests() {
+		return Collections.unmodifiableList(activeUpRequests);
+	}
+
+	/**
+	 * Get the list going down messages from this floor
+	 * @return the list of messages
+	 */
+	public List<MessageRequest> getActiveDownRequests() {
+		return Collections.unmodifiableList(activeDownRequests);
 	}
 }

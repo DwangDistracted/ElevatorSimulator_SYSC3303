@@ -60,12 +60,15 @@ public class MessageRequestUtil {
 	 * 
 	 * @param requestMap the map being modified
 	 * @param requestId  the requestId used to remove a specified message
+	 * @return true if it was removed successfully
 	 */
-	public static void removeMessage(HashMap<Integer, MessageRequest> requestMap, int requestId) {
+	public static boolean removeMessage(HashMap<Integer, MessageRequest> requestMap, int requestId) {
 		if (requestMap.containsKey(requestId)) {
 			requestMap.remove(requestId);
+			return true;
 		} else {
 			System.out.println("There is no active request for " + requestId);
+			return false;
 		}
 	}
 
@@ -75,11 +78,18 @@ public class MessageRequestUtil {
 	 * 
 	 * @param requestMap the map being modified
 	 * @param requestIds the array of message requestIds being removed
+	 * @return true if all the value have been removed
 	 */
-	public static void removeMessage(HashMap<Integer, MessageRequest> requestMap, int[] requestIds) {
+	public static boolean removeMessage(HashMap<Integer, MessageRequest> requestMap, int[] requestIds) {
 		for (int id : requestIds) {
-			requestMap.remove(id);
+			if(requestMap.containsKey(id)) {
+				requestMap.remove(id);
+			}
+			else {
+				return false;
+			}
 		}
+		return true;
 	}
 
 	/**

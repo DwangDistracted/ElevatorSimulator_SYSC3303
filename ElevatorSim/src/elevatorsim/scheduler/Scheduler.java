@@ -102,7 +102,7 @@ public class Scheduler extends Thread {
 	 * @author David Wang and Thomas Leung
 	 *
 	 */
-	private class MessageRequestWrapper {
+	public class MessageRequestWrapper {
 		public final MessageDestination destination;
 		public final MessageRequest message;
 		
@@ -110,5 +110,30 @@ public class Scheduler extends Thread {
 			this.destination = destination;
 			this.message = message;
 		}
+	}
+	
+	/**
+	 * Get the floor controller
+	 * @return the floor controller
+	 */
+	public FloorController getFloorController() {
+		return floorSystem;
+	}
+
+	/**
+	 * Get the list of elevator
+	 * @return the list of elevator
+	 */
+	public List<Elevator> getElevator() {
+		return elevators;
+	}
+	
+	/**
+	 * Get the list of message requests
+	 * 
+	 * @return a list of message requests
+	 */
+	public BlockingQueue<MessageRequestWrapper> getMessageRequests() {
+		return messageRequests;
 	}
 }
