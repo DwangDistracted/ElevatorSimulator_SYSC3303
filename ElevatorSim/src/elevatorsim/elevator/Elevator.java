@@ -10,7 +10,7 @@ import elevatorsim.scheduler.Scheduler;
  * Currently this is just used to receive messages from the scheduler
  * and redirect them to the floors
  * 
- * @author Trevor Bivi (101045460)
+ * @author Trevor Bivi 
  */
 public class Elevator extends Thread implements MessageReciever {
 	private Scheduler scheduler;
