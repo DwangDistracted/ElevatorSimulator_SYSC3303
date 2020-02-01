@@ -1,10 +1,13 @@
-# ElevatorSimulator_SYSC3303
+ElevatorSimulator_SYSC3303
+----------------------------------
 This project will aim to implement a multithreaded simulation of an elevator system
 
-## To Run
+To Run
+----------------------------------
 ElevatorSim is an eclipse project. To Run, import the project into Eclipse Java and run from eleveatorsim.Main.  The Unit Tests for the project are implemented in JUnit5. Run them by right clicking on the project and selecting Run As -> JUnit Test.
 
-## Authors
+Authors - Group 1
+----------------------------------
 * Rahul Anilkumar (101038785) - Worked on Message Classes, File Parser, JUnit Tests
 	- Classes: MessageRequest, FileParser, MessageRequestUtil, FileParserTest, MessageRequestUtilTest
 * David Wang (101032271) - Worked on Scheduler, Startup Logic, Sequence Diagram, Documentation
@@ -16,7 +19,8 @@ ElevatorSim is an eclipse project. To Run, import the project into Eclipse Java 
 * Trevor Bivi (101045460) - Worked on Elevator Subsystem, JUnit Tests
 	- Classes: Elevator, MessageDestination, FloorTest
 
-## Classes
+Classes
+----------------------------------
 elevatorsim.Main - This class serves as the program entry point. It creates all the necessary threads and starts all the system.
 
 elevatorsim.common.MessageRequest - This structure contains the data that will be sent between the floor subsystem and elevator subsystem.
@@ -49,7 +53,9 @@ elevatorsim.util.FileParser - Utility class that helps us parse MessageRequests 
 
 elevatorsim.util.MessageRequestUtil - Utility class that helps us manipulate the map of MessageRequests that is read in from the FileParser
 
-## UML Class and Sequence Diagrams
+
+UML Class and Sequence Diagrams
+----------------------------------
 The UML diagrams can be found in the Diagrams/Iteration 1 directory
 
 Iteration1_Sequence.PNG - The sequence diagram depicting the interactions between threads

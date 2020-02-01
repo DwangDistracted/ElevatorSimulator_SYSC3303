@@ -1,80 +1,56 @@
 package elevatorsim.elevator;
 
-import elevatorsim.enums.ElevatorDoorState;
-import elevatorsim.enums.ElevatorMotorState;
+import elevatorsim.common.MessageReciever;
+import elevatorsim.common.MessageRequest;
+import elevatorsim.enums.MessageDestination;
+import elevatorsim.scheduler.Scheduler;
 
-public class Elevator extends Thread {
-	private int floorIndex;
-	private ElevatorButton[] elevatorButtons;
-	private ElevatorLamp[] elevatorLamps;
-	private ElevatorDoor elevatorDoor;
-	private ElevatorMotor elevatorMotor;
+/**
+ * The elevator class
+ * Currently this is just used to receive messages from the scheduler
+ * and redirect them to the floors
+ * 
+ * @author Trevor Bivi (101045460)
+ */
+public class Elevator extends Thread implements MessageReciever {
+	private Scheduler scheduler;
+	private int floorAmount;
 	
+	/**
+	 * Elevator constructor that stores the amount of floors and
+	 * a reference to the scheduler singleton
+	 * @param floorAmount The amount of floors the elevator can visit
+	 */
 	public Elevator ( int floorAmount ) {
-		elevatorButtons = new ElevatorButton[floorAmount];
-		elevatorLamps = new ElevatorLamp[floorAmount];
-		for (int i = 0; i < floorAmount; i++) {
-			elevatorButtons[i] = new ElevatorButton(this,i);
-			elevatorLamps[i] = new ElevatorLamp(this,i);
-		}
-		elevatorDoor = new ElevatorDoor(this);
-		elevatorMotor = new ElevatorMotor(this);
+		this.floorAmount = floorAmount;
+		this.scheduler = Scheduler.getInstance();
 	}
-	
-	public void sendButtonPress(int floorIndex){
-		System.out.println("ELEVATOR SEND BUTTON PRESS EVENT W/ PARAM" + String.valueOf(floorIndex) );
-		
-	}
-	
-	public void sendStopped() {
-		System.out.println("ELEVATOR SEND STOP EVENT");
-	}
-	
-	public void sendOpenedDoor() {
-		System.out.println("ELEVATOR SEND OPENED DOOR EVENT");
-	}
-	
-	public void sendClosedDoor() {
-		System.out.println("ELEVATOR SEND ClOSED DOOR EVENT");
-	}
-	
-	private void closeDoor() {
-		elevatorDoor.targetDoorState(ElevatorDoorState.CLOSED);
-	}
-	
-	private void openDoor() {
-		System.out.print("opening door");
-		elevatorDoor.targetDoorState(ElevatorDoorState.OPEN);
-	}
-	
-	private void motorUp() {
-		elevatorMotor.setMotorDirection(ElevatorMotorState.UP);
-	}
-	
-	private void motorDown() {
-		elevatorMotor.setMotorDirection(ElevatorMotorState.DOWN);
-	}
-	
-	private void motorStop() {
-		elevatorMotor.setMotorDirection(ElevatorMotorState.STOP);
-	}
-	
-	public static void main(String[] args) {
-		System.out.print("running my elevator entry");
-		Elevator elevator = new Elevator(5);
-		elevator.openDoor();
-	}
-	
+
+	/**
+	 * The code to run in an elevator thread
+	 * Currently the elevator only needs to respond to the scheduler so
+	 * The thread just sleeps to allow other threads to run
+	 */
 	public void run() {
 		while (true) {
 			try {
-				//get message
-				System.out.print("why god");
-				
+				Thread.sleep(0);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Receives message requests from the schedule and then
+	 * sends the messages back to the scheduler but
+	 * targeting floors instead of elevators
+	 * 
+	 * @param message The MessageRequest that should be redirected to floors
+	 */
+	@Override
+	public void recieve(MessageRequest message) {
+		System.out.println("Elevator received message: " + message.toString() );
+		scheduler.sendMessage(MessageDestination.FLOORS, message);
 	}
 }
