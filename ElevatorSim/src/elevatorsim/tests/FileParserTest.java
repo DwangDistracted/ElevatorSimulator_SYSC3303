@@ -8,8 +8,8 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.Direction;
+import elevatorsim.common.ElevatorRequest;
+import elevatorsim.constants.Direction;
 import elevatorsim.util.FileParser;
 /**
  * Test cases for the file parser
@@ -36,7 +36,7 @@ class FileParserTest {
 	 */
 	@Test
 	void parseInputFiletest() {
-		HashMap<Integer, MessageRequest> requestMap = new HashMap<Integer, MessageRequest> ();
+		HashMap<Integer, ElevatorRequest> requestMap = new HashMap<Integer, ElevatorRequest> ();
 		//Check that the map is initailly empty
 		assertTrue(requestMap.isEmpty());
 		requestMap = FileParser.parseInputFile(path);

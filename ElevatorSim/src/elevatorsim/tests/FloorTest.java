@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.Direction;
+import elevatorsim.common.ElevatorRequest;
+import elevatorsim.constants.Direction;
 import elevatorsim.floor.Floor;
 
 /**
@@ -16,7 +16,7 @@ import elevatorsim.floor.Floor;
  */
 class FloorTest {
 	private Floor flr;
-	private MessageRequest request, request2, request3, request4;
+	private ElevatorRequest request, request2, request3, request4;
 
 	/**
 	 * Setup objects to be utilized in the testing of the Floor class
@@ -24,10 +24,10 @@ class FloorTest {
 	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		request = new MessageRequest("14:05:15.0", "2", "Up", "5");
-		request2 = new MessageRequest("05:05:23.0", "1", "Up", "3");
-		request3 = new MessageRequest("10:05:12.0", "7", "down", "6");
-		request4 = new MessageRequest("12:05:12.0", "4", "down", "1");
+		request = new ElevatorRequest("14:05:15.0", "2", "Up", "5");
+		request2 = new ElevatorRequest("05:05:23.0", "1", "Up", "3");
+		request3 = new ElevatorRequest("10:05:12.0", "7", "down", "6");
+		request4 = new ElevatorRequest("12:05:12.0", "4", "down", "1");
 		flr = new Floor(1);
 	}
 

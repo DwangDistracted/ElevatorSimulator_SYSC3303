@@ -1,9 +1,10 @@
 package elevatorsim.elevator;
 
 import elevatorsim.common.MessageReciever;
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.MessageDestination;
-import elevatorsim.scheduler.Scheduler;
+
+import java.net.SocketException;
+
+import elevatorsim.common.ElevatorRequest;
 
 /**
  * The elevator class
@@ -13,7 +14,7 @@ import elevatorsim.scheduler.Scheduler;
  * @author Trevor Bivi (101045460)
  */
 public class Elevator extends Thread implements MessageReciever {
-	private Scheduler scheduler;
+	private boolean isRunning = false;
 	private int floorAmount;
 	
 	/**
@@ -22,8 +23,8 @@ public class Elevator extends Thread implements MessageReciever {
 	 * @param floorAmount The amount of floors the elevator can visit
 	 */
 	public Elevator ( int floorAmount ) {
+		super("Elevator");
 		this.floorAmount = floorAmount;
-		this.scheduler = Scheduler.getInstance();
 	}
 
 	/**
@@ -32,11 +33,22 @@ public class Elevator extends Thread implements MessageReciever {
 	 * The thread just sleeps to allow other threads to run
 	 */
 	public void run() {
-		while (true) {
-			try {
-				Thread.sleep(0);
-			} catch (Exception e) {
-				e.printStackTrace();
+		ElevatorServer server = null;
+		isRunning = true;
+
+		try {
+			server = new ElevatorServer(this);
+			server.startServer();
+			
+			while (isRunning) {
+				Thread.sleep(100l);
+			}
+		} catch (SocketException | InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			if (server != null) {
+				System.out.println(this.getName() + " - INFO : Exiting");
+				server.stopServer();
 			}
 		}
 	}
@@ -49,8 +61,11 @@ public class Elevator extends Thread implements MessageReciever {
 	 * @param message The MessageRequest that should be redirected to floors
 	 */
 	@Override
-	public void recieve(MessageRequest message) {
-		System.out.println("Elevator received message: " + message.toString() );
-		scheduler.sendMessage(MessageDestination.FLOORS, message);
+	public void receive(ElevatorRequest message) {
+		System.out.println("Elevator received message: " + message.toString());
+	}
+
+	public void stopRunning() {
+		isRunning = false;
 	}
 }
