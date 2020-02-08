@@ -10,7 +10,7 @@ import elevatorsim.common.ElevatorRequest;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
-import elevatorsim.server.Server;
+import elevatorsim.server.UDPServer;
 
 /**
  * The Server that serves a FloorController Instance
@@ -18,7 +18,7 @@ import elevatorsim.server.Server;
  * 
  * @author David Wang
  */
-public class FloorServer extends Server {
+public class FloorServer extends UDPServer {
 	private final FloorController controller;
 	
 	/**

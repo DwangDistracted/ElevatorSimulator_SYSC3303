@@ -10,7 +10,7 @@ import elevatorsim.common.ElevatorStatus;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
-import elevatorsim.server.Server;
+import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;	
 
 /**
@@ -18,7 +18,7 @@ import elevatorsim.util.DatagramPacketUtils;
  * 
  * @author David Wang
  */
-public class SchedulerServer extends Server {
+public class SchedulerServer extends UDPServer {
 	private static SchedulerServer instance;
 
 	private final ConcurrentMap<InetAddress, Integer> elevators;
@@ -47,14 +47,19 @@ public class SchedulerServer extends Server {
 	 */
 	@Override
 	public DatagramPacket handleElevatorRequest(DatagramPacket request) {
+		Scheduler.getInstance().startProcessing();
+
 		InetAddress availableElevator = Scheduler.getInstance().findAvailableElevator();
 
 		if (availableElevator == null) {
+			Scheduler.getInstance().stopProcessing();
 			return MessagePackets.Responses.RESPONSE_FAILURE();
 		}
 
 		Integer elevatorPort = elevators.get(availableElevator);
 		sender.send(DatagramPacketUtils.getCopyOf(request), availableElevator, elevatorPort);
+
+		Scheduler.getInstance().stopProcessing();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
@@ -62,12 +67,17 @@ public class SchedulerServer extends Server {
 	 * Forwards An Elevator Event to the Registered Floor System
 	 */
 	@Override
-	public DatagramPacket handleElevatorEvent(DatagramPacket request) {		
+	public DatagramPacket handleElevatorEvent(DatagramPacket request) {
+		Scheduler.getInstance().startProcessing();
+
 		if (floorSystem == null) {
+			Scheduler.getInstance().stopProcessing();
 			return MessagePackets.Responses.RESPONSE_FAILURE();
 		}
 
 		sender.send(DatagramPacketUtils.getCopyOf(request), floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
+
+		Scheduler.getInstance().stopProcessing();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
@@ -76,10 +86,14 @@ public class SchedulerServer extends Server {
 	 */
 	@Override
 	public DatagramPacket handleElevatorStatus(DatagramPacket request) {
+		Scheduler.getInstance().startProcessing();
+
 		InetAddress elevator = request.getAddress();
 		String statusAsString = DatagramPacketUtils.getMessageBodyAsString(request);
 
 		boolean success = Scheduler.getInstance().updateElevator(elevator, ElevatorStatus.deserialize(statusAsString));
+
+		Scheduler.getInstance().stopProcessing();
 		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
 	}
 

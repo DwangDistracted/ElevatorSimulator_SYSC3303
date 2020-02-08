@@ -16,16 +16,23 @@ import elevatorsim.common.ElevatorStatus;
  * @author David Wang and Thomas Leung
  */
 public class Scheduler extends Thread {
+	public enum SchedulerState {
+		LISTENING,
+		PROCESSING,
+		STOPPED,
+		INVALID;
+	}
+	
 	private static Scheduler instance;
 	
 	private final ConcurrentMap<InetAddress, ElevatorStatus> elevators = new ConcurrentHashMap<>();
 	private final SchedulerServer server;
-
-	private boolean isRunning = false;
+	private SchedulerState state;
 
 	private Scheduler() throws SocketException {
 		super("Scheduler");
 		server = SchedulerServer.getInstance();
+		state = SchedulerState.STOPPED;
 	}
 	
 	public static Scheduler getInstance() {
@@ -42,12 +49,12 @@ public class Scheduler extends Thread {
 	
 	@Override
 	public void run() {
-		isRunning = true;
+		state = SchedulerState.LISTENING;
 
 		try {
 			server.startServer();
 			
-			while (isRunning) {
+			while (state != SchedulerState.STOPPED && state != SchedulerState.INVALID) {
 				Thread.sleep(100l);
 			}
 		} catch (InterruptedException e) {
@@ -73,7 +80,19 @@ public class Scheduler extends Thread {
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
 	}
 
+	public void startProcessing() {
+		state = (state == SchedulerState.LISTENING) ? SchedulerState.PROCESSING : SchedulerState.INVALID;
+	}
+
+	public void stopProcessing() {
+		state = (state == SchedulerState.PROCESSING) ? SchedulerState.LISTENING : SchedulerState.INVALID;
+	}
+
 	public void stopRunning() {
-		isRunning = false;
+		state = (state == SchedulerState.LISTENING) ? SchedulerState.STOPPED : SchedulerState.INVALID;
+	}
+
+	public SchedulerState getSchedulerState() { 
+		return state;
 	}
 }

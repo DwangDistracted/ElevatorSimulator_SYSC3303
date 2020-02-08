@@ -7,7 +7,7 @@ import elevatorsim.common.ElevatorStatus;
 import elevatorsim.constants.ElevatorEvent;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.Role;
-import elevatorsim.server.Server;
+import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;
 
 /**
@@ -15,7 +15,7 @@ import elevatorsim.util.DatagramPacketUtils;
  * 
  * @author David Wang
  */
-public class ElevatorServer extends Server {
+public class ElevatorServer extends UDPServer {
 	private final Elevator elevator;
 	
 	/**

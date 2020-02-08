@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
@@ -17,7 +18,7 @@ import elevatorsim.util.DatagramPacketUtils;
  * @author David Wang
  */
 public class SenderSocket extends Thread {
-	private final Server parentServer;
+	private final UDPServer parentServer;
 	private final DatagramSocket senderPort;
 	private BlockingQueue<DatagramPacket> pendingMessages;
 	
@@ -27,7 +28,7 @@ public class SenderSocket extends Thread {
 	 * @param threadName the name of the sender thread
 	 * @throws SocketException if a socket cannot be created
 	 */
-	protected SenderSocket(String threadName, Server parentServer) throws SocketException {
+	protected SenderSocket(String threadName, UDPServer parentServer) throws SocketException {
 		super(threadName);
 		
 		this.parentServer = parentServer;
@@ -50,7 +51,14 @@ public class SenderSocket extends Thread {
 	public void run() {
 		try {
 			while(parentServer.isRunning()) {
-				DatagramPacket messageToSend = pendingMessages.poll();
+				DatagramPacket messageToSend = null;
+
+				try {
+					messageToSend = pendingMessages.poll(NetworkConstants.RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+
 				if (messageToSend != null) {
 					senderPort.send(messageToSend);
 					

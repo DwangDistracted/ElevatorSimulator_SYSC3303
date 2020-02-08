@@ -7,11 +7,11 @@ import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.Role;
 
 /**
- * This abstract class lays the groundwork for the socket based server used in all three subsystems.
- * It has the ability to send and receive DatagramPackets
+ * This abstract class lays the groundwork for the Datagram based server used in all three subsystems.
+ * It has the ability to send and receive DatagramPackets of length 1024
  * @author David Wang
  */
-public abstract class Server {
+public abstract class UDPServer {
 	protected final SenderSocket sender; 
 	protected final ReceiverSocket receiver;
 
@@ -22,7 +22,7 @@ public abstract class Server {
 	 * @param serverName the name of this server
 	 * @throws SocketException if the server cannot open its sockets
 	 */
-	public Server(String serverName) throws SocketException {
+	public UDPServer(String serverName) throws SocketException {
 		this.sender = new SenderSocket(serverName + "Sender", this);
 		this.receiver = new ReceiverSocket(serverName + "Reciever", this);
 	}
@@ -33,7 +33,7 @@ public abstract class Server {
 	 * @param receivePort the port that this server will listen on
 	 * @throws SocketException if the server cannot open its sockets
 	 */
-	public Server(String serverName, int receivePort) throws SocketException {
+	public UDPServer(String serverName, int receivePort) throws SocketException {
 		this.sender = new SenderSocket(serverName + "Sender", this);
 		this.receiver = new ReceiverSocket(serverName + "Reciever", this, receivePort);
 	}

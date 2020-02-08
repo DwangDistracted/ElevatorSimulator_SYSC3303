@@ -17,7 +17,7 @@ import elevatorsim.util.DatagramPacketUtils;
  * @author David Wang
  */
 public class ReceiverSocket extends Thread {
-	private final Server parentServer;
+	private final UDPServer parentServer;
 	
 	private final DatagramSocket receivePort;
 	private final DatagramSocket responsePort;
@@ -30,7 +30,7 @@ public class ReceiverSocket extends Thread {
 	 * @param receivePortNum the post this server should listen for messages on
 	 * @throws SocketException if the sockets cannot be created
 	 */
-	protected ReceiverSocket(String threadName, Server parent) throws SocketException {
+	protected ReceiverSocket(String threadName, UDPServer parent) throws SocketException {
 		super(threadName);
 		parentServer = parent;
 		
@@ -47,7 +47,7 @@ public class ReceiverSocket extends Thread {
 	 * @param receivePortNum the post this server should listen for messages on
 	 * @throws SocketException if the sockets cannot be created
 	 */
-	protected ReceiverSocket(String threadName, Server parent, int receivePortNum) throws SocketException {
+	protected ReceiverSocket(String threadName, UDPServer parent, int receivePortNum) throws SocketException {
 		super(threadName);
 		this.parentServer = parent;
 
