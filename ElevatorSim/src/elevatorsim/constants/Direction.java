@@ -1,4 +1,4 @@
-package elevatorsim.enums;
+package elevatorsim.constants;
 
 /**
  * An enum to model the directions the elevator travels and the requests made on a floor

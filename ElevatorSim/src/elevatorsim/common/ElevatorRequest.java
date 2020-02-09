@@ -2,7 +2,7 @@ package elevatorsim.common;
 
 import java.time.LocalTime;
 
-import elevatorsim.enums.Direction;
+import elevatorsim.constants.Direction;
 
 /**
  * This is the message object which is passed by the different subsystems in
@@ -11,7 +11,7 @@ import elevatorsim.enums.Direction;
  * @author Rahul Anilkumar
  *
  */
-public class MessageRequest implements Comparable<MessageRequest> {
+public class ElevatorRequest implements Comparable<ElevatorRequest> {
 
 	// private static final DateTimeFormatter format1 =
 	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
@@ -29,11 +29,16 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 * @param direction  the direction up/down that the requester is going
 	 * @param destFloor  the floor being traveled to
 	 */
-	public MessageRequest(String timeStamp, String startFloor, String direction, String destFloor) {
+	public ElevatorRequest(String timeStamp, String startFloor, String direction, String destFloor) {
 		this.timeStamp = LocalTime.parse(timeStamp);
 		this.startFloor = Integer.parseInt(startFloor);
 		this.direction = convertDirection(direction);
 		this.destFloor = Integer.parseInt(destFloor);
+	}
+
+	public static ElevatorRequest deserialize(String requestAsString) {
+		// TODO 
+		return null;
 	}
 
 	/**
@@ -149,7 +154,7 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 * @return the compared result
 	 */
 	@Override
-	public int compareTo(MessageRequest message) {
+	public int compareTo(ElevatorRequest message) {
 		return getTimeStamp().compareTo(message.getTimeStamp());
 	}
 
@@ -164,4 +169,8 @@ public class MessageRequest implements Comparable<MessageRequest> {
 		return status;
 	}
 
+	public String serialize() {
+		// TODO
+		return this.toString();
+	}
 }

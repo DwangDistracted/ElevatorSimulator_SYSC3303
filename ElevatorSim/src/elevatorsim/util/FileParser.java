@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import elevatorsim.common.MessageRequest;
+import elevatorsim.common.ElevatorRequest;
 
 /**
  * File parser to parse the inputs for the system
@@ -24,9 +24,9 @@ public class FileParser {
 	 * @param filePath the file path of the input file
 	 * @return the Hashmap containing all the messages parsed from the input file
 	 */
-	public static HashMap<Integer, MessageRequest> parseInputFile(String filePath) {
-		ArrayList<MessageRequest> requestList = getMessageRequestList(getInputFromFile(filePath));
-		HashMap<Integer, MessageRequest> requestMap = MessageRequestUtil.sortByTimestamp(requestList);
+	public static HashMap<Integer, ElevatorRequest> parseInputFile(String filePath) {
+		ArrayList<ElevatorRequest> requestList = getMessageRequestList(getInputFromFile(filePath));
+		HashMap<Integer, ElevatorRequest> requestMap = MessageRequestUtil.sortByTimestamp(requestList);
 		return requestMap;
 	}
 
@@ -63,10 +63,10 @@ public class FileParser {
 	 * @param filePath String representation of the location of the file
 	 * @return A list of MessageRequest objects
 	 */
-	private static ArrayList<MessageRequest> getMessageRequestList(ArrayList<String[]> inputMessages) {
-		ArrayList<MessageRequest> inputRequests = new ArrayList<MessageRequest>();
+	private static ArrayList<ElevatorRequest> getMessageRequestList(ArrayList<String[]> inputMessages) {
+		ArrayList<ElevatorRequest> inputRequests = new ArrayList<ElevatorRequest>();
 		for (String[] input : inputMessages) {
-			MessageRequest request = new MessageRequest(input[0], input[1], input[2], input[3]);
+			ElevatorRequest request = new ElevatorRequest(input[0], input[1], input[2], input[3]);
 			inputRequests.add(request);
 		}
 		return inputRequests;

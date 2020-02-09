@@ -1,24 +1,24 @@
 package elevatorsim.floor;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import elevatorsim.common.ElevatorRequest;
 import elevatorsim.common.MessageReciever;
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.MessageDestination;
-import elevatorsim.scheduler.Scheduler;
+import elevatorsim.constants.NetworkConstants;
 
 /**
- * Takes in arrival sensor singles, and client requests
+ * Takes in arrival sensor signals, and client requests
  * and then distributes them wherever necessary. 
  * 
  * @author Michael Patsula, David Wang
  */
 public class FloorController extends Thread implements MessageReciever {
 	private HashMap<Integer, Floor> floors;
-	private Map<Integer, MessageRequest> requests;
+	private Map<Integer, ElevatorRequest> requests;
 	
-	public FloorController(String name, int numOfFloors, Map<Integer, MessageRequest> requests) {
+	public FloorController(String name, int numOfFloors, Map<Integer, ElevatorRequest> requests) {
 		super(name);
 		
 		this.floors = new HashMap<>();
@@ -35,16 +35,25 @@ public class FloorController extends Thread implements MessageReciever {
 	 * the appropriate floors for processing
 	 */
 	public void run() {
-		Scheduler scheduler = Scheduler.getInstance();
-		
-		for(MessageRequest request : requests.values()) {
-			System.out.println("Floor Sending Request to Scheduler");
-			floors.get(request.getStartFloor()).readRequest(request);
-			scheduler.sendMessage(MessageDestination.ELEVATORS, request);
-			try {
+		FloorServer server = null;
+		try {
+			server = new FloorServer(this);
+			server.startServer();
+			Thread.sleep(NetworkConstants.DELAY_SERVER_START_MS);
+			
+			for(ElevatorRequest request : requests.values()) {
+				floors.get(request.getStartFloor()).readRequest(request);
+				server.sendElevatorRequest(request);
 				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			}
+		} catch (InterruptedException | IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (server != null) {
+				server.sendExitRequest();
+
+				System.out.println(this.getName() + " - INFO : Exiting");
+				server.stopServer();
 			}
 		}
 	}
@@ -55,8 +64,7 @@ public class FloorController extends Thread implements MessageReciever {
 	 * notifies the correct floor.
 	 */
 	@Override
-	public void recieve(MessageRequest message) {
+	public void receive(ElevatorRequest message) {
 		floors.get(message.getDestFloor()).loadPassengers(message.getDirection());
-	}
-	
+	}	
 }

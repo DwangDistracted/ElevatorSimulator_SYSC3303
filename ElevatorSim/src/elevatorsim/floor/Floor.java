@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.Direction;
+import elevatorsim.common.ElevatorRequest;
+import elevatorsim.constants.Direction;
 
 /**
  * A floor object to model the individual floors of a building
@@ -14,8 +14,8 @@ import elevatorsim.enums.Direction;
 public class Floor {
 	private Integer floorNumber;
 	private FloorButton dirButtons;
-	private List<MessageRequest> activeUpRequests;
-	private List<MessageRequest> activeDownRequests;
+	private List<ElevatorRequest> activeUpRequests;
+	private List<ElevatorRequest> activeDownRequests;
 
 	public Floor(int floorNumber) {
 		this.floorNumber = floorNumber;
@@ -30,7 +30,7 @@ public class Floor {
 	 * 
 	 * @param request the request made by the user/elevator requester
 	 */
-	public void readRequest(MessageRequest request) {
+	public void readRequest(ElevatorRequest request) {
 		if(request.getDirection() == Direction.UP) {
 			activeUpRequests.add(request);
 			dirButtons.setUpFloorButton(true);
@@ -75,7 +75,7 @@ public class Floor {
 	 * Get the list of going up messages from this floor
 	 * @return the list of messages
 	 */
-	public List<MessageRequest> getActiveUpRequests() {
+	public List<ElevatorRequest> getActiveUpRequests() {
 		return Collections.unmodifiableList(activeUpRequests);
 	}
 
@@ -83,7 +83,7 @@ public class Floor {
 	 * Get the list going down messages from this floor
 	 * @return the list of messages
 	 */
-	public List<MessageRequest> getActiveDownRequests() {
+	public List<ElevatorRequest> getActiveDownRequests() {
 		return Collections.unmodifiableList(activeDownRequests);
 	}
 }

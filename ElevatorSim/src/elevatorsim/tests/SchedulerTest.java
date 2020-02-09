@@ -5,12 +5,17 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.MessageRequest;
+import elevatorsim.common.ElevatorRequest;
 import elevatorsim.elevator.Elevator;
-import elevatorsim.enums.MessageDestination;
+import elevatorsim.constants.Role;
 import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;
 import elevatorsim.scheduler.Scheduler.MessageRequestWrapper;
+
+/*
+ * FROM DAVID:
+ * TODO - This is broken now due to the Socket Server System. Must discuss how to test the Scheduler now
+ */
 
 /**
  * A test class to test the Scheduler functionality
@@ -22,8 +27,8 @@ class SchedulerTest {
 	private Scheduler scheduler;
 	private FloorController floorController;
 	private Elevator elevator;
-	private HashMap<Integer, MessageRequest> requestMap;
-	private MessageRequest request1, request2;
+	private HashMap<Integer, ElevatorRequest> requestMap;
+	private ElevatorRequest request1, request2;
 
 	/**
 	 * Setup objects to be utilized in the test of the Scheduler class
@@ -33,13 +38,13 @@ class SchedulerTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		scheduler = Scheduler.getInstance();
-		requestMap = new HashMap<Integer, MessageRequest>();
-		request1 = new MessageRequest("14:05:15.0", "2", "Up", "5");
-		request2 = new MessageRequest("05:05:23.0", "1", "Up", "3");
+		requestMap = new HashMap<Integer, ElevatorRequest>();
+		request1 = new ElevatorRequest("14:05:15.0", "2", "Up", "5");
+		request2 = new ElevatorRequest("05:05:23.0", "1", "Up", "3");
 		requestMap.put(1, request1);
 		requestMap.put(2, request2);
-		requestMap.put(3, new MessageRequest("10:05:12.0", "7", "down", "6"));
-		requestMap.put(4, new MessageRequest("12:05:12.0", "4", "down", "1"));
+		requestMap.put(3, new ElevatorRequest("10:05:12.0", "7", "down", "6"));
+		requestMap.put(4, new ElevatorRequest("12:05:12.0", "4", "down", "1"));
 		floorController = new FloorController("floorController", 10, requestMap);
 		elevator = new Elevator(10);
 	}
@@ -83,14 +88,14 @@ class SchedulerTest {
 	@Test
 	void setMessageTest() {
 		assertTrue(scheduler.getMessageRequests().size() == 0);
-		scheduler.sendMessage(MessageDestination.FLOORS, request1);
+		scheduler.sendMessage(Role.FLOORS, request1);
 		assertTrue(scheduler.getMessageRequests().size() == 1);
-		scheduler.sendMessage(MessageDestination.ELEVATORS, request2);
+		scheduler.sendMessage(Role.ELEVATORS, request2);
 		assertTrue(scheduler.getMessageRequests().size() == 2);
 		MessageRequestWrapper messageRequest = scheduler.getMessageRequests().remove();
-		assertTrue(messageRequest.destination.equals(MessageDestination.FLOORS));
+		assertTrue(messageRequest.destination.equals(Role.FLOORS));
 		messageRequest = scheduler.getMessageRequests().remove();
-		assertTrue(messageRequest.destination.equals(MessageDestination.ELEVATORS));
+		assertTrue(messageRequest.destination.equals(Role.ELEVATORS));
 	}
 
 }

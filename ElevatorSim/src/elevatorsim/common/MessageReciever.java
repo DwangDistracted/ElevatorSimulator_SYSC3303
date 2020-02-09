@@ -7,7 +7,7 @@ package elevatorsim.common;
 public interface MessageReciever {
 	/**
 	 * Receives a message from a Message Sender
-	 * @param message the message being recieved
+	 * @param message the message being received
 	 */
-	public void recieve(MessageRequest message);
+	public void receive(ElevatorRequest message);
 }
