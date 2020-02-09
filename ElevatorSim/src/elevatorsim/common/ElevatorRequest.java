@@ -1,5 +1,6 @@
 package elevatorsim.common;
 
+
 import java.time.LocalTime;
 
 import elevatorsim.constants.Direction;
@@ -11,7 +12,7 @@ import elevatorsim.constants.Direction;
  * @author Rahul Anilkumar
  *
  */
-public class ElevatorRequest implements Comparable<ElevatorRequest> {
+public class ElevatorRequest extends ElevatorMessage<ElevatorRequest> implements Comparable<ElevatorRequest>{
 
 	// private static final DateTimeFormatter format1 =
 	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
@@ -36,9 +37,8 @@ public class ElevatorRequest implements Comparable<ElevatorRequest> {
 		this.destFloor = Integer.parseInt(destFloor);
 	}
 
-	public static ElevatorRequest deserialize(String requestAsString) {
-		// TODO 
-		return null;
+	public ElevatorRequest() {
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -167,10 +167,5 @@ public class ElevatorRequest implements Comparable<ElevatorRequest> {
 				+ " | StartFloor: " + getStartFloor() + " | Direction: " + getDirection().toString()
 				+ " | DestinationFloor: " + getDestFloor();
 		return status;
-	}
-
-	public String serialize() {
-		// TODO
-		return this.toString();
 	}
 }
