@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public abstract class ElevatorMessage <T extends ElevatorMessage <T>>implements Serializable {
+public abstract class SerializableMessage <T extends SerializableMessage <T>>implements Serializable {
 
 	/**
 	 * Serialize the object into bytes in order to send the data over a 

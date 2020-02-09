@@ -6,7 +6,7 @@ package elevatorsim.common;
  *  
  * @author David Wang
  */
-public class ElevatorStatus extends ElevatorMessage<ElevatorStatus> {
+public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
 	// TODO - what should an elevator send back as its status?
 	private String placeholder;
 

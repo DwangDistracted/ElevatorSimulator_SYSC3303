@@ -12,7 +12,7 @@ import elevatorsim.constants.Direction;
  * @author Rahul Anilkumar
  *
  */
-public class ElevatorRequest extends ElevatorMessage<ElevatorRequest> implements Comparable<ElevatorRequest>{
+public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implements Comparable<ElevatorRequest>{
 
 	// private static final DateTimeFormatter format1 =
 	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
