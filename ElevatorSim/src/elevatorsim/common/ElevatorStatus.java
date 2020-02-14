@@ -6,16 +6,12 @@ package elevatorsim.common;
  *  
  * @author David Wang
  */
-public class ElevatorStatus {
+public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
 	// TODO - what should an elevator send back as its status?
 	private String placeholder;
 
 	public ElevatorStatus(String text) {
 		this.placeholder = text;
-	}
-
-	public static ElevatorStatus deserialize(String serialized) {
-		return new ElevatorStatus(serialized);
 	}
 
 	public static ElevatorStatus empty() {
@@ -24,9 +20,5 @@ public class ElevatorStatus {
 
 	public String toString() {
 		return placeholder;
-	}
-	
-	public String serialize() {
-		return toString();
 	}
 }

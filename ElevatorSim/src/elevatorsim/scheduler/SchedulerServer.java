@@ -90,8 +90,8 @@ public class SchedulerServer extends UDPServer {
 
 		InetAddress elevator = request.getAddress();
 		String statusAsString = DatagramPacketUtils.getMessageBodyAsString(request);
-
-		boolean success = Scheduler.getInstance().updateElevator(elevator, ElevatorStatus.deserialize(statusAsString));
+		// TODO Fix how the elevator status is deserialized. Should it be deserializing a string? or the parsed byte array?
+		boolean success = Scheduler.getInstance().updateElevator(elevator, ElevatorStatus.deserialize());
 
 		Scheduler.getInstance().stopProcessing();
 		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
