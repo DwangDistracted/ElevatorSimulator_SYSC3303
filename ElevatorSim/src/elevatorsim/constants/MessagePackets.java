@@ -51,7 +51,7 @@ public class MessagePackets {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
 		message.write(NetworkConstants.MessageTypes.ELEVATOR_REQUEST.getMarker());
 		message.write(NetworkConstants.NULL_BYTE);
-		message.write(body.serialize().getBytes());
+		body.serialize(message);
 		message.write(NetworkConstants.NULL_BYTE);
 		
 		return new DatagramPacket(message.toByteArray(), message.size());
