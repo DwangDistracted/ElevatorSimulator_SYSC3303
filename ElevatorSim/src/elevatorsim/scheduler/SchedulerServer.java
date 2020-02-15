@@ -3,10 +3,16 @@ package elevatorsim.scheduler;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import elevatorsim.common.ElevatorStatus;
+import elevatorsim.common.requests.ElevatorEvent;
+import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorStateChange;
+import elevatorsim.common.requests.ElevatorStatus;
+import elevatorsim.constants.Direction;
+import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
@@ -16,7 +22,7 @@ import elevatorsim.util.DatagramPacketUtils;
 /**
  * Creates a Server that Services the Scheduler 
  * 
- * @author David Wang
+ * @author David Wang, Trevor Bivi
  */
 public class SchedulerServer extends UDPServer {
 	private static SchedulerServer instance;
@@ -45,23 +51,80 @@ public class SchedulerServer extends UDPServer {
 	/**
 	 * Forwards An Elevator Request to a Registered Elevator that can Service it
 	 */
+	
+	public void handleElevatorCall(ElevatorRequest elevatorRequest) {
+		 // + elevatorRequest. + "an elevator is requested at floor" + elevatorRequest.getStartFloor().toString() + ". (The passenger will travel " + elevatorRequest.getDirection().toString() + "to floor " + Integer.toString(elevatorRequest.getDestFloor()).toString() + ".");
+		InetAddress availableElevator = Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(), elevatorRequest.getDirection());
+		
+		//If an elevator isnt available, store the request
+		//If there is an available elevator but it's moving then ignore it too for now because it's not worth optimising until there are multiple elevators
+		if (availableElevator == null || Scheduler.getInstance().getElevators().get(availableElevator).getDirection() != null ) {
+			Scheduler.getInstance().addStoredRequest(elevatorRequest);
+			ArrayList<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+			InetAddress elevatorAddress = Scheduler.getInstance().findAvailableElevator();
+			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddress);
+			if( storedRequests.size() == 1 && elevatorStatus.getDirection() == null ) {
+				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
+				
+				elevatorStatus.setDirection( elevatorRequest.getStartFloor() - elevatorStatus.getFloor() > 0 ? Direction.UP : Direction.DOWN );
+				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)), elevatorAddress, elevators.get(elevatorAddress));
+			}
+			return;
+		}
+		
+		int elevatorStartFloor = Scheduler.getInstance().getElevators().get(availableElevator).getFloor();
+		int boardFloor = elevatorRequest.getStartFloor();
+		int floorChange = boardFloor - elevatorStartFloor;
+		Direction direction;
+		if( floorChange < 0 ) {
+			direction = Direction.DOWN;
+		} else if (floorChange > 0) {
+			direction = Direction.UP;
+		}else {
+			direction = null;
+		}
+		if (direction == null) {
+			//send request to elevator so it can send back it's version
+			Integer elevatorPort = elevators.get(availableElevator);
+			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator, elevatorPort);
+		}
+	
+		return;
+	}
+	
 	@Override
 	public DatagramPacket handleElevatorRequest(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
-
-		InetAddress availableElevator = Scheduler.getInstance().findAvailableElevator();
-
-		if (availableElevator == null) {
-			Scheduler.getInstance().stopProcessing();
-			return MessagePackets.Responses.RESPONSE_FAILURE();
+		ElevatorRequest elevatorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
+		System.out.print("SchedulerServer - Info: Received elevator request " + elevatorRequest.toString() + "\n");
+		boolean success = true;
+		if (elevatorRequest.getStartFloor() == null) {
+			
+				//ugly way of adding floor request to only elevator - will improve in future iteration
+			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get( Scheduler.getInstance().findAvailableElevator());
+				
+			Direction newDirection = elevatorStatus.addFloor( elevatorRequest.getDestFloor() );
+			if (newDirection != null) {
+				new java.util.Timer().schedule( 
+			        new java.util.TimerTask() {
+			            @Override
+			            public void run() {
+			            	Scheduler.getInstance().startProcessing();
+			                sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.DOOR_CLOSED )) , request.getAddress(), elevators.get(request.getAddress()));
+			                Scheduler.getInstance().stopProcessing();
+			           }
+			       }, 
+			       1000 
+				);	
+			}
+			
+		}else {
+			handleElevatorCall(elevatorRequest);
 		}
-
-		Integer elevatorPort = elevators.get(availableElevator);
-		sender.send(DatagramPacketUtils.getCopyOf(request), availableElevator, elevatorPort);
-
 		Scheduler.getInstance().stopProcessing();
-		return MessagePackets.Responses.RESPONSE_SUCCESS();
+		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
 	}
+	
 
 	/**
 	 * Forwards An Elevator Event to the Registered Floor System
@@ -69,13 +132,19 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorEvent(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
-
 		if (floorSystem == null) {
 			Scheduler.getInstance().stopProcessing();
 			return MessagePackets.Responses.RESPONSE_FAILURE();
 		}
-
-		sender.send(DatagramPacketUtils.getCopyOf(request), floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
+		
+		ElevatorEvent elevatorEvent = MessagePackets.deserializeElevatorEvent(request.getData());
+		System.out.print("SchedulerServer - Info: Received elevator event " + elevatorEvent.toString() + "\n");
+		
+		Scheduler.getInstance().getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
+		if (Scheduler.getInstance().getElevators().get(request.getAddress()).getStops().indexOf(elevatorEvent.getFloor()) != -1) {
+			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)), request.getAddress(), this.elevators.get(request.getAddress()));
+		}
+		//sender.send(DatagramPacketUtils.getCopyOf(request), floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
 
 		Scheduler.getInstance().stopProcessing();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
@@ -85,23 +154,60 @@ public class SchedulerServer extends UDPServer {
 	 * Stores the Updated Elevator Status to the Scheduler SubSystem
 	 */
 	@Override
-	public DatagramPacket handleElevatorStatus(DatagramPacket request) {
+	public DatagramPacket handleElevatorStateChange(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
-
+		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(request.getData());
+		System.out.print("SchedulerServer - Info: Received elevator state change update " + elevatorStateChange.toString() + "\n");
 		InetAddress elevator = request.getAddress();
-		String statusAsString = DatagramPacketUtils.getMessageBodyAsString(request);
+		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevator);
+		ElevatorState elevatorState = elevatorStateChange.getStateChange();
 		// TODO Fix how the elevator status is deserialized. Should it be deserializing a string? or the parsed byte array?
-		boolean success = Scheduler.getInstance().updateElevator(elevator, ElevatorStatus.deserialize());
+		elevatorStatus.setState(elevatorState); //updateElevator(elevator, ElevatorStatus.deserialize( request.getData() ));
 
+		if(elevatorState == ElevatorState.DOOR_CLOSED) {
+			if( elevatorStatus.getStops().indexOf(elevatorStatus.getFloor()) != -1  ) {
+				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)), elevator, elevators.get(elevator));
+			} else if(elevatorStatus.getDirection() == Direction.UP) {
+				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_UP)), elevator, elevators.get(elevator));
+			} else if(elevatorStatus.getDirection() == Direction.DOWN) {
+				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_DOWN)), elevator, elevators.get(elevator));
+			}
+		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
+			elevatorStatus.removeStop(elevatorStatus.getFloor());
+			if(elevatorStatus.getStops().size() > 0) {
+				new java.util.Timer().schedule( 
+				        new java.util.TimerTask() {
+				            @Override
+				            public void run() {
+				            	System.out.print("sending close\n");
+				            	Scheduler.getInstance().startProcessing();
+				                sender.send(DatagramPacketUtils.getCopyOf( MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.DOOR_CLOSED ))) , request.getAddress(), elevators.get(request.getAddress()));
+				                Scheduler.getInstance().stopProcessing();
+				            }
+				        }, 
+				        1000 
+				);
+			} else {
+				elevatorStatus.setDirection(null);
+				ArrayList<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+				if( storedRequests.size() > 0 ) {
+					ElevatorRequest firstStoredRequest = storedRequests.get(0);
+					Scheduler.getInstance().removeStoredRequest(0);
+					handleElevatorCall(firstStoredRequest);
+				}
+			}
+			
+		}
+		
 		Scheduler.getInstance().stopProcessing();
-		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
+		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
-
 	/**
 	 * Registers the caller as either a Elevator or Floor SubSystem, keeping track of its IPAddress and Port 
 	 */
 	@Override
 	public DatagramPacket handleRegisterRequest(DatagramPacket request) {
+		System.out.print("SchedulerServer - Info: Received registed request\n");
 		String requestBody = DatagramPacketUtils.getMessageBodyAsString(request);
 		Role requesterRole = Role.valueOf(requestBody);
 
@@ -124,6 +230,7 @@ public class SchedulerServer extends UDPServer {
 	 */
 	@Override
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
+		System.out.print("SchedulerServer - Info: Received exit request\n");
 		elevators.forEach(
 				(addr, port) -> {
 					sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), addr, port);

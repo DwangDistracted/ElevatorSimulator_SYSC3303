@@ -71,8 +71,8 @@ public class ReceiverSocket extends Thread {
 			} else if (DatagramPacketUtils.isElevatorRequest(request)) {
 				response = parentServer.handleElevatorRequest(request);
 				
-			} else if (DatagramPacketUtils.isStatusRequest(request)) {
-				response = parentServer.handleElevatorStatus(request);
+			} else if (DatagramPacketUtils.isStateChangeRequest(request)) {
+				response = parentServer.handleElevatorStateChange(request);
 				
 			} else if (DatagramPacketUtils.isExitRequest(request)) {
 				response = parentServer.handleExitRequest(request);

@@ -1,21 +1,25 @@
 package elevatorsim.elevator;
-
-import elevatorsim.common.MessageReciever;
+import elevatorsim.constants.ElevatorState;
 
 import java.net.SocketException;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.MessageReciever;
+import elevatorsim.common.requests.Request;
+
+
 
 /**
  * The elevator class
- * Currently this is just used to receive messages from the scheduler
- * and redirect them to the floors
+ * stores information about an elevator
  * 
- * @author Trevor Bivi (101045460)
+ * @author Trevor Bivi
  */
-public class Elevator extends Thread implements MessageReciever {
+public class Elevator extends Thread {
 	private boolean isRunning = false;
 	private int floorAmount;
+	private int floor;
+	private ElevatorState elevatorState;
+	private boolean[] elevatorLampsOn;
 	
 	/**
 	 * Elevator constructor that stores the amount of floors and
@@ -25,6 +29,9 @@ public class Elevator extends Thread implements MessageReciever {
 	public Elevator ( int floorAmount ) {
 		super("Elevator");
 		this.floorAmount = floorAmount;
+		this.elevatorLampsOn = new boolean[floorAmount];
+		this.floor = 1;
+		this.elevatorState = ElevatorState.DOOR_OPEN;
 	}
 
 	/**
@@ -52,20 +59,33 @@ public class Elevator extends Thread implements MessageReciever {
 			}
 		}
 	}
-
-	/**
-	 * Receives message requests from the schedule and then
-	 * sends the messages back to the scheduler but
-	 * targeting floors instead of elevators
-	 * 
-	 * @param message The MessageRequest that should be redirected to floors
-	 */
-	@Override
-	public void receive(ElevatorRequest message) {
-		System.out.println("Elevator received message: " + message.toString());
+	
+	public boolean getLampIsOn(int lampIndex) {
+		return this.elevatorLampsOn[lampIndex];
+	}
+	
+	public void setLampIsOn(int lampIndex, boolean isOn) {
+		//System.out.print("SET LAMP" + Integer.toString(lampIndex) + " " + Boolean.toString(isOn));
+		this.elevatorLampsOn[lampIndex] = isOn;
 	}
 
 	public void stopRunning() {
 		isRunning = false;
+	}
+	
+	public int getFloor() {
+		return this.floor;
+	}
+	
+	public void setFloor(int newFloor) {
+		this.floor = newFloor;
+	}
+	
+	public ElevatorState getElevatorState() {
+		return this.elevatorState;
+	}
+	
+	public void setElevatorState(ElevatorState elevatorState) {
+		this.elevatorState = elevatorState;
 	}
 }

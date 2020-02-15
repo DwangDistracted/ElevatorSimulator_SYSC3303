@@ -2,16 +2,20 @@ package elevatorsim.scheduler;
 
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import elevatorsim.common.ElevatorStatus;
+
+import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorStatus;
+import elevatorsim.constants.Direction;
 
 /**
  * This is the scheduler for the elevator simulator. 
  * 
- * It is a singleton object responsible for calculating which elevator to send requests to. It also tracks the state of the scheduler subsystem,
+ * It is a singleton object responsible for calculating which elevator to send requests to. It also tracks the state of the scheduler subsystem and some information about elevators it is controlling
  * 
- * @author David Wang and Thomas Leung
+ * @author David Wang, Thomas Leung, Trevor Bivi
  */
 public class Scheduler extends Thread {
 	/**
@@ -28,13 +32,17 @@ public class Scheduler extends Thread {
 	private static Scheduler instance;
 	
 	private final ConcurrentMap<InetAddress, ElevatorStatus> elevators = new ConcurrentHashMap<>();
+	
+	
 	private final SchedulerServer server;
 	private SchedulerState state;
+	private ArrayList<ElevatorRequest> storedRequests;
 
 	private Scheduler() throws SocketException {
 		super("Scheduler");
 		server = SchedulerServer.getInstance();
 		state = SchedulerState.STOPPED;
+		storedRequests = new ArrayList<ElevatorRequest>();
 	}
 	
 	/**
@@ -97,8 +105,30 @@ public class Scheduler extends Thread {
 	 * @return an Available Elevator
 	 */
 	public InetAddress findAvailableElevator() {
-		// Iteration 1 - only one elevator, just return it
+		// Iteration 2 - only one elevator, just return it
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
+	}
+	
+	/**
+	 * Returns an elevator that could service a call
+	 * @param floor the start floor
+	 * @param direction the direction to travel
+	 * @return the address of the elevator if there is one otherwise null
+	 */
+	public InetAddress findAvailableElevator(int floor, Direction direction) {
+		for (InetAddress key : elevators.keySet()) {
+			ElevatorStatus elevatorStatus = elevators.get(key);
+			if( (elevatorStatus.getDirection() == Direction.UP && direction == Direction.UP && floor > elevatorStatus.getFloor()) ||
+				(elevatorStatus.getDirection() == Direction.DOWN && direction == Direction.DOWN && floor < elevatorStatus.getFloor()) ||
+				elevatorStatus.getDirection() == null && floor == elevatorStatus.getFloor() ) {
+				return key;
+			}
+		}
+		return null;
+	}
+	
+	public ConcurrentMap<InetAddress, ElevatorStatus> getElevators(){
+		return elevators;
 	}
 
 	/**
@@ -128,5 +158,21 @@ public class Scheduler extends Thread {
 	 */
 	public SchedulerState getSchedulerState() { 
 		return state;
+	}
+	
+	public ArrayList<ElevatorRequest> getStoredRequests(){
+		return (ArrayList<ElevatorRequest>) this.storedRequests.clone();
+	}
+	
+	public void addStoredRequest(ElevatorRequest storedRequests) {
+		this.storedRequests.add(storedRequests);
+	}
+	
+	public void removeStoredRequest(ElevatorRequest object) {
+		this.storedRequests.remove(object);
+	}
+	
+	public void removeStoredRequest(int index) {
+		this.storedRequests.remove(index);
 	}
 }

@@ -3,7 +3,7 @@ package elevatorsim;
 import java.io.File;
 import java.util.HashMap;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.elevator.Elevator;
 import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;
