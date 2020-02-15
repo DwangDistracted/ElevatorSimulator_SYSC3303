@@ -1,8 +1,6 @@
 package elevatorsim.floor;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -41,25 +39,25 @@ public class FloorServer extends UDPServer {
 		return Role.FLOORS;
 	}
 
+	/**
+	 * Receives a DatagramPacket with an ElevatorArrivalRequest payload.
+	 * Pass the request to the FloorEvents object
+	 * 
+	 * @param request - ElevatorArrivalRequest
+	 *  @return DatagramPacket containing either a success or failure response 
+	 *  (depending on success of request processing)
+	 */
 	@Override
 	public DatagramPacket handleElevatorEvent(DatagramPacket request) {
-		ByteArrayInputStream baos = new ByteArrayInputStream(request.getData());
-		ElevatorArrivalRequest arrivalRequest;
 		
 		try {
-			ObjectInputStream oos = new ObjectInputStream(baos);
-			arrivalRequest = (ElevatorArrivalRequest)oos.readObject();
-			
+			ElevatorArrivalRequest arrivalRequest = MessagePackets.deserializeArrivalRequest(request.getData());
 			floorEvents.receive(arrivalRequest);
-			baos.close();
-			oos.close();
-		} catch (ClassNotFoundException | IOException e) {
+			
+			return MessagePackets.Responses.RESPONSE_SUCCESS();
+		} catch(Exception ex) {
 			return MessagePackets.Responses.RESPONSE_FAILURE();
 		}
-		
-		
-		
-		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
 	/**
@@ -83,7 +81,7 @@ public class FloorServer extends UDPServer {
 	 */
 	public void sendDestinationRequest(ElevatorDestinationRequest request) {
 		try {
-			sender.send(MessagePackets.generateElevatorButtonRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+			sender.send(MessagePackets.generateDestinationRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
 			System.out.println("FloorServer - ERROR: Could not find Scheduler Host. Check Network Set Up");
 			e.printStackTrace();
