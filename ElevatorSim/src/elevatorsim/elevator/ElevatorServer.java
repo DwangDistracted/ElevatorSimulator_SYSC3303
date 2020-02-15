@@ -44,6 +44,9 @@ public class ElevatorServer extends UDPServer {
 		return Role.ELEVATORS;
 	}
 
+	/**
+	 * Handles an incoming elevator request. Turns on the correct lamp for the destination floor and sends a request for a destination to the scheduler
+	 */
 	@Override
 	public DatagramPacket handleElevatorRequest(DatagramPacket request) {
 		/*
@@ -65,6 +68,10 @@ public class ElevatorServer extends UDPServer {
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 	
+	/**
+	 * Handles a request to change state. Some states will take time to transition to such as opening and closing doors. Some state changes will be reported back to the scheduler so it can perform the next needed action on the elevator.
+	 * @param stateChange a packet containing the desired new status of the elevator
+	 */
 	@Override
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
@@ -82,7 +89,9 @@ public class ElevatorServer extends UDPServer {
 			timerTask.cancel();
 		}
 		
+		//If door is currently open or opening
 		if ( currentState == ElevatorState.DOOR_OPEN || currentState == ElevatorState.DOOR_OPENING ) {
+			//Initiate door close if requests
 			if( newState == ElevatorState.DOOR_CLOSED ) {
 				this.elevator.setElevatorState( ElevatorState.DOOR_CLOSING );
 				timer = new Timer();
@@ -106,7 +115,9 @@ public class ElevatorServer extends UDPServer {
 			} else if( newState != ElevatorState.DOOR_OPEN) {
 				error = true;
 			}
+		//If door is currently closing
 		}else if (currentState == ElevatorState.DOOR_CLOSING) {
+			//initiate door open if requested
 			if(newState == ElevatorState.DOOR_OPEN ) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				timer = new Timer();
@@ -129,7 +140,9 @@ public class ElevatorServer extends UDPServer {
 			} else if (newState != ElevatorState.DOOR_CLOSED) {
 				error = true;
 			}
+		//If door is currently closed
 		} else if (currentState == ElevatorState.DOOR_CLOSED) {
+			//Initiate door open if requested
 			if(newState == ElevatorState.DOOR_OPEN ) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				this.elevator.setLampIsOn(elevator.getFloor()-1, false);
@@ -150,6 +163,7 @@ public class ElevatorServer extends UDPServer {
 				timer.schedule( 
 				timerTask, 
 		        TimeConstants.changeDoorState );
+			// move up if requested
 			} else if (newState == ElevatorState.MOTOR_UP) {
 				elevator.setElevatorState(ElevatorState.MOTOR_UP);
 				timer = new Timer();
@@ -174,7 +188,7 @@ public class ElevatorServer extends UDPServer {
 				timerTask, 
 				TimeConstants.moveOneFloor,TimeConstants.moveOneFloor );
 				
-				
+			//Move down if requested
 			} else if(newState == ElevatorState.MOTOR_DOWN) {
 				
 				elevator.setElevatorState(ElevatorState.MOTOR_DOWN);
@@ -203,7 +217,9 @@ public class ElevatorServer extends UDPServer {
 			}else if (newState != ElevatorState.DOOR_CLOSED) {
 				error = true;
 			}
+		//If currently moving
 		}else if (currentState == ElevatorState.MOTOR_UP || currentState == ElevatorState.MOTOR_DOWN) {
+			//Stop elevator if requested
 			if(newState == ElevatorState.DOOR_CLOSED) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
 				try {
