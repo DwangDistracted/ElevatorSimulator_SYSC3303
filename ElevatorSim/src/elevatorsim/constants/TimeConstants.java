@@ -12,6 +12,6 @@ public class TimeConstants {
 	public static final int elevatorButtonPressDelay = 1000;
 	
 	public static final int maxFloorRequestDelay = 10000;
-	public static final int initiateExitDelay = 10000;
+	public static final int initiateExitDelay = 12500;
 	
 }

@@ -52,20 +52,18 @@ public class SchedulerServer extends UDPServer {
 	}
 
 	/**
-	 * If an elevator is idle at the floor being called to then it will begin servicing the request
-	 * Otherwise the elevatorRequest will be stored. If there is an idle elevator somewhere it will be brought to this floor to begin servicing the stored request.
-	 * 
+	 * Forwards An Elevator Request to a Registered Elevator that can Service it
 	 */
 	
 	public boolean handleElevatorCall(ElevatorRequest elevatorRequest) {
 		 // + elevatorRequest. + "an elevator is requested at floor" + elevatorRequest.getStartFloor().toString() + ". (The passenger will travel " + elevatorRequest.getDirection().toString() + "to floor " + Integer.toString(elevatorRequest.getDestFloor()).toString() + ".");
 		InetAddress availableElevator = Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(), elevatorRequest.getDirection());
-		if (availableElevator == null) {
-			
+		
+		//If an elevator isnt available, store the request
+		//If there is an available elevator but it's moving then ignore it too for now because it's not worth optimising until there are multiple elevators
+		if (availableElevator == null || Scheduler.getInstance().getElevators().get(availableElevator).getDirection() != null ) {
 			ArrayList<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
-			System.out.println("NO AVAILABLE ELVATOR reqsz" + Integer.toString(storedRequests.size()));
 			storedRequests.add(elevatorRequest);
-			System.out.println("NO AVAILABLE ELVATOR add wrk?? reqsz" + Integer.toString(Scheduler.getInstance().getStoredRequests().size()));
 			InetAddress elevatorAddress = Scheduler.getInstance().findAvailableElevator();
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddress);
 			if( storedRequests.size() == 1 && elevatorStatus.getDirection() == null ) {
@@ -76,13 +74,7 @@ public class SchedulerServer extends UDPServer {
 			}
 			return true;
 		}
-		System.out.println("ELEVATOR AVAILABLE");
-		
-		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(availableElevator);
-		// if elevator will pass floor then stop for passenger
-		if (elevatorStatus.getDirection() != null) {
-			return true;
-		}
+		System.out.println();
 		
 		
 		int elevatorStartFloor = Scheduler.getInstance().getElevators().get(availableElevator).getFloor();
@@ -106,17 +98,11 @@ public class SchedulerServer extends UDPServer {
 	}
 	
 	@Override
-	/**
-	 * handles an elevator request
-	 * Will either begin servicing a call, store the call to service later, or add a destination stop to an elevator
-	 */
 	public DatagramPacket handleElevatorRequest(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
 		ElevatorRequest elevatorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator request " + elevatorRequest.toString() + "\n");
 		boolean success = true;
-		
-		//If this is a request coming from inside an elevator to visit a destination
 		if (elevatorRequest.getStartFloor() == null) {
 			
 				//ugly way of adding floor request to only elevator - will improve in future iteration
@@ -133,10 +119,10 @@ public class SchedulerServer extends UDPServer {
 			                Scheduler.getInstance().stopProcessing();
 			           }
 			       }, 
-			       TimeConstants.doorOpenTime
+			       1000 
 				);	
 			}
-		//Otherwise handle the new calling of an elevator to a start floor
+			
 		}else {
 			success = handleElevatorCall(elevatorRequest);
 		}
@@ -204,7 +190,7 @@ public class SchedulerServer extends UDPServer {
 				                Scheduler.getInstance().stopProcessing();
 				            }
 				        }, 
-				        TimeConstants.doorOpenTime
+				        1000 
 				);
 			} else {
 				elevatorStatus.setDirection(null);
@@ -226,7 +212,7 @@ public class SchedulerServer extends UDPServer {
 	 */
 	@Override
 	public DatagramPacket handleRegisterRequest(DatagramPacket request) {
-		System.out.println("SCHEDULER RECEIVED REGISTER REQUEST");
+		System.out.print("SchedulerServer - Info: Received registed request\n");
 		String requestBody = DatagramPacketUtils.getMessageBodyAsString(request);
 		Role requesterRole = Role.valueOf(requestBody);
 
@@ -249,7 +235,7 @@ public class SchedulerServer extends UDPServer {
 	 */
 	@Override
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
-		System.out.println("Scheduler - INFO : Received exit request. Number of elevator requests left stored: " + Integer.toString(Scheduler.getInstance().getStoredRequests().size()));
+		System.out.print("SchedulerServer - Info: Received exit request\n");
 		elevators.forEach(
 				(addr, port) -> {
 					sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), addr, port);
