@@ -6,7 +6,8 @@ import java.util.Set;
  * A request which contains the destination of passengers for a ceratain elevator 
  */
 public class ElevatorDestinationRequest extends Request<ElevatorDestinationRequest> {
-	
+	private static final long serialVersionUID = -1368065090246286307L;
+
 	private int passengerStartFloor;
 	private Set<Integer> destinationFloors;
 	private int elevatorId;

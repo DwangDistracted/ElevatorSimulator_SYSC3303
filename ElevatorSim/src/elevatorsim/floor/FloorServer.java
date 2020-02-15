@@ -71,9 +71,6 @@ public class FloorServer extends UDPServer {
 		} catch (UnknownHostException e) {
 			System.out.println("FloorServer - ERROR: Could not find Scheduler Host. Check Network Set Up");
 			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("FloorServer - ERROR: Could not find Request Message");
-			e.printStackTrace();
 		}
 		
 	}

@@ -8,12 +8,12 @@ package elevatorsim.constants;
  */
 public enum ElevatorState {
 	DOOR_OPEN ((byte) 0x01, "Door open"),
-	DOOR_OPENING ((byte) 0x01, "Door opening"),
-	DOOR_CLOSED ((byte) 0x02, "Door closed"),
-	DOOR_CLOSING ((byte) 0x03, "Door closing"),
-	MOTOR_UP ((byte) 0x04, "Motor moving upwards"),
-	MOTOR_DOWN ((byte) 0x05, "Motor moving downwards"),
-	INVALID ((byte) 0x06, "Invalid");
+	DOOR_OPENING ((byte) 0x02, "Door opening"),
+	STATIONARY_AND_DOOR_CLOSED ((byte) 0x03, "Stationary and door closed"),
+	DOOR_CLOSING ((byte) 0x04, "Door closing"),
+	MOTOR_UP ((byte) 0x05, "Motor moving upwards"),
+	MOTOR_DOWN ((byte) 0x06, "Motor moving downwards"),
+	INVALID ((byte) 0x07, "Invalid");
 	
 	private byte byteValue;
 	private String stringValue;
@@ -35,7 +35,7 @@ public enum ElevatorState {
 		ElevatorState[] normalStates = new ElevatorState[] {
 			DOOR_OPEN,
 			DOOR_OPENING,
-			DOOR_CLOSED,
+			STATIONARY_AND_DOOR_CLOSED,
 			DOOR_CLOSING,
 			MOTOR_UP,
 			MOTOR_DOWN

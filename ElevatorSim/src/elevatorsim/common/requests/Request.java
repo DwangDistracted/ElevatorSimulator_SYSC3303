@@ -7,11 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public abstract class Request <T extends Request <T>> implements Serializable {
+public abstract class Request<T extends Request <T>> implements Serializable {
+	private static final long serialVersionUID = -404468803509482396L;
 
 	/**
 	 * Serialize the object into bytes in order to send the data over a 
-	 * datagramsocket 
+	 * datagram socket 
 	 * @param baos
 	 */
 	public void serialize(ByteArrayOutputStream baos) {
