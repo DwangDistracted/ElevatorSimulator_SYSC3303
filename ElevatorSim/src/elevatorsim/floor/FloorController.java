@@ -49,6 +49,7 @@ public class FloorController extends Thread {
 	 * Simulates people entering the lobby and making an elevator request
 	 */
 	public void run() {
+		floorEvents.start();
 		try {
 			for(ElevatorRequest request : requests.values()) {
 				Thread.sleep(getRequestDelay(request.getTimeStamp()));
