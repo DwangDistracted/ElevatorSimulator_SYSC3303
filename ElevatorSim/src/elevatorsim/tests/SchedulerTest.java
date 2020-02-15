@@ -19,8 +19,6 @@ import elevatorsim.scheduler.Scheduler.SchedulerState;
  */
 class SchedulerTest {
 	private Scheduler scheduler;
-	private ElevatorRequest request1, request2;
-
 
 	/**
 	 * Setup objects to be utilized in the test of the Scheduler class
