@@ -64,8 +64,9 @@ public class ElevatorServer extends UDPServer {
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			}
+			return MessagePackets.Responses.RESPONSE_SUCCESS();
 		}
-		return MessagePackets.Responses.RESPONSE_SUCCESS();
+		return MessagePackets.Responses.RESPONSE_FAILURE();
 	}
 	
 	/**
