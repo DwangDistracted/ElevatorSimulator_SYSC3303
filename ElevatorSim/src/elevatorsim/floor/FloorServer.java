@@ -1,11 +1,14 @@
 package elevatorsim.floor;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.MessagePackets;
@@ -39,8 +42,23 @@ public class FloorServer extends UDPServer {
 
 	@Override
 	public DatagramPacket handleElevatorEvent(DatagramPacket request) {
-		//controller.receive(message);
-		return MessagePackets.Responses.RESPONSE_NOT_APPLICABLE();
+		ByteArrayInputStream baos = new ByteArrayInputStream(request.getData());
+		ElevatorArrivalRequest arrivalRequest;
+		
+		try {
+			ObjectInputStream oos = new ObjectInputStream(baos);
+			arrivalRequest = (ElevatorArrivalRequest)oos.readObject();
+			
+			controller.receive(arrivalRequest);
+			baos.close();
+			oos.close();
+		} catch (ClassNotFoundException | IOException e) {
+			return MessagePackets.Responses.RESPONSE_FAILURE();
+		}
+		
+		
+		
+		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
 	/**
