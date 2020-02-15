@@ -14,7 +14,7 @@ import elevatorsim.common.requests.Request;
  * 
  * @author Trevor Bivi
  */
-public class Elevator extends Thread implements MessageReciever {
+public class Elevator extends Thread {
 	private boolean isRunning = false;
 	private int floorAmount;
 	private int floor;
@@ -67,18 +67,6 @@ public class Elevator extends Thread implements MessageReciever {
 	public void setLampIsOn(int lampIndex, boolean isOn) {
 		//System.out.print("SET LAMP" + Integer.toString(lampIndex) + " " + Boolean.toString(isOn));
 		this.elevatorLampsOn[lampIndex] = isOn;
-	}
-
-	/**
-	 * Receives message requests from the schedule and then
-	 * sends the messages back to the scheduler but
-	 * targeting floors instead of elevators
-	 * 
-	 * @param message The MessageRequest that should be redirected to floors
-	 */
-	@Override
-	public void receive(Request message) {
-		System.out.println("Elevator received message: " + message.toString());
 	}
 
 	public void stopRunning() {

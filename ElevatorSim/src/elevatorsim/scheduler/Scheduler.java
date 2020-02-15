@@ -105,13 +105,17 @@ public class Scheduler extends Thread {
 	 * @return an Available Elevator
 	 */
 	public InetAddress findAvailableElevator() {
-		// Iteration 1 - only one elevator, just return it
+		// Iteration 2 - only one elevator, just return it
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
 	}
 	
+	/**
+	 * Returns an elevator that could service a call
+	 * @param floor the start floor
+	 * @param direction the direction to travel
+	 * @return the address of the elevator if there is one otherwise null
+	 */
 	public InetAddress findAvailableElevator(int floor, Direction direction) {
-		// Iteration 1 - only one elevator, just return it
-		
 		for (InetAddress key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
 			if( (elevatorStatus.getDirection() == Direction.UP && direction == Direction.UP && floor > elevatorStatus.getFloor()) ||
@@ -157,10 +161,18 @@ public class Scheduler extends Thread {
 	}
 	
 	public ArrayList<ElevatorRequest> getStoredRequests(){
-		return this.storedRequests;
+		return (ArrayList<ElevatorRequest>) this.storedRequests.clone();
 	}
 	
-	public void setStoredRequests(ArrayList<ElevatorRequest> storedRequests) {
-		this.storedRequests = storedRequests;
+	public void addStoredRequest(ElevatorRequest storedRequests) {
+		this.storedRequests.add(storedRequests);
+	}
+	
+	public void removeStoredRequest(ElevatorRequest object) {
+		this.storedRequests.remove(object);
+	}
+	
+	public void removeStoredRequest(int index) {
+		this.storedRequests.remove(index);
 	}
 }
