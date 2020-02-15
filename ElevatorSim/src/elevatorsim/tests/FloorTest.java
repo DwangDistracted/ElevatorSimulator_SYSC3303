@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorArrivalRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.Direction;
 import elevatorsim.floor.Floor;
 
@@ -17,6 +18,7 @@ import elevatorsim.floor.Floor;
 class FloorTest {
 	private Floor flr;
 	private ElevatorRequest request, request2, request3, request4;
+	private ElevatorArrivalRequest request5;
 
 	/**
 	 * Setup objects to be utilized in the testing of the Floor class
@@ -28,7 +30,9 @@ class FloorTest {
 		request2 = new ElevatorRequest("05:05:23.0", "1", "Up", "3");
 		request3 = new ElevatorRequest("10:05:12.0", "7", "down", "6");
 		request4 = new ElevatorRequest("12:05:12.0", "4", "down", "1");
-		flr = new Floor(1);
+		
+		request5 = new ElevatorArrivalRequest(1,2, Direction.UP);
+		flr = new Floor(1,10);
 	}
 
 	/**
@@ -66,12 +70,12 @@ class FloorTest {
 		assertEquals(flr.getActiveUpRequests().size(), 2);
 		assertEquals(flr.getActiveDownRequests().size(), 2);
 
-		// check if requests are cleared for a going up elevator arival
-		flr.loadPassengers(Direction.UP);
+		// check if requests are cleared for a going up elevator arrival
+		flr.loadPassengers(request5);
 		assertTrue(flr.getActiveUpRequests().isEmpty());
 
-		// check if requests are cleared for a going down elevator arival
-		flr.loadPassengers(Direction.DOWN);
+		// check if requests are cleared for a going down elevator arrival
+		flr.loadPassengers(request5);
 		assertTrue(flr.getActiveDownRequests().isEmpty());
 	}
 

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.ElevatorRequest;
 import elevatorsim.elevator.Elevator;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.Role;
 import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;

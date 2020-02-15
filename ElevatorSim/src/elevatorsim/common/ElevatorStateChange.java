@@ -1,14 +1,21 @@
 package elevatorsim.common;
 
-import elevatorsim.constants.ElevatorStates;
+import elevatorsim.constants.ElevatorState;
 
+/**
+ * Stores information about a elevator state change
+ * This is send from the scheduler to an elevator to tell the elevator how it should change it's state
+ * and from the elevator to the scheduler to tell it when the elevator has finished making the change
+ * @author Trevor Bivi
+ *
+ */
 public class ElevatorStateChange extends SerializableMessage<ElevatorStateChange> {
-	ElevatorStates elevatorState;
-	public ElevatorStateChange(ElevatorStates state) {
+	ElevatorState elevatorState;
+	public ElevatorStateChange(ElevatorState state) {
 		this.elevatorState = state;
 	}
 	
-	public ElevatorStates getStateChange() {
+	public ElevatorState getStateChange() {
 		return this.elevatorState;
 	}
 	

@@ -3,7 +3,12 @@ package elevatorsim.constants;
 import elevatorsim.common.ElevatorStatus;
 import elevatorsim.common.SerializableMessage;
 
-public enum ElevatorStates {
+/**
+ * Represents the different states the elevator can be in
+ * Note: The elevator must not be moving if it is in the door closed state (or other states starting in door for that matter)
+ * @author Trevor Bivi
+ */
+public enum ElevatorState {
 	DOOR_OPEN ((byte) 0x01, "Door open"),
 	DOOR_OPENING ((byte) 0x01, "Door opening"),
 	DOOR_CLOSED ((byte) 0x02, "Door closed"),
@@ -15,7 +20,7 @@ public enum ElevatorStates {
 	private byte byteValue;
 	private String stringValue;
 	
-	private ElevatorStates(byte byteValue, String stringValue) {
+	private ElevatorState(byte byteValue, String stringValue) {
 		this.byteValue = byteValue;
 		this.stringValue = stringValue;
 	}
@@ -27,9 +32,9 @@ public enum ElevatorStates {
 	public String getStringValue() {
 		return this.stringValue;
 	}
-	
-	public ElevatorStates getStateFromByteValue(byte byteValue) {
-		ElevatorStates[] normalStates = new ElevatorStates[] {
+
+	public ElevatorState getStateFromByteValue(byte byteValue) {
+		ElevatorState[] normalStates = new ElevatorState[] {
 			DOOR_OPEN,
 			DOOR_OPENING,
 			DOOR_CLOSED,

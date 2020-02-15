@@ -3,22 +3,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elevatorsim.constants.Direction;
-import elevatorsim.constants.ElevatorStates;
+import elevatorsim.constants.ElevatorState;
 
 /**
  * This class contains information that the scheduler can use to determine which elevator to service an elevator request.
  * This should be send to the scheduler from the elevator. (TODO - discuss when/how)
  *  
- * @author David Wang
+ * @author David Wang, Trevor Bivi
  */
 public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
-	// TODO - what should an elevator send back as its status?
-	private ElevatorStates state;
-	private Direction direction;
-	private int floor;
-	private List<Integer> stops;
+	private ElevatorState state; // The last known state the elevator sent to the scheduler
+	private Direction direction; // The direction the elevator is currently servicing
+	private int floor; // If an elevator is not moving in a direction it is at this floor. If it is moving it must be able to stop before the next floor.
+	private List<Integer> stops; // The end destinations this specific elevator must stop at
 
-	public ElevatorStatus(ElevatorStates state) {
+	public ElevatorStatus(ElevatorState state) {
 		this.state = state;
 		this.floor = 1;
 		this.direction = null;
@@ -26,7 +25,7 @@ public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
 	}
 
 	public static ElevatorStatus empty() {
-		return new ElevatorStatus(ElevatorStates.DOOR_OPEN);
+		return new ElevatorStatus(ElevatorState.DOOR_OPEN);
 	}
 	
 	public Direction getDirection() {
@@ -45,11 +44,11 @@ public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
 		this.floor = floor;
 	}
 	
-	public ElevatorStates getState() {
+	public ElevatorState getState() {
 		return this.state;
 	}
 	
-	public void setState(ElevatorStates elevatorState) {
+	public void setState(ElevatorState elevatorState) {
 		this.state = elevatorState;
 	}
 	
@@ -57,16 +56,28 @@ public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
 		return this.stops;
 	}
 	
+	/**
+	 * Removes a given floor from the list of stops if it exists
+	 * @param floor the floor to remove
+	 */
 	public void removeStop(Integer floor) {
 		if(this.stops.indexOf(floor) != -1) {
 			this.stops.remove(floor);
 		}
 	}
 	
+	/**
+	 * Removes all stops
+	 */
 	public void clearStops() {
 		this.stops = new ArrayList<Integer>();
 	}
 	
+	/**
+	 * Adds a floor to the list of destinations this elevator must stop
+	 * @param floor the floor that must be stopped at
+	 * @return
+	 */
 	public Direction addFloor(Integer floor) {
 		if (this.stops.indexOf(floor) != -1 ) {
 			return null;

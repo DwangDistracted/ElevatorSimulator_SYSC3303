@@ -8,14 +8,15 @@ import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.ElevatorStateChange;
 import elevatorsim.common.ElevatorStatus;
 import elevatorsim.constants.ElevatorEvent;
-import elevatorsim.constants.ElevatorStates;
+import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
+import elevatorsim.constants.TimeConstants;
 import elevatorsim.scheduler.Scheduler;
 import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;
@@ -23,7 +24,7 @@ import elevatorsim.util.DatagramPacketUtils;
 /**
  * The Server that serves an Elevator instance
  * 
- * @author David Wang
+ * @author David Wang, Trevor Bivi
  */
 public class ElevatorServer extends UDPServer {
 	private final Elevator elevator;
@@ -56,7 +57,7 @@ public class ElevatorServer extends UDPServer {
 
 		ElevatorRequest floorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print("ElevatorServer - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
-		if(this.elevator.getFloor() == floorRequest.getStartFloor() && this.elevator.getElevatorState() == ElevatorStates.DOOR_OPEN) {
+		if(this.elevator.getFloor() == floorRequest.getStartFloor() && this.elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
 			
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
 			
@@ -77,8 +78,8 @@ public class ElevatorServer extends UDPServer {
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
 		System.out.print("ElevatorServer - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
-		ElevatorStates currentState = this.elevator.getElevatorState();
-		ElevatorStates newState = elevatorStateChange.getStateChange();
+		ElevatorState currentState = this.elevator.getElevatorState();
+		ElevatorState newState = elevatorStateChange.getStateChange();
 		boolean error = false;
 		if(timer != null) {
 			timer.cancel();
@@ -87,17 +88,17 @@ public class ElevatorServer extends UDPServer {
 			timerTask.cancel();
 		}
 		
-		if ( currentState == ElevatorStates.DOOR_OPEN || currentState == ElevatorStates.DOOR_OPENING ) {
-			if( newState == ElevatorStates.DOOR_CLOSED ) {
-				this.elevator.setElevatorState( ElevatorStates.DOOR_CLOSING );
+		if ( currentState == ElevatorState.DOOR_OPEN || currentState == ElevatorState.DOOR_OPENING ) {
+			if( newState == ElevatorState.DOOR_CLOSED ) {
+				this.elevator.setElevatorState( ElevatorState.DOOR_CLOSING );
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorStates.DOOR_CLOSING) {
-		            		elevator.setElevatorState(ElevatorStates.DOOR_CLOSED);
+		            	if(elevator.getElevatorState() == ElevatorState.DOOR_CLOSING) {
+		            		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
 		            		try {
-								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorStates.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -107,22 +108,22 @@ public class ElevatorServer extends UDPServer {
 		        };
 				timer.schedule( 
 				       timerTask, 
-				        1000 
+				        TimeConstants.changeDoorState 
 				);
-			} else if( newState != ElevatorStates.DOOR_OPEN) {
+			} else if( newState != ElevatorState.DOOR_OPEN) {
 				error = true;
 			}
-		}else if (currentState == ElevatorStates.DOOR_CLOSING) {
-			if(newState == ElevatorStates.DOOR_OPEN ) {
-				this.elevator.setElevatorState(ElevatorStates.DOOR_OPENING);
+		}else if (currentState == ElevatorState.DOOR_CLOSING) {
+			if(newState == ElevatorState.DOOR_OPEN ) {
+				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorStates.DOOR_OPENING) {
-		            		elevator.setElevatorState(ElevatorStates.DOOR_OPEN);
+		            	if(elevator.getElevatorState() == ElevatorState.DOOR_OPENING) {
+		            		elevator.setElevatorState(ElevatorState.DOOR_OPEN);
 		            		try {
-								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorStates.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -132,21 +133,21 @@ public class ElevatorServer extends UDPServer {
 		        };
 				timer.schedule( 
 				timerTask, 
-		        100 );
-			} else if (newState != ElevatorStates.DOOR_CLOSED) {
+		        TimeConstants.changeDoorState );
+			} else if (newState != ElevatorState.DOOR_CLOSED) {
 				error = true;
 			}
-		} else if (currentState == ElevatorStates.DOOR_CLOSED) {
-			if(newState == ElevatorStates.DOOR_OPEN ) {
-				this.elevator.setElevatorState(ElevatorStates.DOOR_OPENING);
+		} else if (currentState == ElevatorState.DOOR_CLOSED) {
+			if(newState == ElevatorState.DOOR_OPEN ) {
+				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorStates.DOOR_OPENING) {
-		            		elevator.setElevatorState(ElevatorStates.DOOR_OPEN);
+		            	if(elevator.getElevatorState() == ElevatorState.DOOR_OPENING) {
+		            		elevator.setElevatorState(ElevatorState.DOOR_OPEN);
 		            		try {
-								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorStates.DOOR_OPEN)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -156,14 +157,14 @@ public class ElevatorServer extends UDPServer {
 		        };
 				timer.schedule( 
 				timerTask, 
-		        100 );
-			} else if (newState == ElevatorStates.MOTOR_UP) {
-				elevator.setElevatorState(ElevatorStates.MOTOR_UP);
+		        TimeConstants.changeDoorState );
+			} else if (newState == ElevatorState.MOTOR_UP) {
+				elevator.setElevatorState(ElevatorState.MOTOR_UP);
 				timer = new Timer();
 				timerTask = new TimerTask() {
 		            @Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorStates.MOTOR_UP) {
+		            	if(elevator.getElevatorState() == ElevatorState.MOTOR_UP) {
 		            		elevator.setFloor(elevator.getFloor()+1);
 		            		try {
 								sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
@@ -181,17 +182,17 @@ public class ElevatorServer extends UDPServer {
 		        };
 				timer.scheduleAtFixedRate( 
 				timerTask, 
-		        500,500 );
+				TimeConstants.moveOneFloor,TimeConstants.moveOneFloor );
 				
 				
-			} else if(newState == ElevatorStates.MOTOR_DOWN) {
+			} else if(newState == ElevatorState.MOTOR_DOWN) {
 				
-				elevator.setElevatorState(ElevatorStates.MOTOR_DOWN);
+				elevator.setElevatorState(ElevatorState.MOTOR_DOWN);
 				timer = new Timer();
 				timerTask = new TimerTask() {
 		            @Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorStates.MOTOR_DOWN) {
+		            	if(elevator.getElevatorState() == ElevatorState.MOTOR_DOWN) {
 		            		elevator.setFloor(elevator.getFloor()-1);
 		            		try {
 								sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
@@ -209,16 +210,16 @@ public class ElevatorServer extends UDPServer {
 		        };
 				timer.scheduleAtFixedRate( 
 				timerTask, 
-		        500,500 );
+		        TimeConstants.moveOneFloor,TimeConstants.moveOneFloor );
 				
-			}else if (newState != ElevatorStates.DOOR_CLOSED) {
+			}else if (newState != ElevatorState.DOOR_CLOSED) {
 				error = true;
 			}
-		}else if (currentState == ElevatorStates.MOTOR_UP || currentState == ElevatorStates.MOTOR_DOWN) {
-			if(newState == ElevatorStates.DOOR_CLOSED) {
-				this.elevator.setElevatorState(ElevatorStates.DOOR_CLOSED);
+		}else if (currentState == ElevatorState.MOTOR_UP || currentState == ElevatorState.MOTOR_DOWN) {
+			if(newState == ElevatorState.DOOR_CLOSED) {
+				this.elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
 				try {
-					sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorStates.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+					sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

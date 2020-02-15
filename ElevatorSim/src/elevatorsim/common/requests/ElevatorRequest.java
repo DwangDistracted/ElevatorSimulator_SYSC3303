@@ -1,9 +1,10 @@
-package elevatorsim.common;
+package elevatorsim.common.requests;
 
 
 import java.time.LocalTime;
 import java.util.Arrays;
 
+import elevatorsim.common.SerializableMessage;
 import elevatorsim.constants.Direction;
 import elevatorsim.constants.NetworkConstants;
 
@@ -14,7 +15,7 @@ import elevatorsim.constants.NetworkConstants;
  * @author Rahul Anilkumar
  *
  */
-public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implements Comparable<ElevatorRequest>{
+public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implements Comparable<ElevatorRequest>, Request{
 
 	// private static final DateTimeFormatter format1 =
 	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");

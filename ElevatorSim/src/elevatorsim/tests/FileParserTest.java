@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.Direction;
 import elevatorsim.util.FileParser;
 /**

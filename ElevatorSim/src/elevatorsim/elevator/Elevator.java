@@ -1,24 +1,24 @@
 package elevatorsim.elevator;
-
-import elevatorsim.common.MessageReciever;
-import elevatorsim.constants.ElevatorStates;
+import elevatorsim.constants.ElevatorState;
 
 import java.net.SocketException;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.MessageReciever;
+import elevatorsim.common.requests.Request;
+
+
 
 /**
  * The elevator class
- * Currently this is just used to receive messages from the scheduler
- * and redirect them to the floors
+ * stores information about an elevator
  * 
- * @author Trevor Bivi (101045460)
+ * @author Trevor Bivi
  */
 public class Elevator extends Thread implements MessageReciever {
 	private boolean isRunning = false;
 	private int floorAmount;
 	private int floor;
-	private ElevatorStates elevatorState;
+	private ElevatorState elevatorState;
 	
 	/**
 	 * Elevator constructor that stores the amount of floors and
@@ -29,7 +29,7 @@ public class Elevator extends Thread implements MessageReciever {
 		super("Elevator");
 		this.floorAmount = floorAmount;
 		this.floor = 1;
-		this.elevatorState = ElevatorStates.DOOR_OPEN;
+		this.elevatorState = ElevatorState.DOOR_OPEN;
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class Elevator extends Thread implements MessageReciever {
 	 * @param message The MessageRequest that should be redirected to floors
 	 */
 	@Override
-	public void receive(ElevatorRequest message) {
+	public void receive(Request message) {
 		System.out.println("Elevator received message: " + message.toString());
 	}
 
@@ -82,11 +82,11 @@ public class Elevator extends Thread implements MessageReciever {
 		this.floor = newFloor;
 	}
 	
-	public ElevatorStates getElevatorState() {
+	public ElevatorState getElevatorState() {
 		return this.elevatorState;
 	}
 	
-	public void setElevatorState(ElevatorStates elevatorState) {
+	public void setElevatorState(ElevatorState elevatorState) {
 		this.elevatorState = elevatorState;
 	}
 }

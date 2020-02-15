@@ -4,14 +4,13 @@ import elevatorsim.common.ElevatorStatus;
 import elevatorsim.common.SerializableMessage;
 
 /**
- * Events triggered by the state of an elevator.
+ * Floor change events triggered by the an elevator.
  * This should be passed from Elevator to Floor.
- * TODO - can this also include elevator status?
  *  
- * @author David Wang
+ * @author David Wang, Trevor Bivi
  */
 public class ElevatorEvent extends SerializableMessage<ElevatorEvent> {
-	private int floor;
+	private int floor; //The new floor
 	public ElevatorEvent (int floor) {
 		this.floor = floor;
 	}

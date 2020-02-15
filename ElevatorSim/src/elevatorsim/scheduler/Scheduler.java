@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.ElevatorStatus;
 import elevatorsim.constants.Direction;
 
 /**
  * This is the scheduler for the elevator simulator. 
  * 
- * It is a singleton object responsible for calculating which elevator to send requests to. It also tracks the state of the scheduler subsystem,
+ * It is a singleton object responsible for calculating which elevator to send requests to. It also tracks the state of the scheduler subsystem and some information about elevators it is controlling
  * 
- * @author David Wang and Thomas Leung
+ * @author David Wang, Thomas Leung, Trevor Bivi
  */
 public class Scheduler extends Thread {
 	/**
@@ -37,7 +37,7 @@ public class Scheduler extends Thread {
 	
 	private final SchedulerServer server;
 	private SchedulerState state;
-	private ArrayList<ElevatorRequest> storedRequests;
+	private ArrayList<ElevatorRequest> storedRequests; // The requests that are not currently being served. Note: the elevator might be traveling to the startFloor of the first item in this list to begin serving it
 
 	private Scheduler() throws SocketException {
 		super("Scheduler");
@@ -77,6 +77,7 @@ public class Scheduler extends Thread {
 		} finally {
 			if (server != null) {
 				System.out.println(this.getName() + " - INFO : Exiting");
+				System.out.print("STOOPED:" + Boolean.toString(state == SchedulerState.STOPPED) + "INVALID:" + Boolean.toString(state == SchedulerState.INVALID));
 				server.stopServer();
 			}
 		}
@@ -102,6 +103,7 @@ public class Scheduler extends Thread {
 	}
 
 	/**
+	 * Currently this tries to always return the one elevator that should exist eventually it might
 	 * Finds an available elevator that can service an Elevator Request
 	 * @return an Available Elevator
 	 */
@@ -110,6 +112,12 @@ public class Scheduler extends Thread {
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
 	}
 	
+	/**
+	 * Finds an elevator that is either at the given floor or will pass the floor going in the desired direction
+	 * @param floor the floor the passenger is boarding on
+	 * @param direction the direction the passenger wants to go
+	 * @return
+	 */
 	public InetAddress findAvailableElevator(int floor, Direction direction) {
 		// Iteration 1 - only one elevator, just return it
 		

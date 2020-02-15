@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorRequest;
+
 
 /**
  * A utility class to help with manipulating the MessageRequest DataStructures
