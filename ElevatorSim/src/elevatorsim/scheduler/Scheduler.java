@@ -38,6 +38,7 @@ public class Scheduler extends Thread {
 	
 	private final SchedulerServer server;
 	private SchedulerState state;
+	
 	private ArrayList<ElevatorRequest> storedRequests;
 
 	private Scheduler() throws SocketException {
@@ -177,4 +178,13 @@ public class Scheduler extends Thread {
 	public void removeStoredRequest(int index) {
 		this.storedRequests.remove(index);
 	}
+	
+	/**
+	 *  Method for testing the StateMachine
+	 * @param state the state to set the value to
+	 */
+	public void setState(SchedulerState state) {
+		this.state = state;
+	}
+
 }
