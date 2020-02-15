@@ -8,10 +8,10 @@ import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.common.ElevatorStateChange;
-import elevatorsim.common.ElevatorStatus;
-import elevatorsim.constants.ElevatorEvent;
+import elevatorsim.common.requests.ElevatorStateChange;
+import elevatorsim.common.requests.ElevatorStatus;
 import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
@@ -197,7 +197,7 @@ public class ElevatorServer extends UDPServer {
 		            		try {
 		            			sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
+								      // TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		} catch (IOException e) {
 		            			// TODO Auto-generated catch block

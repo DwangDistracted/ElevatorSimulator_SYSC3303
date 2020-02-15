@@ -1,4 +1,4 @@
-package elevatorsim.common;
+package elevatorsim.common.requests;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +11,7 @@ import elevatorsim.constants.ElevatorState;
  *  
  * @author David Wang, Trevor Bivi
  */
-public class ElevatorStatus extends SerializableMessage<ElevatorStatus> {
+public class ElevatorStatus extends Request<ElevatorStatus> {
 	private ElevatorState state; // The last known state the elevator sent to the scheduler
 	private Direction direction; // The direction the elevator is currently servicing
 	private int floor; // If an elevator is not moving in a direction it is at this floor. If it is moving it must be able to stop before the next floor.

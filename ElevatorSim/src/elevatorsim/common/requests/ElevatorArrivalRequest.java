@@ -1,9 +1,12 @@
 package elevatorsim.common.requests;
 
-import elevatorsim.common.SerializableMessage;
 import elevatorsim.constants.Direction;
 
-public class ElevatorArrivalRequest extends SerializableMessage<ElevatorArrivalRequest> implements Request {
+/**
+ * A request sent when the arrival sensor notifies the system that an elevator is
+ * arriving to a floor
+ */
+public class ElevatorArrivalRequest extends Request<ElevatorArrivalRequest> {
 	
 	private int arrivalFloor;
 	private int elevatorId;

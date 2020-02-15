@@ -1,7 +1,4 @@
-package elevatorsim.constants;
-
-import elevatorsim.common.ElevatorStatus;
-import elevatorsim.common.SerializableMessage;
+package elevatorsim.common.requests;
 
 /**
  * Floor change events triggered by the an elevator.
@@ -9,7 +6,7 @@ import elevatorsim.common.SerializableMessage;
  *  
  * @author David Wang, Trevor Bivi
  */
-public class ElevatorEvent extends SerializableMessage<ElevatorEvent> {
+public class ElevatorEvent extends Request<ElevatorEvent> {
 	private int floor; //The new floor
 	public ElevatorEvent (int floor) {
 		this.floor = floor;

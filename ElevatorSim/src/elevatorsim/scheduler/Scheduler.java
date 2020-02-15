@@ -3,12 +3,11 @@ package elevatorsim.scheduler;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.common.ElevatorStatus;
+import elevatorsim.common.requests.ElevatorStatus;
 import elevatorsim.constants.Direction;
 
 /**

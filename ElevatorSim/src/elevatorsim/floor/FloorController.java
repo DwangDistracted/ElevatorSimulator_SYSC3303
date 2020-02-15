@@ -1,34 +1,25 @@
 package elevatorsim.floor;
 
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 
-import elevatorsim.common.requests.ElevatorArrivalRequest;
-import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.common.requests.MessageReciever;
-import elevatorsim.common.requests.Request;
-import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.TimeConstants;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 /**
- * Takes in arrival sensor signals, and client requests
- * and then distributes them wherever necessary. 
- * 
+ *Stores all the floor instances, and simulates people making
+ * elevator requests 
+ *  
  * @author Michael Patsula, David Wang
  */
-public class FloorController extends Thread implements MessageReciever {
+public class FloorController extends Thread {
 	private HashMap<Integer, Floor> floors;
 	private Map<Integer, ElevatorRequest> requests;
-	private boolean running;
-	private Queue<Request> eventQueue;
-	FloorServer server = null;
 	private LocalTime lastRequestTime;
+	private FloorEvents floorEvents;
 	
 	public FloorController(String name, int numOfFloors, Map<Integer, ElevatorRequest> requests) {
 		super(name);
@@ -40,6 +31,7 @@ public class FloorController extends Thread implements MessageReciever {
 		}
 
 		this.requests = requests;
+		floorEvents = new FloorEvents(this);
 	}
 	
 	/**
@@ -54,60 +46,27 @@ public class FloorController extends Thread implements MessageReciever {
 	}
 	
 	/**
-	 * Send elevator requests to the scheduler, and
-	 * the appropriate floors for processing
+	 * Simulates people entering the lobby and making an elevator request
 	 */
 	public void run() {
+		floorEvents.start();
 		try {
-			server = new FloorServer(this);
-			server.startServer();
-			Thread.sleep(NetworkConstants.DELAY_SERVER_START_MS);
-			
 			for(ElevatorRequest request : requests.values()) {
-				floors.get(request.getStartFloor()).readRequest(request);
-				server.sendElevatorRequest(request, getRequestDelay(request.getTimeStamp()));
-				Thread.sleep(500);
+				Thread.sleep(getRequestDelay(request.getTimeStamp()));
+				floorEvents.receive(request);
 			}
 			
-			while(running) {
-				processEvents();
-				wait();
-			}
-			
-		} catch (InterruptedException | IOException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} finally {
-			if (server != null) {
-				server.sendExitRequest();
-
-				System.out.println(this.getName() + " - INFO : Exiting");
-				server.stopServer();
-			}
-		}
+		} 
 	}
-	
-	public void processEvents() {
-		while(!eventQueue.isEmpty()) {
-			Request request = eventQueue.poll();
-			
-			if(request instanceof ElevatorArrivalRequest) {
-				Floor floor = floors.get(((ElevatorArrivalRequest) request).getArrivalFloor());
-				ElevatorDestinationRequest buttonRequests = floor.loadPassengers((ElevatorArrivalRequest) request);
-				
-				server.sendDestinationRequest(buttonRequests);
-			} 
-		}
-	}
-	
 	
 	/**
-	 * This method Receives the arrival signal sent from the scheduler
-	 * indicating an elevator has arrived at a particular floor and then 
-	 * notifies the correct floor.
+	 * Fetches the Floor instance 
+	 * @param floor number
+	 * @return
 	 */
-	@Override
-	public void receive(Request request) {
-		eventQueue.add(request);
-		notifyAll();
-	}	
+	public Floor getFloor(int floor) {
+		return floors.get(floor);
+	}
 }
