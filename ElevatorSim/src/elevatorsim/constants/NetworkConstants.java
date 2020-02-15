@@ -50,8 +50,9 @@ public class NetworkConstants {
 		REGISTER((byte)0x1F),
 		ELEVATOR_REQUEST((byte)0x2F),
 		ELEVATOR_EVENT((byte)0x3F),
-		STATUS((byte)0x4F),
-		EXIT((byte)0x5F),
+		LOBBY_EVENT((byte)0x4F),
+		STATUS((byte)0x5F),
+		EXIT((byte)0x6F),
 		RESPONSE((byte)0xFF);
 		
 		private byte marker;

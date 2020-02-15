@@ -116,7 +116,7 @@ public class MessagePackets {
 	 */
 	public static DatagramPacket generateDestinationRequest(ElevatorDestinationRequest body) {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
-		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
+		message.write(NetworkConstants.MessageTypes.LOBBY_EVENT.getMarker());
 		message.write(NetworkConstants.NULL_BYTE);
 		body.serialize(message);
 		message.write(NetworkConstants.NULL_BYTE);
@@ -131,7 +131,7 @@ public class MessagePackets {
 	 * @throws IllegalArgument if the ElevatorDestinationRequest fails to be deserialized
 	 */
 	public static ElevatorDestinationRequest deserializeDestinationRequest(byte[] data) {
-		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
+		if(data[0] != NetworkConstants.MessageTypes.LOBBY_EVENT.getMarker() ||
 				data[1] != NetworkConstants.NULL_BYTE ||
 				data[data.length-1] != NetworkConstants.NULL_BYTE) {
 			throw new IllegalArgumentException("Tried to deserialize an invalid elevator request message");
