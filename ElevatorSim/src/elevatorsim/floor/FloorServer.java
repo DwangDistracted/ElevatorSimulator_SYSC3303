@@ -24,16 +24,16 @@ import elevatorsim.server.UDPServer;
  * @author David Wang
  */
 public class FloorServer extends UDPServer {
-	private final FloorController controller;
+	private final FloorEvents floorEvents;
 	
 	/**
 	 * Creates a new FloorServer. Can only be called once.
 	 * @param floorSystem
 	 * @throws SocketException
 	 */
-	public FloorServer(FloorController floorSystem) throws SocketException {
+	public FloorServer(FloorEvents floorSystem) throws SocketException {
 		super("FloorSystemServer", NetworkConstants.FLOOR_RECIEVE_PORT);
-		this.controller = floorSystem;
+		this.floorEvents = floorSystem;
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ public class FloorServer extends UDPServer {
 			ObjectInputStream oos = new ObjectInputStream(baos);
 			arrivalRequest = (ElevatorArrivalRequest)oos.readObject();
 			
-			controller.receive(arrivalRequest);
+			floorEvents.receive(arrivalRequest);
 			baos.close();
 			oos.close();
 		} catch (ClassNotFoundException | IOException e) {
@@ -65,15 +65,8 @@ public class FloorServer extends UDPServer {
 	/**
 	 * Sends an Elevator Request to the Scheduler
 	 * @param request the elevator request
-	 * @param delay how long to wait to simulate the delay inbetween elevator calls
 	 */
-	public void sendElevatorRequest(ElevatorRequest request, long delay) {
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void sendElevatorRequest(ElevatorRequest request) {
 		
 		try {
 			sender.send(MessagePackets.generateElevatorRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
@@ -84,8 +77,6 @@ public class FloorServer extends UDPServer {
 			System.out.println("FloorServer - ERROR: Could not find Request Message");
 			e.printStackTrace();
 		}
-		
-		
 		
 	}
 	
