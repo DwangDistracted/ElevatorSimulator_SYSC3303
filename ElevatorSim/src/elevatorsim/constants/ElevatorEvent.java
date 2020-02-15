@@ -8,8 +8,5 @@ package elevatorsim.constants;
  * @author David Wang
  */
 public enum ElevatorEvent {
-	LOADING_PASSENGERS,
-	OPENING_DOORS,
-	CLOSING_DOORS,
-	FLOOR_ARRIVAL;
+
 }
