@@ -92,16 +92,16 @@ public class ElevatorServer extends UDPServer {
 		//If door is currently open or opening
 		if ( currentState == ElevatorState.DOOR_OPEN || currentState == ElevatorState.DOOR_OPENING ) {
 			//Initiate door close if requests
-			if( newState == ElevatorState.DOOR_CLOSED ) {
+			if( newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED ) {
 				this.elevator.setElevatorState( ElevatorState.DOOR_CLOSING );
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 					@Override
 		            public void run() {
 						if(elevator.getElevatorState() == ElevatorState.DOOR_CLOSING) {
-							elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
+							elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
 							try {
-								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
 								e.printStackTrace();
 							}
@@ -127,7 +127,7 @@ public class ElevatorServer extends UDPServer {
 		            	if(elevator.getElevatorState() == ElevatorState.DOOR_OPENING) {
 		            		elevator.setElevatorState(ElevatorState.DOOR_OPEN);
 		            		try {
-		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
 		            			e.printStackTrace();
 		            		}
@@ -137,11 +137,11 @@ public class ElevatorServer extends UDPServer {
 				timer.schedule( 
 				timerTask, 
 				TimeConstants.changeDoorState );
-			} else if (newState != ElevatorState.DOOR_CLOSED) {
+			} else if (newState != ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 				error = true;
 			}
 		//If door is currently closed
-		} else if (currentState == ElevatorState.DOOR_CLOSED) {
+		} else if (currentState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 			//Initiate door open if requested
 			if(newState == ElevatorState.DOOR_OPEN ) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
@@ -214,16 +214,16 @@ public class ElevatorServer extends UDPServer {
 				timerTask, 
 		        TimeConstants.moveOneFloor,TimeConstants.moveOneFloor );
 				
-			}else if (newState != ElevatorState.DOOR_CLOSED) {
+			}else if (newState != ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 				error = true;
 			}
 		//If currently moving
 		}else if (currentState == ElevatorState.MOTOR_UP || currentState == ElevatorState.MOTOR_DOWN) {
 			//Stop elevator if requested
-			if(newState == ElevatorState.DOOR_CLOSED) {
-				this.elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
+			if(newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
+				this.elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
 				try {
-					sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+					sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				}

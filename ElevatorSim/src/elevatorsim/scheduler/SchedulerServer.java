@@ -70,7 +70,7 @@ public class SchedulerServer extends UDPServer {
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
 				
 				elevatorStatus.setDirection( elevatorRequest.getStartFloor() - elevatorStatus.getFloor() > 0 ? Direction.UP : Direction.DOWN );
-				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)), elevatorAddress, elevators.get(elevatorAddress));
+				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)), elevatorAddress, elevators.get(elevatorAddress));
 			}
 			return;
 		}
@@ -113,7 +113,7 @@ public class SchedulerServer extends UDPServer {
 			            @Override
 			            public void run() {
 			            	Scheduler.getInstance().startProcessing();
-			                sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.DOOR_CLOSED )) , request.getAddress(), elevators.get(request.getAddress()));
+			                sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED )) , request.getAddress(), elevators.get(request.getAddress()));
 			                Scheduler.getInstance().stopProcessing();
 			           }
 			       }, 
@@ -144,7 +144,7 @@ public class SchedulerServer extends UDPServer {
 		
 		Scheduler.getInstance().getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
 		if (Scheduler.getInstance().getElevators().get(request.getAddress()).getStops().indexOf(elevatorEvent.getFloor()) != -1) {
-			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)), request.getAddress(), this.elevators.get(request.getAddress()));
+			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)), request.getAddress(), this.elevators.get(request.getAddress()));
 		}
 		//sender.send(DatagramPacketUtils.getCopyOf(request), floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
 
@@ -166,7 +166,7 @@ public class SchedulerServer extends UDPServer {
 		// TODO Fix how the elevator status is deserialized. Should it be deserializing a string? or the parsed byte array?
 		elevatorStatus.setState(elevatorState); //updateElevator(elevator, ElevatorStatus.deserialize( request.getData() ));
 
-		if(elevatorState == ElevatorState.DOOR_CLOSED) {
+		if(elevatorState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 			if( elevatorStatus.getStops().indexOf(elevatorStatus.getFloor()) != -1  ) {
 				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)), elevator, elevators.get(elevator));
 			} else if(elevatorStatus.getDirection() == Direction.UP) {
@@ -183,7 +183,7 @@ public class SchedulerServer extends UDPServer {
 				            public void run() {
 				            	System.out.print("sending close\n");
 				            	Scheduler.getInstance().startProcessing();
-				                sender.send(DatagramPacketUtils.getCopyOf( MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.DOOR_CLOSED ))) , request.getAddress(), elevators.get(request.getAddress()));
+				                sender.send(DatagramPacketUtils.getCopyOf( MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED ))) , request.getAddress(), elevators.get(request.getAddress()));
 				                Scheduler.getInstance().stopProcessing();
 				            }
 				        }, 
