@@ -56,6 +56,14 @@ public class FloorServer extends UDPServer {
 			System.out.println("FloorServer - ERROR: Could not find Request Message");
 			e.printStackTrace();
 		}
+		
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**

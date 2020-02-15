@@ -2,8 +2,10 @@ package elevatorsim.common;
 
 
 import java.time.LocalTime;
+import java.util.Arrays;
 
 import elevatorsim.constants.Direction;
+import elevatorsim.constants.NetworkConstants;
 
 /**
  * This is the message object which is passed by the different subsystems in
@@ -16,7 +18,7 @@ public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implem
 
 	// private static final DateTimeFormatter format1 =
 	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
-	private int startFloor;
+	private Integer startFloor;
 	private Direction direction;
 	private int destFloor;
 	private LocalTime timeStamp;
@@ -35,6 +37,19 @@ public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implem
 		this.startFloor = Integer.parseInt(startFloor);
 		this.direction = convertDirection(direction);
 		this.destFloor = Integer.parseInt(destFloor);
+	}
+	
+	/**
+	 * Default constructor to create a MessageRequest object
+	 * 
+	 * @param timeStamp  the input time for the request
+	 * @param startFloor the floor the request was made from
+	 * @param direction  the direction up/down that the requester is going
+	 * @param destFloor  the floor being traveled to
+	 */
+	public ElevatorRequest(LocalTime timeStamp, int destFloor) {
+		this.timeStamp = timeStamp;
+		this.destFloor = destFloor;
 	}
 
 	public ElevatorRequest() {
@@ -61,9 +76,9 @@ public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implem
 	/**
 	 * Getter Method for the starting floor number
 	 * 
-	 * @return the start floorNumber as an int value
+	 * @return the start floorNumber as an Integer value
 	 */
-	public int getStartFloor() {
+	public Integer getStartFloor() {
 		return startFloor;
 	}
 
@@ -72,7 +87,7 @@ public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implem
 	 * 
 	 * @param startFloor The value for the starting floor
 	 */
-	public void setStartFloor(int startFloor) {
+	public void setStartFloor(Integer startFloor) {
 		this.startFloor = startFloor;
 	}
 
@@ -164,8 +179,9 @@ public class ElevatorRequest extends SerializableMessage<ElevatorRequest> implem
 	@Override
 	public String toString() {
 		String status = "RequestId: " + getRequestId() + " | Timestamp: " + getTimeStamp().toString()
-				+ " | StartFloor: " + getStartFloor() + " | Direction: " + getDirection().toString()
+				+ " | StartFloor: " + getStartFloor() + " | Direction: " + ( getDirection() == null ? "null" : getDirection().toString())
 				+ " | DestinationFloor: " + getDestFloor();
 		return status;
 	}
+
 }

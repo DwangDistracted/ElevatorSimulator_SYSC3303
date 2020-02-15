@@ -3,8 +3,12 @@ package elevatorsim.constants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.Arrays;
 
 import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.ElevatorStateChange;
+import elevatorsim.common.ElevatorStatus;
+import elevatorsim.common.SerializableMessage;
 
 /**
  * This class contains the DatagramPackets that are commonly used by our communications system.
@@ -47,7 +51,7 @@ public class MessagePackets {
 	 * @return a DatagramPacket that can be sent with a Socket Server
 	 * @throws IOException if the ElevatorRequest fails to be serialized
 	 */
-	public static DatagramPacket generateElevatorRequest(ElevatorRequest body) throws IOException {
+	public static DatagramPacket generateElevatorRequest(ElevatorRequest body) {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
 		message.write(NetworkConstants.MessageTypes.ELEVATOR_REQUEST.getMarker());
 		message.write(NetworkConstants.NULL_BYTE);
@@ -55,6 +59,33 @@ public class MessagePackets {
 		message.write(NetworkConstants.NULL_BYTE);
 		
 		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	public static ElevatorRequest deserializeElevatorRequest(byte[] data) {
+		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_REQUEST.getMarker() ||
+				data[1] != NetworkConstants.NULL_BYTE ||
+				data[data.length-1] != NetworkConstants.NULL_BYTE) {
+			throw new IllegalArgumentException("Tried to deserialize an invalid elevator request message");
+		}
+		return ElevatorRequest.deserialize(Arrays.copyOfRange(data, 2, data.length-1));
+	}
+		
+	public static DatagramPacket generateElevatorStateChange(ElevatorStateChange body) {
+		ByteArrayOutputStream message = new ByteArrayOutputStream();
+		message.write( NetworkConstants.MessageTypes.STATUS.getMarker());
+		message.write(NetworkConstants.NULL_BYTE);
+		body.serialize(message);
+		message.write(NetworkConstants.NULL_BYTE);
+		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	public static ElevatorStateChange deserializeElevatorStateChange(byte[] data) {
+		if(data[0] != NetworkConstants.MessageTypes.STATUS.getMarker() ||
+				data[1] != NetworkConstants.NULL_BYTE ||
+				data[data.length-1] != NetworkConstants.NULL_BYTE) {
+			throw new IllegalArgumentException("Tried to deserialize an invalid state cange message");
+		}
+		return ElevatorStateChange.deserialize(Arrays.copyOfRange(data, 2, data.length-1));
 	}
 
 	/**
@@ -67,10 +98,19 @@ public class MessagePackets {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
 		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
 		message.write(NetworkConstants.NULL_BYTE);
-		message.write(body.name().getBytes());
+		body.serialize(message);
 		message.write(NetworkConstants.NULL_BYTE);
 		
 		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	public static ElevatorEvent deserializeElevatorEvent(byte[] data) {
+		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
+				data[1] != NetworkConstants.NULL_BYTE ||
+				data[data.length-1] != NetworkConstants.NULL_BYTE) {
+			throw new IllegalArgumentException("Tried to deserialize an invalid elevator event message");
+		}
+		return ElevatorEvent.deserialize(Arrays.copyOfRange(data,2,data.length-1));
 	}
 	
 	/**

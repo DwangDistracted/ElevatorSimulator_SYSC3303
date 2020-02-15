@@ -1,6 +1,7 @@
 package elevatorsim.elevator;
 
 import elevatorsim.common.MessageReciever;
+import elevatorsim.constants.ElevatorStates;
 
 import java.net.SocketException;
 
@@ -16,6 +17,8 @@ import elevatorsim.common.ElevatorRequest;
 public class Elevator extends Thread implements MessageReciever {
 	private boolean isRunning = false;
 	private int floorAmount;
+	private int floor;
+	private ElevatorStates elevatorState;
 	
 	/**
 	 * Elevator constructor that stores the amount of floors and
@@ -25,6 +28,8 @@ public class Elevator extends Thread implements MessageReciever {
 	public Elevator ( int floorAmount ) {
 		super("Elevator");
 		this.floorAmount = floorAmount;
+		this.floor = 1;
+		this.elevatorState = ElevatorStates.DOOR_OPEN;
 	}
 
 	/**
@@ -67,5 +72,21 @@ public class Elevator extends Thread implements MessageReciever {
 
 	public void stopRunning() {
 		isRunning = false;
+	}
+	
+	public int getFloor() {
+		return this.floor;
+	}
+	
+	public void setFloor(int newFloor) {
+		this.floor = newFloor;
+	}
+	
+	public ElevatorStates getElevatorState() {
+		return this.elevatorState;
+	}
+	
+	public void setElevatorState(ElevatorStates elevatorState) {
+		this.elevatorState = elevatorState;
 	}
 }

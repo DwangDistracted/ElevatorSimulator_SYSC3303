@@ -13,7 +13,7 @@ public class DatagramPacketUtils {
 	public static boolean isRegisterRequest(DatagramPacket request) {
 		return NetworkConstants.MessageTypes.REGISTER.getMarker() == request.getData()[0];
 	}
-	public static boolean isStatusRequest(DatagramPacket request) {
+	public static boolean isStateChangeRequest(DatagramPacket request) {
 		return NetworkConstants.MessageTypes.STATUS.getMarker() == request.getData()[0];
 	}
 	public static boolean isElevatorRequest(DatagramPacket request) {
@@ -25,7 +25,6 @@ public class DatagramPacketUtils {
 	public static boolean isExitRequest(DatagramPacket request) {
 		return NetworkConstants.MessageTypes.EXIT.getMarker() == request.getData()[0];
 	}
-
 	public static boolean isResponse(DatagramPacket response) {
 		return NetworkConstants.MessageTypes.RESPONSE.getMarker() == response.getData()[0];
 	}

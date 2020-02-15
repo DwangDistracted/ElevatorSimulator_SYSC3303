@@ -84,7 +84,7 @@ public abstract class UDPServer {
 	 * @param request the elevator status request
 	 * @return a response packet depending on the success of the handler
 	 */
-	public DatagramPacket handleElevatorStatus(DatagramPacket request) {
+	public DatagramPacket handleElevatorStateChange(DatagramPacket request) {
 		return MessagePackets.Responses.RESPONSE_NOT_APPLICABLE();
 	}
 	/**
