@@ -2,6 +2,9 @@ package elevatorsim.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +14,12 @@ import elevatorsim.constants.Direction;
 import elevatorsim.floor.Floor;
 
 /**
- * A test class to test the Floor Class functionality
- * @author Trevor Bivi (101045460)
+ * A test class to test the Floor Class functionality.
+ * @author Trevor Bivi, Thomas Leung
  *
  */
 class FloorTest {
-	private Floor flr;
+	private Floor flr, flr7;
 	private ElevatorRequest request, request2, request3, request4;
 	private ElevatorArrivalRequest request5;
 
@@ -28,30 +31,52 @@ class FloorTest {
 	void setUp() throws Exception {
 		request = new ElevatorRequest("14:05:15.0", "2", "Up", "5");
 		request2 = new ElevatorRequest("05:05:23.0", "1", "Up", "3");
-		request3 = new ElevatorRequest("10:05:12.0", "7", "down", "6");
-		request4 = new ElevatorRequest("12:05:12.0", "4", "down", "1");
+		request3 = new ElevatorRequest("10:05:12.0", "7", "Down", "6");
+		request4 = new ElevatorRequest("12:05:12.0", "4", "Down", "1");
 		
 		request5 = new ElevatorArrivalRequest(1,2, Direction.UP);
 		flr = new Floor(1,10);
+		// assume you are on the seventh floor
+		flr7 = new Floor(7, 10);
+		
 	}
 
 	/**
-	 * Tests for the readRequest test. It checks that the requests are 
-	 * going to the correct arraylist in the Floor class
+	 * Tests for the reading UP request from readRequest method. It checks that 
+	 * the requests are going to the correct location in the Floor class.
 	 */
 	@Test
-	void readRequesttest() {
-		// check if upRequests are set to the correct arraylist
-		assertTrue(flr.getActiveUpRequests().isEmpty());
+	void readRequestForUptest() {
+		// check if upRequests are set to the correct arrayList
+		assertTrue(flr.getActiveUpDest().isEmpty());
 		flr.readRequest(request);
-		assertFalse(flr.getActiveUpRequests().isEmpty());
-		assertEquals(flr.getActiveUpRequests().get(0), request);
-		assertTrue(flr.getActiveDownRequests().isEmpty());
+		assertFalse(flr.getActiveUpDest().isEmpty());
+		// you have to convert a set to a list in order to access the content
+		List<Integer> listUp = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertEquals(request.getDestFloor(), listUp.get(0));
+		// check the direction lamp
+		assertTrue(flr.getBtnLamp().getUpLamp());
+		flr.readRequest(request2);
+		listUp = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertEquals(request2.getDestFloor(), listUp.get(0));
+		assertTrue(flr.getBtnLamp().getUpLamp());
+	}
+	
+	/**
+	 * Tests for the reading DOWN request from readRequest method. It checks that 
+	 * the requests are going to the correct location in the Floor class.
+	 */
+	@Test
+	void readRequestForDowntest() {
 		// check for the downRequests
-		flr.readRequest(request3);
-		assertFalse(flr.getActiveDownRequests().isEmpty());
-		assertEquals(flr.getActiveDownRequests().get(0), request3);
-		assertEquals(flr.getActiveUpRequests().size(), 1);
+		assertTrue(flr7.getActiveDownDest().isEmpty());
+		flr7.readRequest(request3);
+		assertFalse(flr7.getActiveDownDest().isEmpty());
+		List<Integer> listDown = new ArrayList<Integer>(flr7.getActiveDownDest());
+		assertEquals(request3.getDestFloor(), listDown.get(0));
+		assertFalse(flr7.getBtnLamp().getUpLamp());
+		assertTrue(flr7.getBtnLamp().getDownLamp());
+		assertEquals(flr7.getActiveDownDest().size(), 1);
 	}
 
 	/**
@@ -67,16 +92,21 @@ class FloorTest {
 		flr.readRequest(request3);
 		flr.readRequest(request4);
 		// check if the list of active requests has the 2 entries each
-		assertEquals(flr.getActiveUpRequests().size(), 2);
-		assertEquals(flr.getActiveDownRequests().size(), 2);
+		List<Integer> listUp = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertEquals(listUp.size(), 2);
+		List<Integer> listDown = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertEquals(listDown.size(), 2);
 
 		// check if requests are cleared for a going up elevator arrival
 		flr.loadPassengers(request5);
-		assertTrue(flr.getActiveUpRequests().isEmpty());
+		listUp = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertTrue(listUp.isEmpty());
 
 		// check if requests are cleared for a going down elevator arrival
+		request5.setElevatorDirection(Direction.DOWN);
 		flr.loadPassengers(request5);
-		assertTrue(flr.getActiveDownRequests().isEmpty());
+		listDown = new ArrayList<Integer>(flr.getActiveUpDest());
+		assertTrue(listDown.isEmpty());
 	}
 
 	/**
@@ -87,6 +117,7 @@ class FloorTest {
 	void getFloorNumbertest() {
 		// Check that the correct floor number has been set
 		assertTrue(flr.getFloorNumber() == 1);
+		assertTrue(flr7.getFloorNumber() == 7);
 	}
 
 }

@@ -11,7 +11,7 @@ import elevatorsim.constants.Direction;
 
 /**
  * A floor object to model the individual floors of a building
- *	@author Michael Patsula, Rahul Anilkumar, David Wang, Thomas Leung
+ *	@author Michael Patsula, Rahul Anilkumar, Thomas Leung
  */
 public class Floor {
 	private Integer floorNumber;
@@ -73,14 +73,14 @@ public class Floor {
 	 */
 	public ElevatorDestinationRequest loadPassengers(ElevatorArrivalRequest request ) {
 		ElevatorDestinationRequest buttonRequest = null;
-		if (request.getElevatorDirection() == Direction.UP) {
+		if (request.getElevatorDirection().equals(Direction.UP)) {
 			arrivalLamps.setUpLamp(true);
 			buttonLamps.setUpLamp(false);
 			System.out.println("Elevator has arrived going up");	
 			
 			buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
 			activeUpDestinations.clear();
-		} else if (request.getElevatorDirection() == Direction.DOWN) {
+		} else if (request.getElevatorDirection().equals(Direction.DOWN)) {
 			arrivalLamps.setDownLamp(true);
 			buttonLamps.setDownLamp(false);
 			System.out.println("Elevator has arrived going down");
@@ -88,6 +88,7 @@ public class Floor {
 			buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
 			activeDownDestinations.clear();
 		} else {
+			System.out.println("Invalid Request");
 			// INVALID Direction - ignore request
 		}
 		
@@ -108,7 +109,7 @@ public class Floor {
 	 * Get the list of going up destination messages from this floor
 	 * @return the list of going up destination messages
 	 */
-	public Set<Integer> getActiveUpDestRequests() {
+	public Set<Integer> getActiveUpDest() {
 		return Collections.unmodifiableSet(activeUpDestinations);
 	}
 	
@@ -123,7 +124,7 @@ public class Floor {
 	 * Get the list going down messages from this floor
 	 * @return the list of messages
 	 */
-	public Set<Integer> getActiveDownDestRequests() {
+	public Set<Integer> getActiveDownDest() {
 		return Collections.unmodifiableSet(activeDownDestinations);
 	}
 }
