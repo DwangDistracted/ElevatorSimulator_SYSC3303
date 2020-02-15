@@ -78,7 +78,7 @@ public class FloorController extends Thread implements MessageReciever {
 				Floor floor = floors.get(((ElevatorArrivalRequest) request).getArrivalFloor());
 				ElevatorDestinationRequest buttonRequests = floor.loadPassengers((ElevatorArrivalRequest) request);
 				
-				server.sendDestenationRequest(buttonRequests);
+				server.sendDestinationRequest(buttonRequests);
 			} 
 		}
 	}

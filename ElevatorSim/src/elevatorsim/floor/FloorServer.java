@@ -81,7 +81,7 @@ public class FloorServer extends UDPServer {
 	 * Sends an Elevator Request to the Scheduler
 	 * @param request the elevator request
 	 */
-	public void sendDestenationRequest(ElevatorDestinationRequest request) {
+	public void sendDestinationRequest(ElevatorDestinationRequest request) {
 		try {
 			sender.send(MessagePackets.generateElevatorButtonRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
