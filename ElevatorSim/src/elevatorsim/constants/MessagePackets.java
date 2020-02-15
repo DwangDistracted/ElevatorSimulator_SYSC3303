@@ -67,6 +67,7 @@ public class MessagePackets {
 	 * Deserializes an elevator request packet's data
 	 * @param data the data of the packet
 	 * @return the elevator request
+	 * @throws IllegalArgument if the ElevatorRequest fails to be deserialized
 	 */
 	public static ElevatorRequest deserializeElevatorRequest(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_REQUEST.getMarker() ||
@@ -97,6 +98,7 @@ public class MessagePackets {
 	 * Deserialize an elevator arrival request packet's data
 	 * @param data the data of the packet
 	 * @return the elevator arrival request
+	 * @throws IllegalArgument if the ElevatorRequest fails to be deserialized
 	 */
 	public static ElevatorArrivalRequest deserializeArrivalRequest(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
@@ -108,10 +110,9 @@ public class MessagePackets {
 	}
 	
 	/**
-	 * Creates an elevator arrival request with the provided ElevatorArrivalRequest as its body
-	 * @param body the ElevatorArrivalRequest to use as the request's body
+	 * Creates an elevator destination request with the provided ElevatorDestinationRequest as its body
+	 * @param body the ElevatorDestinationRequest to use as the request's body
 	 * @return a DatagramPacket that can be sent with a Socket Server
-	 * @throws IOException if the ElevatorRequest fails to be serialized
 	 */
 	public static DatagramPacket generateDestinationRequest(ElevatorDestinationRequest body) {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
@@ -124,9 +125,10 @@ public class MessagePackets {
 	}
 	
 	/**
-	 * Deserialize an elevator arrival request packet's data
+	 * Deserialize an destination request packet's data
 	 * @param data the data of the packet
-	 * @return the elevator arrival request
+	 * @return the elevator destination request
+	 * @throws IllegalArgument if the ElevatorDestinationRequest fails to be deserialized
 	 */
 	public static ElevatorDestinationRequest deserializeDestinationRequest(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
@@ -155,6 +157,7 @@ public class MessagePackets {
 	 * Deserializes an elevator state change packet's data
 	 * @param data the data of the packet
 	 * @return the elevator state change
+	 * @throws IllegalArgumentException if the ElevatorStateChange fails to be deserialized
 	 */
 	public static ElevatorStateChange deserializeElevatorStateChange(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.STATUS.getMarker() ||
@@ -181,6 +184,12 @@ public class MessagePackets {
 		return new DatagramPacket(message.toByteArray(), message.size());
 	}
 	
+	/**
+	 * Deserializes an elevator event packet's data
+	 * @param data the data of the packet
+	 * @return the elevator state change
+	 * @throws IllegalArgumentException if the ElevatorEvent fails to be deserialized
+	 */
 	public static ElevatorEvent deserializeElevatorEvent(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
 				data[1] != NetworkConstants.NULL_BYTE ||
