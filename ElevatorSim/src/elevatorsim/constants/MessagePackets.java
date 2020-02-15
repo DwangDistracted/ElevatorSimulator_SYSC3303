@@ -185,10 +185,9 @@ public class MessagePackets {
 	}
 	
 	/**
-	 * Deserializes an elevator event packet's data
-	 * @param data the data of the packet
-	 * @return the elevator state change
-	 * @throws IllegalArgumentException if the ElevatorEvent fails to be deserialized
+	 * Deserializes an elevatorEvent packet's data
+	 * @param data the data of the request body
+	 * @return ElevatorEvent the ElevatorEvent represented by the data
 	 */
 	public static ElevatorEvent deserializeElevatorEvent(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||

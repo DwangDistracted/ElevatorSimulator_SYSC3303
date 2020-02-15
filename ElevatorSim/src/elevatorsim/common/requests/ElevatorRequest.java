@@ -2,10 +2,7 @@ package elevatorsim.common.requests;
 
 
 import java.time.LocalTime;
-import java.util.Arrays;
-
 import elevatorsim.constants.Direction;
-import elevatorsim.constants.NetworkConstants;
 
 /**
  * This is the message object which is passed by the different subsystems in
@@ -15,9 +12,8 @@ import elevatorsim.constants.NetworkConstants;
  *
  */
 public class ElevatorRequest extends Request<ElevatorRequest> implements Comparable<ElevatorRequest> {
+	private static final long serialVersionUID = 950145307997619529L;
 
-	// private static final DateTimeFormatter format1 =
-	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
 	private Integer startFloor;
 	private Direction direction;
 	private int destFloor;

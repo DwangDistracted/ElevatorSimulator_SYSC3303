@@ -3,6 +3,8 @@ package elevatorsim.scheduler;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -105,13 +107,17 @@ public class Scheduler extends Thread {
 	 * @return an Available Elevator
 	 */
 	public InetAddress findAvailableElevator() {
-		// Iteration 1 - only one elevator, just return it
+		// Iteration 2 - only one elevator, just return it
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
 	}
 	
+	/**
+	 * Returns an elevator that could service a call
+	 * @param floor the start floor
+	 * @param direction the direction to travel
+	 * @return the address of the elevator if there is one otherwise null
+	 */
 	public InetAddress findAvailableElevator(int floor, Direction direction) {
-		// Iteration 1 - only one elevator, just return it
-		
 		for (InetAddress key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
 			if( (elevatorStatus.getDirection() == Direction.UP && direction == Direction.UP && floor > elevatorStatus.getFloor()) ||
@@ -156,11 +162,35 @@ public class Scheduler extends Thread {
 		return state;
 	}
 	
-	public ArrayList<ElevatorRequest> getStoredRequests(){
-		return this.storedRequests;
+	/**
+	 * returns an unmodifiable version of the storedRequests
+	 * @return the unmodifiable list of stored requests
+	 */
+	public List<ElevatorRequest> getStoredRequests(){
+		return Collections.unmodifiableList(storedRequests);
 	}
 	
-	public void setStoredRequests(ArrayList<ElevatorRequest> storedRequests) {
-		this.storedRequests = storedRequests;
+	/**
+	 * adds an ElevatorRequest to the list of stored requests
+	 * @param storedRequests
+	 */
+	public void addStoredRequest(ElevatorRequest storedRequests) {
+		this.storedRequests.add(storedRequests);
+	}
+	
+	/**
+	 * Removes a given ElevatorRequest from the list of stored requests
+	 * @param object ElevatorRequest to remove
+	 */
+	public void removeStoredRequest(ElevatorRequest object) {
+		this.storedRequests.remove(object);
+	}
+	
+	/**
+	 * Removes a Elevator request from the list of stored requests by index
+	 * @param index the index of the request to remove
+	 */
+	public void removeStoredRequest(int index) {
+		this.storedRequests.remove(index);
 	}
 }

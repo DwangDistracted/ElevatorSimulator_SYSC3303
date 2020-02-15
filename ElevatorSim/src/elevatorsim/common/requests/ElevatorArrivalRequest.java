@@ -7,7 +7,8 @@ import elevatorsim.constants.Direction;
  * arriving to a floor
  */
 public class ElevatorArrivalRequest extends Request<ElevatorArrivalRequest> {
-	
+	private static final long serialVersionUID = 2893575143882472896L;
+
 	private int arrivalFloor;
 	private int elevatorId;
 	private Direction elevatorDirection;

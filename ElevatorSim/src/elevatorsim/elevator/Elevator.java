@@ -1,12 +1,8 @@
 package elevatorsim.elevator;
+
 import elevatorsim.constants.ElevatorState;
 
 import java.net.SocketException;
-
-import elevatorsim.common.requests.MessageReciever;
-import elevatorsim.common.requests.Request;
-
-
 
 /**
  * The elevator class
@@ -14,7 +10,7 @@ import elevatorsim.common.requests.Request;
  * 
  * @author Trevor Bivi
  */
-public class Elevator extends Thread implements MessageReciever {
+public class Elevator extends Thread {
 	private boolean isRunning = false;
 	private int floorAmount;
 	private int floor;
@@ -60,43 +56,59 @@ public class Elevator extends Thread implements MessageReciever {
 		}
 	}
 	
+	/**
+	 * get state of an elevator lamp
+	 * @param lampIndex the index of the floor represented by the lamp (floor# - 1)
+	 * @return whether or not the lamp is on
+	 */
 	public boolean getLampIsOn(int lampIndex) {
 		return this.elevatorLampsOn[lampIndex];
 	}
 	
+	/**
+	 * Sets the state of a lamp
+	 * @param lampIndex the index of the floor represented by the lamp (floor# - 1)
+	 * @param isOn
+	 */
 	public void setLampIsOn(int lampIndex, boolean isOn) {
-		//System.out.print("SET LAMP" + Integer.toString(lampIndex) + " " + Boolean.toString(isOn));
 		this.elevatorLampsOn[lampIndex] = isOn;
 	}
 
 	/**
-	 * Receives message requests from the schedule and then
-	 * sends the messages back to the scheduler but
-	 * targeting floors instead of elevators
-	 * 
-	 * @param message The MessageRequest that should be redirected to floors
+	 * Initiates the stopping of the server
 	 */
-	@Override
-	public void receive(Request message) {
-		System.out.println("Elevator received message: " + message.toString());
-	}
-
 	public void stopRunning() {
 		isRunning = false;
 	}
 	
+	/**
+	 * The floor number the elevator is currently on.
+	 * @return
+	 */
 	public int getFloor() {
 		return this.floor;
 	}
 	
+	/**
+	 * updates the floor the elevator is on
+	 * @param newFloor the new floor number
+	 */
 	public void setFloor(int newFloor) {
 		this.floor = newFloor;
 	}
 	
+	/**
+	 * Returns the state of the elevator state machine
+	 * @return the state
+	 */
 	public ElevatorState getElevatorState() {
 		return this.elevatorState;
 	}
 	
+	/**
+	 * Sets the state of the elevator state machine
+	 * @param elevatorState the new state
+	 */
 	public void setElevatorState(ElevatorState elevatorState) {
 		this.elevatorState = elevatorState;
 	}

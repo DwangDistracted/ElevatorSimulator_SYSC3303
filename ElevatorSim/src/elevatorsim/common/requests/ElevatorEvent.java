@@ -7,6 +7,8 @@ package elevatorsim.common.requests;
  * @author David Wang, Trevor Bivi
  */
 public class ElevatorEvent extends Request<ElevatorEvent> {
+	private static final long serialVersionUID = -2338473739227940127L;
+
 	private int floor; //The new floor
 	public ElevatorEvent (int floor) {
 		this.floor = floor;
