@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
 
+import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
@@ -77,6 +78,66 @@ public class MessagePackets {
 	}
 	
 	/**
+	 * Creates an elevator arrival request with the provided ElevatorArrivalRequest as its body
+	 * @param body the ElevatorArrivalRequest to use as the request's body
+	 * @return a DatagramPacket that can be sent with a Socket Server
+	 * @throws IOException if the ElevatorRequest fails to be serialized
+	 */
+	public static DatagramPacket generateArrivalRequest(ElevatorArrivalRequest body) {
+		ByteArrayOutputStream message = new ByteArrayOutputStream();
+		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
+		message.write(NetworkConstants.NULL_BYTE);
+		body.serialize(message);
+		message.write(NetworkConstants.NULL_BYTE);
+		
+		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	/**
+	 * Deserialize an elevator arrival request packet's data
+	 * @param data the data of the packet
+	 * @return the elevator arrival request
+	 */
+	public static ElevatorArrivalRequest deserializeArrivalRequest(byte[] data) {
+		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
+				data[1] != NetworkConstants.NULL_BYTE ||
+				data[data.length-1] != NetworkConstants.NULL_BYTE) {
+			throw new IllegalArgumentException("Tried to deserialize an invalid elevator request message");
+		}
+		return ElevatorArrivalRequest.deserialize(Arrays.copyOfRange(data, 2, data.length-1));
+	}
+	
+	/**
+	 * Creates an elevator arrival request with the provided ElevatorArrivalRequest as its body
+	 * @param body the ElevatorArrivalRequest to use as the request's body
+	 * @return a DatagramPacket that can be sent with a Socket Server
+	 * @throws IOException if the ElevatorRequest fails to be serialized
+	 */
+	public static DatagramPacket generateDestinationRequest(ElevatorDestinationRequest body) {
+		ByteArrayOutputStream message = new ByteArrayOutputStream();
+		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
+		message.write(NetworkConstants.NULL_BYTE);
+		body.serialize(message);
+		message.write(NetworkConstants.NULL_BYTE);
+		
+		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	/**
+	 * Deserialize an elevator arrival request packet's data
+	 * @param data the data of the packet
+	 * @return the elevator arrival request
+	 */
+	public static ElevatorDestinationRequest deserializeDestinationRequest(byte[] data) {
+		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
+				data[1] != NetworkConstants.NULL_BYTE ||
+				data[data.length-1] != NetworkConstants.NULL_BYTE) {
+			throw new IllegalArgumentException("Tried to deserialize an invalid elevator request message");
+		}
+		return ElevatorDestinationRequest.deserialize(Arrays.copyOfRange(data, 2, data.length-1));
+	}
+	
+	/**
 	 * Creates an Elevator State Change with the provided ElevatorStateChange as its body
 	 * @param body the ELevatorStateChange to use as the request's body
 	 * @return the datagram packet
@@ -102,21 +163,6 @@ public class MessagePackets {
 			throw new IllegalArgumentException("Tried to deserialize an invalid state cange message");
 		}
 		return ElevatorStateChange.deserialize(Arrays.copyOfRange(data, 2, data.length-1));
-	}
-	/**
-	 * Creates an Elevator Button Request with the provided ElevatorRequest as its body
-	 * @param body the ElevatorButtonRequest to use as the request's body
-	 * @return a DatagramPacket that can be sent with a Socket Server
-	 * @throws IOException if the ElevatorRequest fails to be serialized
-	 */
-	public static DatagramPacket generateElevatorButtonRequest(ElevatorDestinationRequest body) throws IOException {
-		ByteArrayOutputStream message = new ByteArrayOutputStream();
-		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
-		message.write(NetworkConstants.NULL_BYTE);
-		body.serialize(message);
-		message.write(NetworkConstants.NULL_BYTE);
-		
-		return new DatagramPacket(message.toByteArray(), message.size());
 	}
 
 	/**
