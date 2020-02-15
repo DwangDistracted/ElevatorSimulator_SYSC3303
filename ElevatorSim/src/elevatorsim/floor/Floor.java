@@ -1,5 +1,6 @@
 package elevatorsim.floor;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,12 +11,12 @@ import elevatorsim.constants.Direction;
 
 /**
  * A floor object to model the individual floors of a building
- *	@author Michael Patsula, Rahul Anilkumar, David Wang
+ *	@author Michael Patsula, Rahul Anilkumar, David Wang, Thomas Leung
  */
 public class Floor {
 	private Integer floorNumber;
-	private DirectionLamp buttonLamps;
-	private DirectionLamp arrivalLamps;
+	private DirectionLamp buttonLamps;	// the lamp for the button the 'user pressed'
+	private DirectionLamp arrivalLamps; // the lamp that usually locate at the top of the elevator (up/down triangle)
 	private Set<Integer> activeUpDestinations;
 	private Set<Integer> activeDownDestinations;
 
@@ -24,12 +25,17 @@ public class Floor {
 		activeUpDestinations = new HashSet<>();
 		activeDownDestinations = new HashSet<>();
 		
+		// check if it is the highest floor or the lowest floor 
+		// to disable the up/down button.
 		if(floorNumber == 1) {
-			this.buttonLamps = new DirectionLamp(true, null);
-			this.arrivalLamps = new DirectionLamp(true, null);
+			this.buttonLamps = new DirectionLamp(false, null);
+			this.arrivalLamps = new DirectionLamp(false, null);
 		} else if (floorNumber == numOfFloors) {
-			this.buttonLamps = new DirectionLamp(null, true);
-			this.arrivalLamps = new DirectionLamp(true, null);
+			this.buttonLamps = new DirectionLamp(null, false);
+			this.arrivalLamps = new DirectionLamp(null, false);
+		} else {
+			this.buttonLamps = new DirectionLamp(false, false);
+			this.arrivalLamps = new DirectionLamp(false, false);
 		}
 	}
 	
@@ -96,5 +102,28 @@ public class Floor {
 	public Integer getFloorNumber() {
 		return floorNumber;
 	}
-
+	
+	// ---- Methods are for testing only ----
+	/**
+	 * Get the list of going up destination messages from this floor
+	 * @return the list of going up destination messages
+	 */
+	public Set<Integer> getActiveUpDestRequests() {
+		return Collections.unmodifiableSet(activeUpDestinations);
+	}
+	
+	/**
+	 * Get direction lamp
+	 */
+	public DirectionLamp getBtnLamp() {
+		return buttonLamps;
+	}
+	
+	/**
+	 * Get the list going down messages from this floor
+	 * @return the list of messages
+	 */
+	public Set<Integer> getActiveDownDestRequests() {
+		return Collections.unmodifiableSet(activeDownDestinations);
+	}
 }
