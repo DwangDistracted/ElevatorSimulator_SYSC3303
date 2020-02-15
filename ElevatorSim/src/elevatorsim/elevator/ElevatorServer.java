@@ -94,15 +94,15 @@ public class ElevatorServer extends UDPServer {
 				timerTask = new java.util.TimerTask() {
 					@Override
 		            public void run() {
-		            	if(elevator.getElevatorState() == ElevatorState.DOOR_CLOSING) {
-		            		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
-		            		try {
-		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+						if(elevator.getElevatorState() == ElevatorState.DOOR_CLOSING) {
+							elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
+							try {
+								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-		            	}
+						}
 					}
 				};
 				timer.schedule( 
