@@ -62,6 +62,7 @@ public class ElevatorServer extends UDPServer {
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
 			
 			try {
+				elevator.setLampIsOn(floorRequest.getDestFloor()-1, true);
 				sender.send(MessagePackets.generateElevatorRequest(destRequest) , InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
@@ -140,6 +141,7 @@ public class ElevatorServer extends UDPServer {
 		} else if (currentState == ElevatorState.DOOR_CLOSED) {
 			if(newState == ElevatorState.DOOR_OPEN ) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
+				this.elevator.setLampIsOn(elevator.getFloor()-1, false);
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override

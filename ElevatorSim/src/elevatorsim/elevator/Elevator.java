@@ -19,6 +19,7 @@ public class Elevator extends Thread implements MessageReciever {
 	private int floorAmount;
 	private int floor;
 	private ElevatorState elevatorState;
+	private boolean[] elevatorLampsOn;
 	
 	/**
 	 * Elevator constructor that stores the amount of floors and
@@ -28,6 +29,7 @@ public class Elevator extends Thread implements MessageReciever {
 	public Elevator ( int floorAmount ) {
 		super("Elevator");
 		this.floorAmount = floorAmount;
+		this.elevatorLampsOn = new boolean[floorAmount];
 		this.floor = 1;
 		this.elevatorState = ElevatorState.DOOR_OPEN;
 	}
@@ -56,6 +58,15 @@ public class Elevator extends Thread implements MessageReciever {
 				server.stopServer();
 			}
 		}
+	}
+	
+	public boolean getLampIsOn(int lampIndex) {
+		return this.elevatorLampsOn[lampIndex];
+	}
+	
+	public void setLampIsOn(int lampIndex, boolean isOn) {
+		//System.out.print("SET LAMP" + Integer.toString(lampIndex) + " " + Boolean.toString(isOn));
+		this.elevatorLampsOn[lampIndex] = isOn;
 	}
 
 	/**
