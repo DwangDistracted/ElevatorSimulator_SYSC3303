@@ -3,6 +3,8 @@ package elevatorsim.scheduler;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -160,8 +162,8 @@ public class Scheduler extends Thread {
 		return state;
 	}
 	
-	public ArrayList<ElevatorRequest> getStoredRequests(){
-		return (ArrayList<ElevatorRequest>) this.storedRequests.clone();
+	public List<ElevatorRequest> getStoredRequests(){
+		return Collections.unmodifiableList(storedRequests);
 	}
 	
 	public void addStoredRequest(ElevatorRequest storedRequests) {

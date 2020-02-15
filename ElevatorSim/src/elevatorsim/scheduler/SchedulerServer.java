@@ -3,7 +3,8 @@ package elevatorsim.scheduler;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -28,8 +29,9 @@ public class SchedulerServer extends UDPServer {
 	private static SchedulerServer instance;
 
 	private final ConcurrentMap<InetAddress, Integer> elevators;
-
 	private InetAddress floorSystem = null; 
+	
+	private Timer timer = new Timer();
 
 	private SchedulerServer() throws SocketException {
 		super("SchedulerServer", NetworkConstants.SCHEDULER_PORT);
@@ -60,7 +62,8 @@ public class SchedulerServer extends UDPServer {
 		//If there is an available elevator but it's moving then ignore it too for now because it's not worth optimising until there are multiple elevators
 		if (availableElevator == null || Scheduler.getInstance().getElevators().get(availableElevator).getDirection() != null ) {
 			Scheduler.getInstance().addStoredRequest(elevatorRequest);
-			ArrayList<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+
 			InetAddress elevatorAddress = Scheduler.getInstance().findAvailableElevator();
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddress);
 			if( storedRequests.size() == 1 && elevatorStatus.getDirection() == null ) {
@@ -105,7 +108,7 @@ public class SchedulerServer extends UDPServer {
 				
 			Direction newDirection = elevatorStatus.addFloor( elevatorRequest.getDestFloor() );
 			if (newDirection != null) {
-				new java.util.Timer().schedule( 
+				timer.schedule( 
 			        new java.util.TimerTask() {
 			            @Override
 			            public void run() {
@@ -124,7 +127,6 @@ public class SchedulerServer extends UDPServer {
 		Scheduler.getInstance().stopProcessing();
 		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
 	}
-	
 
 	/**
 	 * Forwards An Elevator Event to the Registered Floor System
@@ -175,7 +177,7 @@ public class SchedulerServer extends UDPServer {
 		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
 			elevatorStatus.removeStop(elevatorStatus.getFloor());
 			if(elevatorStatus.getStops().size() > 0) {
-				new java.util.Timer().schedule( 
+				timer.schedule( 
 				        new java.util.TimerTask() {
 				            @Override
 				            public void run() {
@@ -189,7 +191,7 @@ public class SchedulerServer extends UDPServer {
 				);
 			} else {
 				elevatorStatus.setDirection(null);
-				ArrayList<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+				List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
 				if( storedRequests.size() > 0 ) {
 					ElevatorRequest firstStoredRequest = storedRequests.get(0);
 					Scheduler.getInstance().removeStoredRequest(0);
@@ -202,12 +204,12 @@ public class SchedulerServer extends UDPServer {
 		Scheduler.getInstance().stopProcessing();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
+	
 	/**
 	 * Registers the caller as either a Elevator or Floor SubSystem, keeping track of its IPAddress and Port 
 	 */
 	@Override
 	public DatagramPacket handleRegisterRequest(DatagramPacket request) {
-		System.out.print("SchedulerServer - Info: Received registed request\n");
 		String requestBody = DatagramPacketUtils.getMessageBodyAsString(request);
 		Role requesterRole = Role.valueOf(requestBody);
 
@@ -235,7 +237,7 @@ public class SchedulerServer extends UDPServer {
 				(addr, port) -> {
 					sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), addr, port);
 				});
-
+		timer.cancel();
 		Scheduler.getInstance().stopRunning();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
