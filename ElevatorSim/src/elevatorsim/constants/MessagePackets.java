@@ -4,7 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorRequest;
+
+
 
 /**
  * This class contains the DatagramPackets that are commonly used by our communications system.
@@ -41,6 +44,7 @@ public class MessagePackets {
 								   2);
 	}
 
+	
 	/**
 	 * Creates an Elevator Request with the provided ElevatorRequest as its body
 	 * @param body the ElevatorRequest to use as the request's body
@@ -50,6 +54,22 @@ public class MessagePackets {
 	public static DatagramPacket generateElevatorRequest(ElevatorRequest body) throws IOException {
 		ByteArrayOutputStream message = new ByteArrayOutputStream();
 		message.write(NetworkConstants.MessageTypes.ELEVATOR_REQUEST.getMarker());
+		message.write(NetworkConstants.NULL_BYTE);
+		body.serialize(message);
+		message.write(NetworkConstants.NULL_BYTE);
+		
+		return new DatagramPacket(message.toByteArray(), message.size());
+	}
+	
+	/**
+	 * Creates an Elevator Button Request with the provided ElevatorRequest as its body
+	 * @param body the ElevatorButtonRequest to use as the request's body
+	 * @return a DatagramPacket that can be sent with a Socket Server
+	 * @throws IOException if the ElevatorRequest fails to be serialized
+	 */
+	public static DatagramPacket generateElevatorButtonRequest(ElevatorDestinationRequest body) throws IOException {
+		ByteArrayOutputStream message = new ByteArrayOutputStream();
+		message.write(NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker());
 		message.write(NetworkConstants.NULL_BYTE);
 		body.serialize(message);
 		message.write(NetworkConstants.NULL_BYTE);

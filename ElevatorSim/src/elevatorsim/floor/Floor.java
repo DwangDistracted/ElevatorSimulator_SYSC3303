@@ -1,10 +1,11 @@
 package elevatorsim.floor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorArrivalRequest;
+import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.Direction;
 
 /**
@@ -13,15 +14,23 @@ import elevatorsim.constants.Direction;
  */
 public class Floor {
 	private Integer floorNumber;
-	private FloorButton dirButtons;
-	private List<ElevatorRequest> activeUpRequests;
-	private List<ElevatorRequest> activeDownRequests;
+	private DirectionLamp buttonLamps;
+	private DirectionLamp arrivalLamps;
+	private Set<Integer> activeUpDestinations;
+	private Set<Integer> activeDownDestinations;
 
-	public Floor(int floorNumber) {
+	public Floor(int floorNumber, int numOfFloors) {
 		this.floorNumber = floorNumber;
-		this.dirButtons = new FloorButton();
-		activeUpRequests = new ArrayList<>();
-		activeDownRequests = new ArrayList<>();
+		activeUpDestinations = new HashSet<>();
+		activeDownDestinations = new HashSet<>();
+		
+		if(floorNumber == 1) {
+			this.buttonLamps = new DirectionLamp(true, null);
+			this.arrivalLamps = new DirectionLamp(true, null);
+		} else if (floorNumber == numOfFloors) {
+			this.buttonLamps = new DirectionLamp(null, true);
+			this.arrivalLamps = new DirectionLamp(true, null);
+		}
 	}
 	
 	/**
@@ -32,11 +41,11 @@ public class Floor {
 	 */
 	public void readRequest(ElevatorRequest request) {
 		if(request.getDirection() == Direction.UP) {
-			activeUpRequests.add(request);
-			dirButtons.setUpFloorButton(true);
+			activeUpDestinations.add(request.getDestFloor());
+			buttonLamps.setUpLamp(true);
 		} else if (request.getDirection() == Direction.DOWN) {
-			activeDownRequests.add(request);
-			dirButtons.setDownFloorButton(true);
+			activeDownDestinations.add(request.getDestFloor());
+			buttonLamps.setDownLamp(true);
 		} else {
 			// INVALID Direction - ignore request
 		}
@@ -48,18 +57,27 @@ public class Floor {
 	 * 
 	 * @param directionLamp
 	 */
-	public void loadPassengers(Direction directionLamp) {
-		if (directionLamp == Direction.UP) {
-			dirButtons.setUpFloorButton(false);
-			System.out.println("Elevator has arrived going up");
-			activeUpRequests.clear();
-		} else if (directionLamp == Direction.DOWN) {
-			dirButtons.setDownFloorButton(false);
+	public ElevatorDestinationRequest loadPassengers(ElevatorArrivalRequest request ) {
+		ElevatorDestinationRequest buttonRequest = null;
+		if (request.getElevatorDirection() == Direction.UP) {
+			arrivalLamps.setUpLamp(true);
+			buttonLamps.setUpLamp(false);
+			System.out.println("Elevator has arrived going up");	
+			
+			buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
+			activeUpDestinations.clear();
+		} else if (request.getElevatorDirection() == Direction.DOWN) {
+			arrivalLamps.setDownLamp(true);
+			buttonLamps.setDownLamp(false);
 			System.out.println("Elevator has arrived going down");
-			activeDownRequests.clear();
+			
+			buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
+			activeDownDestinations.clear();
 		} else {
 			// INVALID Direction - ignore request
 		}
+		
+		return buttonRequest;
 	}
 
 	/**
@@ -70,20 +88,5 @@ public class Floor {
 	public Integer getFloorNumber() {
 		return floorNumber;
 	}
-	
-	/**
-	 * Get the list of going up messages from this floor
-	 * @return the list of messages
-	 */
-	public List<ElevatorRequest> getActiveUpRequests() {
-		return Collections.unmodifiableList(activeUpRequests);
-	}
 
-	/**
-	 * Get the list going down messages from this floor
-	 * @return the list of messages
-	 */
-	public List<ElevatorRequest> getActiveDownRequests() {
-		return Collections.unmodifiableList(activeDownRequests);
-	}
 }

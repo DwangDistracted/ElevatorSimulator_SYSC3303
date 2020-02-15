@@ -1,10 +1,11 @@
 package elevatorsim.elevator;
 
-import elevatorsim.common.MessageReciever;
-
 import java.net.SocketException;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.MessageReciever;
+import elevatorsim.common.requests.Request;
+
+
 
 /**
  * The elevator class
@@ -61,7 +62,7 @@ public class Elevator extends Thread implements MessageReciever {
 	 * @param message The MessageRequest that should be redirected to floors
 	 */
 	@Override
-	public void receive(ElevatorRequest message) {
+	public void receive(Request message) {
 		System.out.println("Elevator received message: " + message.toString());
 	}
 

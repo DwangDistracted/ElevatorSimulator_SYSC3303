@@ -6,7 +6,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import elevatorsim.common.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
@@ -38,7 +39,7 @@ public class FloorServer extends UDPServer {
 
 	@Override
 	public DatagramPacket handleElevatorEvent(DatagramPacket request) {
-		// TODO
+		//controller.receive(message);
 		return MessagePackets.Responses.RESPONSE_NOT_APPLICABLE();
 	}
 
@@ -57,7 +58,23 @@ public class FloorServer extends UDPServer {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Sends an Elevator Request to the Scheduler
+	 * @param request the elevator request
+	 */
+	public void sendDestenationRequest(ElevatorDestinationRequest request) {
+		try {
+			sender.send(MessagePackets.generateElevatorButtonRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+		} catch (UnknownHostException e) {
+			System.out.println("FloorServer - ERROR: Could not find Scheduler Host. Check Network Set Up");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("FloorServer - ERROR: Could not find Request Message");
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Notifies the Scheduler that the Floor System is terminating
 	 */

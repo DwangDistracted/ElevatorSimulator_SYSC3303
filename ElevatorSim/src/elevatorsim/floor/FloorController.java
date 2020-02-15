@@ -3,9 +3,13 @@ package elevatorsim.floor;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
-import elevatorsim.common.ElevatorRequest;
-import elevatorsim.common.MessageReciever;
+import elevatorsim.common.requests.ElevatorArrivalRequest;
+import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.requests.MessageReciever;
+import elevatorsim.common.requests.Request;
 import elevatorsim.constants.NetworkConstants;
 
 /**
@@ -17,6 +21,9 @@ import elevatorsim.constants.NetworkConstants;
 public class FloorController extends Thread implements MessageReciever {
 	private HashMap<Integer, Floor> floors;
 	private Map<Integer, ElevatorRequest> requests;
+	private boolean running;
+	private Queue<Request> eventQueue;
+	FloorServer server = null;
 	
 	public FloorController(String name, int numOfFloors, Map<Integer, ElevatorRequest> requests) {
 		super(name);
@@ -24,7 +31,7 @@ public class FloorController extends Thread implements MessageReciever {
 		this.floors = new HashMap<>();
 		//Initialize Floors
 		for(int i = 0; i < numOfFloors; i++ ) {
-			floors.put(i, new Floor(i));
+			floors.put(i, new Floor(i, numOfFloors));
 		}
 
 		this.requests = requests;
@@ -35,7 +42,6 @@ public class FloorController extends Thread implements MessageReciever {
 	 * the appropriate floors for processing
 	 */
 	public void run() {
-		FloorServer server = null;
 		try {
 			server = new FloorServer(this);
 			server.startServer();
@@ -46,6 +52,12 @@ public class FloorController extends Thread implements MessageReciever {
 				server.sendElevatorRequest(request);
 				Thread.sleep(500);
 			}
+			
+			while(running) {
+				processEvents();
+				wait();
+			}
+			
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -58,13 +70,28 @@ public class FloorController extends Thread implements MessageReciever {
 		}
 	}
 	
+	public void processEvents() {
+		while(!eventQueue.isEmpty()) {
+			Request request = eventQueue.poll();
+			
+			if(request instanceof ElevatorArrivalRequest) {
+				Floor floor = floors.get(((ElevatorArrivalRequest) request).getArrivalFloor());
+				ElevatorDestinationRequest buttonRequests = floor.loadPassengers((ElevatorArrivalRequest) request);
+				
+				server.sendDestenationRequest(buttonRequests);
+			} 
+		}
+	}
+	
+	
 	/**
 	 * This method Receives the arrival signal sent from the scheduler
 	 * indicating an elevator has arrived at a particular floor and then 
 	 * notifies the correct floor.
 	 */
 	@Override
-	public void receive(ElevatorRequest message) {
-		floors.get(message.getDestFloor()).loadPassengers(message.getDirection());
+	public void receive(Request request) {
+		eventQueue.add(request);
+		notifyAll();
 	}	
 }
