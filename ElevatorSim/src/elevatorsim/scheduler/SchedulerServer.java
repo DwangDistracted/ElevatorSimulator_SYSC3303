@@ -1,24 +1,21 @@
 package elevatorsim.scheduler;
 
-import java.awt.List;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.common.ElevatorStateChange;
-import elevatorsim.common.ElevatorStatus;
+import elevatorsim.common.requests.ElevatorStateChange;
+import elevatorsim.common.requests.ElevatorStatus;
 import elevatorsim.constants.Direction;
-import elevatorsim.constants.ElevatorEvent;
 import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
-import elevatorsim.constants.TimeConstants;
 import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;	
 

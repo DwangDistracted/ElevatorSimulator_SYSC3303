@@ -1,7 +1,5 @@
 package elevatorsim.constants;
 
-import elevatorsim.common.ElevatorStatus;
-import elevatorsim.common.SerializableMessage;
 
 /**
  * Represents the different states the elevator can be in

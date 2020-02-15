@@ -2,12 +2,10 @@ package elevatorsim.common.requests;
 
 import java.util.Set;
 
-import elevatorsim.common.SerializableMessage;
-
 /**
  * A request which contains the destination of passengers for a ceratain elevator 
  */
-public class ElevatorDestinationRequest extends SerializableMessage<ElevatorDestinationRequest> implements Request {
+public class ElevatorDestinationRequest extends Request<ElevatorDestinationRequest> {
 	
 	private int passengerStartFloor;
 	private Set<Integer> destinationFloors;

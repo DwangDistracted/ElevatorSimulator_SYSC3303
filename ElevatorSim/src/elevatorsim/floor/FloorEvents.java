@@ -21,6 +21,9 @@ public class FloorEvents extends Thread implements MessageReciever {
 		this.controller = controller;
 	}
 	
+	/**
+	 * Processes floor events
+	 */
 	public void run() {
 		running = true;
 		
@@ -45,7 +48,8 @@ public class FloorEvents extends Thread implements MessageReciever {
 	}
 	
 	/**
-	 * Processes all the floor events and then sends responses when nessesary
+	 * Processes all the floor events and then sends appropriate responses
+	 * to other modules when nessessary
 	 */
 	private void processEvents() {
 		while(!eventQueue.isEmpty()) {
@@ -70,6 +74,7 @@ public class FloorEvents extends Thread implements MessageReciever {
 	 * This method Receives the arrival signal sent from the scheduler
 	 * indicating an elevator has arrived at a particular floor and then 
 	 * notifies the correct floor.
+	 * @param message - a floor event
 	 */
 	@Override
 	public void receive(Request message) {
@@ -77,6 +82,9 @@ public class FloorEvents extends Thread implements MessageReciever {
 	}
 	
 	
+	/**
+	 * Stops the floor subsystem from processing events
+	 */
 	public void stopEventPolling() {
 		this.running = false;
 	}

@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
 
-import elevatorsim.common.ElevatorStateChange;
-import elevatorsim.common.ElevatorStatus;
-import elevatorsim.common.SerializableMessage;
-
 import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.requests.ElevatorStateChange;
 
 /**
  * This class contains the DatagramPackets that are commonly used by our communications system.

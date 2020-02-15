@@ -1,4 +1,4 @@
-package elevatorsim.common;
+package elevatorsim.common.requests;
 
 import elevatorsim.constants.ElevatorState;
 
@@ -9,7 +9,7 @@ import elevatorsim.constants.ElevatorState;
  * @author Trevor Bivi
  *
  */
-public class ElevatorStateChange extends SerializableMessage<ElevatorStateChange> {
+public class ElevatorStateChange extends Request<ElevatorStateChange> {
 	ElevatorState elevatorState;
 	public ElevatorStateChange(ElevatorState state) {
 		this.elevatorState = state;
