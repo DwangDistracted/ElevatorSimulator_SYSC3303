@@ -147,11 +147,11 @@ public class ElevatorServer extends UDPServer {
 		            	if(elevator.getElevatorState() == ElevatorState.DOOR_OPENING) {
 		            		elevator.setElevatorState(ElevatorState.DOOR_OPEN);
 		            		try {
-								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
-							} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+		            		} catch (UnknownHostException e) {
+		            			// TODO Auto-generated catch block
+		            			e.printStackTrace();
+		            		}
 		            	}
 		            }
 		        };
@@ -171,10 +171,10 @@ public class ElevatorServer extends UDPServer {
 		            		} catch (UnknownHostException e) {
 		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+		            		} catch (IOException e) {
+		            			// TODO Auto-generated catch block
+		            			e.printStackTrace();
+		            		}
 		            	} else {
 		            		timer.cancel();
 		            	}
@@ -195,14 +195,14 @@ public class ElevatorServer extends UDPServer {
 		            	if(elevator.getElevatorState() == ElevatorState.MOTOR_DOWN) {
 		            		elevator.setFloor(elevator.getFloor()-1);
 		            		try {
-								sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
-							} catch (UnknownHostException e) {
+		            			sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
+		            		} catch (UnknownHostException e) {
 								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+		            			e.printStackTrace();
+		            		} catch (IOException e) {
+		            			// TODO Auto-generated catch block
+		            			e.printStackTrace();
+		            		}
 		            	}else {
 		            		timer.cancel();
 		            	}
