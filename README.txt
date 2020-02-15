@@ -1,63 +1,52 @@
 ElevatorSimulator_SYSC3303
 ----------------------------------
-This project will aim to implement a multithreaded simulation of an elevator system
+This project will aim to implement a multithreaded simulation of an elevator system.
 
 To Run
 ----------------------------------
-ElevatorSim is an eclipse project. To Run, import the project into Eclipse Java and run from eleveatorsim.Main.  The Unit Tests for the project are implemented in JUnit5. Run them by right clicking on the project and selecting Run As -> JUnit Test.
+ElevatorSim is an eclipse project. 
+
+To Run, import the project into Eclipse Java and run from elevatorsim.Main.
+
+The Unit Tests for the project are implemented in JUnit5. Run them by right clicking on the project and selecting Run As -> JUnit Test.
 
 Authors - Group 1
 ----------------------------------
-* Rahul Anilkumar (101038785) - Worked on Message Classes, File Parser, JUnit Tests
-	- Classes: MessageRequest, FileParser, MessageRequestUtil, FileParserTest, MessageRequestUtilTest
-* David Wang (101032271) - Worked on Scheduler, Startup Logic, Sequence Diagram, Documentation
-	- Classes: Main, MessageReciever, Scheduler
-* Michael Patsula - Worked on Floor Subsystem
-	- Classes: Direction, Floor, FloorButtons, FloorController
-* Thomas Leung (101043255) - Worked on Scheduler Class, JUnit Tests, UML Class Diagram
-	- Classes: Scheduler, SchedulerTest
-* Trevor Bivi (101045460) - Worked on Elevator Subsystem, JUnit Tests
-	- Classes: Elevator, MessageDestination, FloorTest
+* Rahul Anilkumar (101038785) - Worked on Unit Tests, Requests, Documentation
+* David Wang (101032271) - Worked on UDP Server, Scheduler State Machine, Sequence Diagram
+* Michael Patsula (101043663) - Worked on Floor System, Requests
+* Thomas Leung (101043255) - Worked on Unit Tests, UML Diagram, Requests
+* Trevor Bivi (101045460) - Worked on Elevator System, Elevator State Machine, Scheduler Logic.
 
-Classes
+
+Packages
 ----------------------------------
-elevatorsim.Main - This class serves as the program entry point. It creates all the necessary threads and starts all the system.
+elevatorsim - contains the Main Program Entry Point for the Elevator System
 
-elevatorsim.common.MessageRequest - This structure contains the data that will be sent between the floor subsystem and elevator subsystem.
+elevatorsim.common.requests - contains the Request POJOs that are used in the system. These POJOs contain information used by all the subsystems to communicate to one another
 
-elevatorsim.common.MessageReciever - This interface contains a method stub that all classes that are meant to recieve MessageRequests is expected to implement
+elevatorsim.constants - contains constants and enumerations used in the various subsystems. Also has a class that will create the DatagramPackets used for UDP communications between subsystems.
 
-elevatorsim.elevator.Elevator - This class models the brains of the elevator system. In the current iteration all it does is send back all messages it recieves
+elevatorsim.elevator - contains the logic and model for the elevator subsystem
 
-elevatorsim.enums.Direction - This enumeration contains the directions that an elevator can go. Currently has UP, DOWN, and INVALID directions.
+elevatorsim.floor - contains the logic and model for the floor subsystem
 
-elevatorsim.enums.MessageDestination - This enumeration contains the destinations that a MessageRequest can go to. Currently has ELEVATORS and FLOORS.
+elevatorsim.scheduler - contains the logic for the scheduler subsystem
 
-elevatorsim.floor.Floor - This class models a floor in the building. It keeps track of what requests have been raised by the floor.
+elevatorsim.server - contains the logic for a UDP Server capable of listening and sending. Each Subsystem will implement their own server logic based off the interfaces and abstract classes in this package.
 
-elevatorsim.floor.FloorButtons - This class models the buttons on the floor, specifically the up and down elevator request buttons. They are set and unset as the Floor reads and sends requests.
+elevatorsim.tests - contains the unit tests for ElevatorSim
 
-elevatorsim.floor.FloorController - This class models the logic of the floor system. It sends and recieves requests from the scheduler.
-
-elevatorsim.scheduler.Scheduler - This class models the scheduler system of the elevator. Currently allows sending of messages back and forth between the elevators and floor subsystem.
-
-elevatorsim.test.FileParserTest - Junit test class to test the FileParser class methods
-
-elevatorsim.test.FloorTest - Junit test class to test the Floor class methods
-
-elevatorsim.test.MessageRequestUtilTest - Junit test class to test the MessageRequestUtil class' static methods
-
-elevatorsim.test.SchedulerTest - Junit test class to test the Scheduler class methods
-
-elevatorsim.util.FileParser - Utility class that helps us parse MessageRequests from text files
-
-elevatorsim.util.MessageRequestUtil - Utility class that helps us manipulate the map of MessageRequests that is read in from the FileParser
-
+elevatorsim.util - contains utility classes used in the systems to parse files, datagram packets, and requests
 
 UML Class and Sequence Diagrams
 ----------------------------------
-The UML diagrams can be found in the Diagrams/Iteration 1 directory
+The UML diagrams can be found in the Diagrams/Iteration 2 directory
 
-Iteration1_Sequence.PNG - The sequence diagram depicting the interactions between threads
+Sequence_Diagram.PNG - The sequence diagram depicting the interactions between threads in all three subsystems
 
-Iteration1_Class_Diagram.PNG - The class diagram depicting the structure of the ElevatorSim project
+Class_Diagram.PNG - The class diagram depicting the structure of the ElevatorSim project
+
+State_Machine_Elevator.PNG - The class diagram depicting the state and state transitions for the Elevator
+
+State_Machine_Scheduler.PNG - The class diagram depicting the state and state transitions for the Scheduler
