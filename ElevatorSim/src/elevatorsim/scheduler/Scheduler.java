@@ -162,18 +162,34 @@ public class Scheduler extends Thread {
 		return state;
 	}
 	
+	/**
+	 * returns an unmodifiable version of the storedRequests
+	 * @return the unmodifiable list of stored requests
+	 */
 	public List<ElevatorRequest> getStoredRequests(){
 		return Collections.unmodifiableList(storedRequests);
 	}
 	
+	/**
+	 * adds an ElevatorRequest to the list of stored requests
+	 * @param storedRequests
+	 */
 	public void addStoredRequest(ElevatorRequest storedRequests) {
 		this.storedRequests.add(storedRequests);
 	}
 	
+	/**
+	 * Removes a given ElevatorRequest from the list of stored requests
+	 * @param object ElevatorRequest to remove
+	 */
 	public void removeStoredRequest(ElevatorRequest object) {
 		this.storedRequests.remove(object);
 	}
 	
+	/**
+	 * Removes a Elevator request from the list of stored requests by index
+	 * @param index the index of the request to remove
+	 */
 	public void removeStoredRequest(int index) {
 		this.storedRequests.remove(index);
 	}

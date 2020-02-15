@@ -135,6 +135,11 @@ public class MessagePackets {
 		return new DatagramPacket(message.toByteArray(), message.size());
 	}
 	
+	/**
+	 * Deserializes an elevatorEvent packet's data
+	 * @param data the data of the request body
+	 * @return ElevatorEvent the ElevatorEvent represented by the data
+	 */
 	public static ElevatorEvent deserializeElevatorEvent(byte[] data) {
 		if(data[0] != NetworkConstants.MessageTypes.ELEVATOR_EVENT.getMarker() ||
 				data[1] != NetworkConstants.NULL_BYTE ||
