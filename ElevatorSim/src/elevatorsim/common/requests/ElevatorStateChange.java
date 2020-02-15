@@ -10,6 +10,8 @@ import elevatorsim.constants.ElevatorState;
  *
  */
 public class ElevatorStateChange extends Request<ElevatorStateChange> {
+	private static final long serialVersionUID = -1552572386383129377L;
+
 	ElevatorState elevatorState;
 	public ElevatorStateChange(ElevatorState state) {
 		this.elevatorState = state;

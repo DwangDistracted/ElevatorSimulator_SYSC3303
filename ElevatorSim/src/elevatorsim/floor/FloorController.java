@@ -37,7 +37,7 @@ public class FloorController extends Thread {
 	/**
 	 * Determines how long to wait before sending the next elevatorRequest to the scheduler to simulate the time in between floor button presses
 	 * @param newRequestTime the time of the next floor button press
-	 * @return long - the time inbetween presses in milliseconds (or the maximum request delay to speed up execution)
+	 * @return long - the time in between presses in milliseconds (or the maximum request delay to speed up execution)
 	 */
 	public long getRequestDelay(LocalTime newRequestTime) {
 		long delayTime = lastRequestTime == null ? 0 : SECONDS.between(lastRequestTime,newRequestTime);
@@ -58,7 +58,9 @@ public class FloorController extends Thread {
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} 
+		} finally {
+			floorEvents.stopEventPolling();
+		}
 	}
 	
 	/**

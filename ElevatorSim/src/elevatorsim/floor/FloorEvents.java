@@ -1,6 +1,7 @@
 package elevatorsim.floor;
 
 import java.net.SocketException;
+import java.util.ArrayDeque;
 import java.util.Queue;
 
 import elevatorsim.common.requests.ElevatorArrivalRequest;
@@ -11,7 +12,7 @@ import elevatorsim.common.requests.Request;
 import elevatorsim.constants.NetworkConstants;
 
 public class FloorEvents extends Thread implements MessageReciever {
-	private Queue<Request> eventQueue;
+	private Queue<Request<?>> eventQueue;
 	private FloorController controller;
 	private FloorServer server;
 	private boolean running;
@@ -19,6 +20,7 @@ public class FloorEvents extends Thread implements MessageReciever {
 	
 	public FloorEvents(FloorController controller){
 		this.controller = controller;
+		eventQueue = new ArrayDeque<Request<?>>();
 	}
 	
 	/**
@@ -49,11 +51,11 @@ public class FloorEvents extends Thread implements MessageReciever {
 	
 	/**
 	 * Processes all the floor events and then sends appropriate responses
-	 * to other modules when nessessary
+	 * to other modules when necessary
 	 */
 	private void processEvents() {
 		while(!eventQueue.isEmpty()) {
-			Request request = eventQueue.poll();
+			Request<?> request = eventQueue.poll();
 			
 			if(request instanceof ElevatorArrivalRequest) {
 				Floor floor = controller.getFloor(((ElevatorArrivalRequest) request).getArrivalFloor());
@@ -77,7 +79,7 @@ public class FloorEvents extends Thread implements MessageReciever {
 	 * @param message - a floor event
 	 */
 	@Override
-	public void receive(Request message) {
+	public void receive(Request<?> message) {
 		eventQueue.add(message);
 	}
 	

@@ -9,5 +9,5 @@ public interface MessageReciever {
 	 * Receives a message from a Message Sender
 	 * @param message the message being received
 	 */
-	public void receive(Request message);
+	public void receive(Request<?> message);
 }

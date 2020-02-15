@@ -17,9 +17,7 @@ import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
 import elevatorsim.constants.TimeConstants;
-import elevatorsim.scheduler.Scheduler;
 import elevatorsim.server.UDPServer;
-import elevatorsim.util.DatagramPacketUtils;
 
 /**
  * The Server that serves an Elevator instance
@@ -51,25 +49,19 @@ public class ElevatorServer extends UDPServer {
 		/*
 		 * Passes the Elevator Request in the request message to the owning elevator 
 		 */
-
 		ElevatorRequest floorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print("ElevatorServer - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
+
 		if(this.elevator.getFloor() == floorRequest.getStartFloor() && this.elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
-			
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
 			
 			try {
 				elevator.setLampIsOn(floorRequest.getDestFloor()-1, true);
 				sender.send(MessagePackets.generateElevatorRequest(destRequest) , InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		// TODO - deserialize and pass to elevator
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 	
@@ -77,12 +69,15 @@ public class ElevatorServer extends UDPServer {
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
 		System.out.print("ElevatorServer - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
+
 		ElevatorState currentState = this.elevator.getElevatorState();
 		ElevatorState newState = elevatorStateChange.getStateChange();
+
 		boolean error = false;
 		if(timer != null) {
 			timer.cancel();
 		}
+
 		if(timerTask != null) {
 			timerTask.cancel();
 		}
@@ -99,7 +94,6 @@ public class ElevatorServer extends UDPServer {
 							try {
 								sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 							} catch (UnknownHostException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -124,7 +118,6 @@ public class ElevatorServer extends UDPServer {
 		            		try {
 		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
-		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		}
 		            	}
@@ -149,7 +142,6 @@ public class ElevatorServer extends UDPServer {
 		            		try {
 		            			sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
-		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		}
 		            	}
@@ -169,10 +161,8 @@ public class ElevatorServer extends UDPServer {
 		            		try {
 		            			sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
-		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		} catch (IOException e) {
-		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		}
 		            	} else {
@@ -197,10 +187,8 @@ public class ElevatorServer extends UDPServer {
 		            		try {
 		            			sender.send( MessagePackets.generateElevatorEvent(new ElevatorEvent(elevator.getFloor())),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		            		} catch (UnknownHostException e) {
-								      // TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		} catch (IOException e) {
-		            			// TODO Auto-generated catch block
 		            			e.printStackTrace();
 		            		}
 		            	}else {
@@ -221,7 +209,6 @@ public class ElevatorServer extends UDPServer {
 				try {
 					sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_CLOSED)),InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else if (newState != currentState) {
@@ -238,6 +225,7 @@ public class ElevatorServer extends UDPServer {
 	 */
 	@Override
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
+		timer.cancel();
 		elevator.stopRunning();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
