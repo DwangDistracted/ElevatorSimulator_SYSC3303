@@ -60,19 +60,19 @@ class ElevatorTest {
 		// Check the default elevator state
 		assertEquals(ElevatorState.DOOR_OPEN, elevator.getElevatorState());
 		// Receive a door close request
-		recPacket = createPacket(new ElevatorStateChange(ElevatorState.DOOR_CLOSED));
+		recPacket = createPacket(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED));
 		es.handleElevatorStateChange(recPacket);
 		assertEquals(ElevatorState.DOOR_CLOSING, elevator.getElevatorState());
 		// mock the door closed response that the scheduler would set
-		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
-		assertEquals(ElevatorState.DOOR_CLOSED, elevator.getElevatorState());
+		elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
+		assertEquals(ElevatorState.STATIONARY_AND_DOOR_CLOSED, elevator.getElevatorState());
 		// Receive a motor moving upwards Request
 		recPacket = createPacket(new ElevatorStateChange(ElevatorState.MOTOR_UP));
 		es.handleElevatorStateChange(recPacket);
 		assertEquals(ElevatorState.MOTOR_UP, elevator.getElevatorState());
 		// mockElevatorStopped after arrival
-		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
-		assertEquals(ElevatorState.DOOR_CLOSED, elevator.getElevatorState());
+		elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
+		assertEquals(ElevatorState.STATIONARY_AND_DOOR_CLOSED, elevator.getElevatorState());
 		// Request of arrival and door opening
 		recPacket = createPacket(new ElevatorStateChange(ElevatorState.DOOR_OPEN));
 		es.handleElevatorStateChange(recPacket);
@@ -91,19 +91,19 @@ class ElevatorTest {
 		// Check the default elevator state
 		assertEquals(ElevatorState.DOOR_OPEN, elevator.getElevatorState());
 		// Receive a door close request
-		recPacket = createPacket(new ElevatorStateChange(ElevatorState.DOOR_CLOSED));
+		recPacket = createPacket(new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED));
 		es.handleElevatorStateChange(recPacket);
 		assertEquals(ElevatorState.DOOR_CLOSING, elevator.getElevatorState());
 		// mock the door closed response that the scheduler would set
-		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
-		assertEquals(ElevatorState.DOOR_CLOSED, elevator.getElevatorState());
+		elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
+		assertEquals(ElevatorState.STATIONARY_AND_DOOR_CLOSED, elevator.getElevatorState());
 		// Receive a motor moving downwards Request
 		recPacket = createPacket(new ElevatorStateChange(ElevatorState.MOTOR_DOWN));
 		es.handleElevatorStateChange(recPacket);
 		assertEquals(ElevatorState.MOTOR_DOWN, elevator.getElevatorState());
 		// mockElevatorStopped after arrival
-		elevator.setElevatorState(ElevatorState.DOOR_CLOSED);
-		assertEquals(ElevatorState.DOOR_CLOSED, elevator.getElevatorState());
+		elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
+		assertEquals(ElevatorState.STATIONARY_AND_DOOR_CLOSED, elevator.getElevatorState());
 		// Request of arrival and door opening
 		recPacket = createPacket(new ElevatorStateChange(ElevatorState.DOOR_OPEN));
 		es.handleElevatorStateChange(recPacket);

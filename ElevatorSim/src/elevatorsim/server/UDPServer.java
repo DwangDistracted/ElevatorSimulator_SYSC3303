@@ -54,6 +54,10 @@ public abstract class UDPServer {
 		isRunning = false;
 	}
 
+	/**
+	 * Check if the Server is running
+	 * @return True if the Server is running, false otherwise
+	 */
 	public boolean isRunning() {
 		return isRunning;
 	}

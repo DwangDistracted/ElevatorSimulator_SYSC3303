@@ -1,6 +1,5 @@
 package elevatorsim.constants;
 
-
 /**
  * Represents the different states the elevator can be in
  * Note: The elevator must not be moving if it is in the door closed state (or other states starting in door for that matter)
@@ -31,6 +30,12 @@ public enum ElevatorState {
 		return this.stringValue;
 	}
 
+	
+	/**
+	 * Identify the elevator state from the corresponding byte value.
+	 * @param byteValue The specific byte to identify the elevator's state
+	 * @return The elevator's state
+	 */
 	public ElevatorState getStateFromByteValue(byte byteValue) {
 		ElevatorState[] normalStates = new ElevatorState[] {
 			DOOR_OPEN,

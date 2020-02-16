@@ -15,7 +15,8 @@ import elevatorsim.constants.Direction;
 /**
  * This is the scheduler for the elevator simulator. 
  * 
- * It is a singleton object responsible for calculating which elevator to send requests to. It also tracks the state of the scheduler subsystem and some information about elevators it is controlling
+ * It is a singleton object responsible for calculating which elevator to send requests to. 
+ * It also tracks the state of the scheduler subsystem and some information about elevators it is controlling.
  * 
  * @author David Wang, Thomas Leung, Trevor Bivi
  */
@@ -164,7 +165,7 @@ public class Scheduler extends Thread {
 	}
 	
 	/**
-	 * returns an unmodifiable version of the storedRequests
+	 * Returns an unmodifiable version of the storedRequests
 	 * @return the unmodifiable list of stored requests
 	 */
 	public List<ElevatorRequest> getStoredRequests(){
@@ -172,7 +173,7 @@ public class Scheduler extends Thread {
 	}
 	
 	/**
-	 * adds an ElevatorRequest to the list of stored requests
+	 * Adds an ElevatorRequest to the list of stored requests
 	 * @param storedRequests
 	 */
 	public void addStoredRequest(ElevatorRequest storedRequests) {
@@ -196,7 +197,7 @@ public class Scheduler extends Thread {
 	}
 	
 	/**
-	 *  Method for testing the StateMachine
+	 * Method for testing the StateMachine
 	 * @param state the state to set the value to
 	 */
 	public void setState(SchedulerState state) {
