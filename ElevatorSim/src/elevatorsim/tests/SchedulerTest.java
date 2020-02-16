@@ -1,34 +1,24 @@
 package elevatorsim.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.elevator.Elevator;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.constants.Role;
-import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;
-import elevatorsim.scheduler.Scheduler.MessageRequestWrapper;
+import elevatorsim.scheduler.Scheduler.SchedulerState;
 
-/*
- * FROM DAVID:
- * TODO - This is broken now due to the Socket Server System. Must discuss how to test the Scheduler now
- */
 
 /**
  * A test class to test the Scheduler functionality
  * 
- * @author Thomas Leung
+ * @author Thomas Leung, Rahul Anilkumar
  *
  */
 class SchedulerTest {
 	private Scheduler scheduler;
-	private FloorController floorController;
-	private Elevator elevator;
-	private HashMap<Integer, ElevatorRequest> requestMap;
-	private ElevatorRequest request1, request2;
 
 	/**
 	 * Setup objects to be utilized in the test of the Scheduler class
@@ -38,19 +28,10 @@ class SchedulerTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		scheduler = Scheduler.getInstance();
-		requestMap = new HashMap<Integer, ElevatorRequest>();
-		request1 = new ElevatorRequest("14:05:15.0", "2", "Up", "5");
-		request2 = new ElevatorRequest("05:05:23.0", "1", "Up", "3");
-		requestMap.put(1, request1);
-		requestMap.put(2, request2);
-		requestMap.put(3, new ElevatorRequest("10:05:12.0", "7", "down", "6"));
-		requestMap.put(4, new ElevatorRequest("12:05:12.0", "4", "down", "1"));
-		floorController = new FloorController("floorController", 10, requestMap);
-		elevator = new Elevator(10);
 	}
 
 	/**
-	 * Test if we can get one scheduler
+	 * Test if we can get one scheduler instance
 	 */
 	@Test
 	void getSchedulerTest() {
@@ -60,42 +41,68 @@ class SchedulerTest {
 	}
 
 	/**
-	 * Test if the add a floor to scheduler
+	 * Test if the valid state transitions occur as intended
 	 */
 	@Test
-	void setFloorControllerTest() {
-		scheduler.setFloorController(floorController);
-		assertTrue(scheduler.getFloorController().equals(floorController));
-		assertFalse(scheduler.getFloorController().equals(null));
+	void StateMachineValidTransitionTest() {
+		scheduler.setState(SchedulerState.LISTENING);
+		//Check that the initial state of the machine is LISTENING
+		assertEquals(SchedulerState.LISTENING, scheduler.getSchedulerState());
+		//Transition to the Processing state and check the state is in PROCESSING
+		scheduler.startProcessing();
+		assertEquals(SchedulerState.PROCESSING,scheduler.getSchedulerState());
+		//Transition back to the Listening state after processing the requests
+		scheduler.stopProcessing();
+		assertEquals(SchedulerState.LISTENING, scheduler.getSchedulerState());
+		//Transition to the Stopped state of the machine
+		scheduler.stopRunning();
+		assertEquals(SchedulerState.STOPPED,scheduler.getSchedulerState());
 	}
-
+	
 	/**
-	 * Test addElevator method
+	 * Test if the state machine goes to the invalid state for StartProcessing request
 	 */
 	@Test
-	void addElevatorTest() {
-		// elevator is an ArrayList
-		assertTrue(scheduler.getElevator().size() == 0);
-		scheduler.addElevator(elevator);
-		assertTrue(scheduler.getElevator().size() == 1);
-		scheduler.addElevator(elevator);
-		assertTrue(scheduler.getElevator().size() == 2);
+	void InvalidStateTransitionStartProcessingTest() {
+		scheduler.setState(SchedulerState.LISTENING);
+		//Check that the initial state of the machine is LISTENING
+		assertEquals(SchedulerState.LISTENING, scheduler.getSchedulerState());	
+		//Transition to the Processing state and check the state is in PROCESSING
+		scheduler.startProcessing();
+		assertEquals(SchedulerState.PROCESSING,scheduler.getSchedulerState());
+		//Transition to an invalid state after processing the requests to check the Invalid State
+		scheduler.startProcessing();
+		assertEquals(SchedulerState.INVALID, scheduler.getSchedulerState());
 	}
-
+	
 	/**
-	 * Test for sendMessage method
+	 * Test if the state machine goes to the invalid state for StopProcessing request
 	 */
 	@Test
-	void setMessageTest() {
-		assertTrue(scheduler.getMessageRequests().size() == 0);
-		scheduler.sendMessage(Role.FLOORS, request1);
-		assertTrue(scheduler.getMessageRequests().size() == 1);
-		scheduler.sendMessage(Role.ELEVATORS, request2);
-		assertTrue(scheduler.getMessageRequests().size() == 2);
-		MessageRequestWrapper messageRequest = scheduler.getMessageRequests().remove();
-		assertTrue(messageRequest.destination.equals(Role.FLOORS));
-		messageRequest = scheduler.getMessageRequests().remove();
-		assertTrue(messageRequest.destination.equals(Role.ELEVATORS));
+	void InvalidStateTransitionStopProcessingTest() {
+		scheduler.setState(SchedulerState.LISTENING);
+		//Check that the initial state of the machine is LISTENING
+		assertEquals(SchedulerState.LISTENING, scheduler.getSchedulerState());	
+		//Try to transition to the Listening state without hitting the Processing state and check the state is in INVALID
+		scheduler.stopProcessing();
+		assertEquals(SchedulerState.INVALID, scheduler.getSchedulerState());
+	}
+	
+	/**
+	 * Test if the state machine goes to the invalid state for StopProcessing request
+	 */
+	@Test
+	void InvalidStateTransitionStopRunningTest() {
+		scheduler.setState(SchedulerState.LISTENING);
+		//Check that the initial state of the machine is LISTENING
+		assertEquals(SchedulerState.LISTENING, scheduler.getSchedulerState());	
+		//Transition to the Processing state and check the state is in PROCESSING
+		scheduler.startProcessing();
+		assertEquals(SchedulerState.PROCESSING,scheduler.getSchedulerState());
+		//Try to transition to stopped state while still in the processing state and check that the state is INVALID
+		scheduler.stopRunning();
+		assertEquals(SchedulerState.INVALID, scheduler.getSchedulerState());
 	}
 
+	
 }
