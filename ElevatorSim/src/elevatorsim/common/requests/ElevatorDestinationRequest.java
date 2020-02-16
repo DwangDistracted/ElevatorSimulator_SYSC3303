@@ -3,7 +3,7 @@ package elevatorsim.common.requests;
 import java.util.Set;
 
 /**
- * A request which contains the destination of passengers for a ceratain elevator 
+ * A request which contains the destination of passengers for a certain elevator 
  */
 public class ElevatorDestinationRequest extends Request<ElevatorDestinationRequest> {
 	private static final long serialVersionUID = -1368065090246286307L;
