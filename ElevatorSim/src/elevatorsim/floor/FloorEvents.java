@@ -59,9 +59,8 @@ public class FloorEvents extends Thread implements MessageReciever {
 			
 			if(request instanceof ElevatorArrivalRequest) {
 				Floor floor = controller.getFloor(((ElevatorArrivalRequest) request).getArrivalFloor());
-				ElevatorDestinationRequest buttonRequests = floor.loadPassengers((ElevatorArrivalRequest) request);
+				floor.loadPassengers((ElevatorArrivalRequest) request);
 				
-				server.sendDestinationRequest(buttonRequests);
 			} else if(request instanceof ElevatorRequest) {
 				Floor floor = controller.getFloor(((ElevatorRequest) request).getStartFloor());
 				floor.readRequest((ElevatorRequest) request);

@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStateChange;
@@ -175,7 +176,10 @@ public class SchedulerServer extends UDPServer {
 				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_DOWN)), elevator, elevators.get(elevator));
 			}
 		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
+			DatagramPacket packet = MessagePackets.generateArrivalRequest(new ElevatorArrivalRequest(1, elevatorStatus.getFloor(), elevatorStatus.getDirection()));
+			sender.send(packet, floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
 			elevatorStatus.removeStop(elevatorStatus.getFloor());
+			
 			if(elevatorStatus.getStops().size() > 0) {
 				timer.schedule( 
 				        new java.util.TimerTask() {
