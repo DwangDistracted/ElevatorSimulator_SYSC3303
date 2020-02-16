@@ -33,7 +33,7 @@ public class FloorEvents extends Thread implements MessageReciever {
 			this.server = new FloorServer(this);
 			server.startServer();
 			Thread.sleep(NetworkConstants.DELAY_SERVER_START_MS);
-			while(running) {
+			while(running || !eventQueue.isEmpty()) {
 				processEvents();
 				Thread.sleep(500);
 			}
