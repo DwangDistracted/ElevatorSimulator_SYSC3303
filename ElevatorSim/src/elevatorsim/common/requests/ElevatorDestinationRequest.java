@@ -3,6 +3,8 @@ package elevatorsim.common.requests;
 import java.util.Set;
 
 /**
+ * May be used in another iteration
+ * 
  * A request which contains the destination of passengers for a certain elevator 
  */
 public class ElevatorDestinationRequest extends Request<ElevatorDestinationRequest> {

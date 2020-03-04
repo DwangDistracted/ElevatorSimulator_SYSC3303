@@ -74,19 +74,25 @@ public class Floor {
 	public ElevatorDestinationRequest loadPassengers(ElevatorArrivalRequest request ) {
 		ElevatorDestinationRequest buttonRequest = null;
 		if (request.getElevatorDirection().equals(Direction.UP)) {
+			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going up");
 			arrivalLamps.setUpLamp(true);
-			buttonLamps.setUpLamp(false);
-			System.out.println("Elevator has arrived going up");	
 			
-			buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
-			activeUpDestinations.clear();
+			if(!activeUpDestinations.isEmpty()) {
+				System.out.println("Passengers are being loaded onto elevator");
+				buttonLamps.setUpLamp(false);
+				buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
+				activeUpDestinations.clear();
+			}
 		} else if (request.getElevatorDirection().equals(Direction.DOWN)) {
+			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going down");
 			arrivalLamps.setDownLamp(true);
-			buttonLamps.setDownLamp(false);
-			System.out.println("Elevator has arrived going down");
 			
-			buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
-			activeDownDestinations.clear();
+			if(!activeDownDestinations.isEmpty()) {
+				System.out.println("Passengers are being loaded onto elevator");
+				buttonLamps.setDownLamp(false);
+				buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
+				activeDownDestinations.clear();
+			}
 		} else {
 			System.out.println("Invalid Request");
 			// INVALID Direction - ignore request

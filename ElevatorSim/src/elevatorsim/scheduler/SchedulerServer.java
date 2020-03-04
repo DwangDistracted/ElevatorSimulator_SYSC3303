@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStateChange;
@@ -209,21 +210,25 @@ public class SchedulerServer extends UDPServer {
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_DOWN)),
 						elevator, elevators.get(elevator));
 			}
-		} else if (elevatorState == ElevatorState.DOOR_OPEN) {
+
+		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
+			DatagramPacket packet = MessagePackets.generateArrivalRequest(new ElevatorArrivalRequest(1, elevatorStatus.getFloor(), elevatorStatus.getDirection()));
+			sender.send(packet, floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
 			elevatorStatus.removeStop(elevatorStatus.getFloor());
-			if (elevatorStatus.getStops().size() > 0) {
-				timer.schedule(new java.util.TimerTask() {
-					@Override
-					public void run() {
-						System.out.print("sending close\n");
-						Scheduler.getInstance().startProcessing();
-						sender.send(
-								DatagramPacketUtils.getCopyOf(MessagePackets.generateElevatorStateChange(
-										new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED))),
-								request.getAddress(), elevators.get(request.getAddress()));
-						Scheduler.getInstance().stopProcessing();
-					}
-				}, 1000);
+			
+			if(elevatorStatus.getStops().size() > 0) {
+				timer.schedule( 
+				        new java.util.TimerTask() {
+				            @Override
+				            public void run() {
+				            	System.out.print("sending close\n");
+				            	Scheduler.getInstance().startProcessing();
+				                sender.send(DatagramPacketUtils.getCopyOf( MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED ))) , request.getAddress(), elevators.get(request.getAddress()));
+				                Scheduler.getInstance().stopProcessing();
+				            }
+				        }, 
+				        1000 
+				);
 			} else {
 				elevatorStatus.setDirection(null);
 				List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
