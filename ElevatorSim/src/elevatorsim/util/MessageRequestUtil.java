@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import elevatorsim.common.MessageRequest;
+import elevatorsim.common.requests.ElevatorRequest;
+
 
 /**
  * A utility class to help with manipulating the MessageRequest DataStructures
@@ -20,12 +21,12 @@ public class MessageRequestUtil {
 	 * 
 	 * @return a Hashmap containing all the messages read from a list
 	 */
-	public static HashMap<Integer, MessageRequest> sortByTimestamp(ArrayList<MessageRequest> requestList) {
-		HashMap<Integer, MessageRequest> requestMap = new HashMap<Integer, MessageRequest>();
-		ArrayList<MessageRequest> list = requestList;
+	public static HashMap<Integer, ElevatorRequest> sortByTimestamp(ArrayList<ElevatorRequest> requestList) {
+		HashMap<Integer, ElevatorRequest> requestMap = new HashMap<Integer, ElevatorRequest>();
+		ArrayList<ElevatorRequest> list = requestList;
 		Collections.sort(list);
 		int requestId = 0;
-		for (MessageRequest request : list) {
+		for (ElevatorRequest request : list) {
 			request.setRequestId(requestId);
 			requestMap.put(requestId, request);
 			requestId++;
@@ -40,8 +41,8 @@ public class MessageRequestUtil {
 	 * @param requestId  the identifier for the request;
 	 * @return the message for the specified request
 	 */
-	public static MessageRequest getSingleMessage(HashMap<Integer, MessageRequest> requestMap, int requestId) {
-		MessageRequest request = null;
+	public static ElevatorRequest getSingleMessage(HashMap<Integer, ElevatorRequest> requestMap, int requestId) {
+		ElevatorRequest request = null;
 		try {
 			if (requestMap.containsKey(requestId)) {
 				request = requestMap.get(requestId);
@@ -62,7 +63,7 @@ public class MessageRequestUtil {
 	 * @param requestId  the requestId used to remove a specified message
 	 * @return true if it was removed successfully
 	 */
-	public static boolean removeMessage(HashMap<Integer, MessageRequest> requestMap, int requestId) {
+	public static boolean removeMessage(HashMap<Integer, ElevatorRequest> requestMap, int requestId) {
 		if (requestMap.containsKey(requestId)) {
 			requestMap.remove(requestId);
 			return true;
@@ -80,7 +81,7 @@ public class MessageRequestUtil {
 	 * @param requestIds the array of message requestIds being removed
 	 * @return true if all the value have been removed
 	 */
-	public static boolean removeMessage(HashMap<Integer, MessageRequest> requestMap, int[] requestIds) {
+	public static boolean removeMessage(HashMap<Integer, ElevatorRequest> requestMap, int[] requestIds) {
 		for (int id : requestIds) {
 			if(requestMap.containsKey(id)) {
 				requestMap.remove(id);
@@ -98,7 +99,7 @@ public class MessageRequestUtil {
 	 * @param requestMap the map that the requestIds are retireved from
 	 * @return A set containing all requestIds in the map
 	 */
-	public static Set<Integer> getAllRequestIds(HashMap<Integer, MessageRequest> requestMap) {
+	public static Set<Integer> getAllRequestIds(HashMap<Integer, ElevatorRequest> requestMap) {
 		return requestMap.keySet();
 	}
 	
@@ -108,8 +109,8 @@ public class MessageRequestUtil {
 	 * @param floorNumber the floor number that the requests are being aggregated for
 	 * @return the aggregated map of requests
 	 */
-	public static HashMap<Integer, MessageRequest> getRequestMapByFloor(HashMap<Integer, MessageRequest> requestMap, int floorNumber){
-		HashMap<Integer, MessageRequest> newMap = new HashMap<Integer, MessageRequest>();
+	public static HashMap<Integer, ElevatorRequest> getRequestMapByFloor(HashMap<Integer, ElevatorRequest> requestMap, int floorNumber){
+		HashMap<Integer, ElevatorRequest> newMap = new HashMap<Integer, ElevatorRequest>();
 		for(Integer key: requestMap.keySet()) {
 			if(requestMap.get(key).getStartFloor() == floorNumber) {
 				newMap.put(key,requestMap.get(key));

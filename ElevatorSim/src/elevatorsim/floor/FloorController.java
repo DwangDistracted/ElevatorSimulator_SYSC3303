@@ -1,62 +1,74 @@
 package elevatorsim.floor;
 
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import elevatorsim.common.MessageReciever;
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.MessageDestination;
-import elevatorsim.scheduler.Scheduler;
+import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.constants.TimeConstants;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 /**
- * Takes in arrival sensor singles, and client requests
- * and then distributes them wherever necessary. 
- * 
+ *Stores all the floor instances, and simulates people making
+ * elevator requests 
+ *  
  * @author Michael Patsula, David Wang
  */
-public class FloorController extends Thread implements MessageReciever {
+public class FloorController extends Thread {
 	private HashMap<Integer, Floor> floors;
-	private Map<Integer, MessageRequest> requests;
+	private Map<Integer, ElevatorRequest> requests;
+	private LocalTime lastRequestTime;
+	private FloorEvents floorEvents;
 	
-	public FloorController(String name, int numOfFloors, Map<Integer, MessageRequest> requests) {
+	public FloorController(String name, int numOfFloors, Map<Integer, ElevatorRequest> requests) {
 		super(name);
 		
 		this.floors = new HashMap<>();
 		//Initialize Floors
 		for(int i = 0; i < numOfFloors; i++ ) {
-			floors.put(i, new Floor(i));
+			floors.put(i, new Floor(i, numOfFloors));
 		}
 
 		this.requests = requests;
+		floorEvents = new FloorEvents(this);
 	}
 	
 	/**
-	 * Send elevator requests to the scheduler, and
-	 * the appropriate floors for processing
+	 * Determines how long to wait before sending the next elevatorRequest to the scheduler to simulate the time in between floor button presses
+	 * @param newRequestTime the time of the next floor button press
+	 * @return long - the time in between presses in milliseconds (or the maximum request delay to speed up execution)
+	 */
+	public long getRequestDelay(LocalTime newRequestTime) {
+		long delayTime = lastRequestTime == null ? 0 : SECONDS.between(lastRequestTime,newRequestTime);
+		lastRequestTime = newRequestTime;
+		return Long.min(delayTime * 1000, TimeConstants.maxFloorRequestDelay);
+	}
+	
+	/**
+	 * Simulates people entering the lobby and making an elevator request
 	 */
 	public void run() {
-		Scheduler scheduler = Scheduler.getInstance();
-		
-		for(MessageRequest request : requests.values()) {
-			System.out.println("Floor Sending Request to Scheduler");
-			floors.get(request.getStartFloor()).readRequest(request);
-			scheduler.sendMessage(MessageDestination.ELEVATORS, request);
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		floorEvents.start();
+		try {
+			for(ElevatorRequest request : requests.values()) {
+				Thread.sleep(getRequestDelay(request.getTimeStamp()));
+				floorEvents.receive(request);
 			}
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			floorEvents.stopEventPolling();
 		}
 	}
 	
 	/**
-	 * This method Receives the arrival signal sent from the scheduler
-	 * indicating an elevator has arrived at a particular floor and then 
-	 * notifies the correct floor.
+	 * Fetches the Floor instance 
+	 * @param floor number
+	 * @return
 	 */
-	@Override
-	public void recieve(MessageRequest message) {
-		floors.get(message.getDestFloor()).loadPassengers(message.getDirection());
+	public Floor getFloor(int floor) {
+		return floors.get(floor);
 	}
-	
 }

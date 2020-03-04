@@ -1,27 +1,42 @@
 package elevatorsim.floor;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.Direction;
+import elevatorsim.common.requests.ElevatorArrivalRequest;
+import elevatorsim.common.requests.ElevatorDestinationRequest;
+import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.constants.Direction;
 
 /**
  * A floor object to model the individual floors of a building
- *	@author Michael Patsula, Rahul Anilkumar, David Wang
+ *	@author Michael Patsula, Rahul Anilkumar, Thomas Leung
  */
 public class Floor {
 	private Integer floorNumber;
-	private FloorButton dirButtons;
-	private List<MessageRequest> activeUpRequests;
-	private List<MessageRequest> activeDownRequests;
+	private DirectionLamp buttonLamps;	// the lamp for the button the 'user pressed'
+	private DirectionLamp arrivalLamps; // the lamp that usually locate at the top of the elevator (up/down triangle)
+	private Set<Integer> activeUpDestinations;
+	private Set<Integer> activeDownDestinations;
 
-	public Floor(int floorNumber) {
+	public Floor(int floorNumber, int numOfFloors) {
 		this.floorNumber = floorNumber;
-		this.dirButtons = new FloorButton();
-		activeUpRequests = new ArrayList<>();
-		activeDownRequests = new ArrayList<>();
+		activeUpDestinations = new HashSet<>();
+		activeDownDestinations = new HashSet<>();
+		
+		// check if it is the highest floor or the lowest floor 
+		// to disable the up/down button.
+		if(floorNumber == 1) {
+			this.buttonLamps = new DirectionLamp(false, null);
+			this.arrivalLamps = new DirectionLamp(false, null);
+		} else if (floorNumber == numOfFloors) {
+			this.buttonLamps = new DirectionLamp(null, false);
+			this.arrivalLamps = new DirectionLamp(null, false);
+		} else {
+			this.buttonLamps = new DirectionLamp(false, false);
+			this.arrivalLamps = new DirectionLamp(false, false);
+		}
 	}
 	
 	/**
@@ -30,13 +45,21 @@ public class Floor {
 	 * 
 	 * @param request the request made by the user/elevator requester
 	 */
-	public void readRequest(MessageRequest request) {
+	public void readRequest(ElevatorRequest request) {
 		if(request.getDirection() == Direction.UP) {
-			activeUpRequests.add(request);
-			dirButtons.setUpFloorButton(true);
+			activeUpDestinations.add(request.getDestFloor());
+			try {
+				buttonLamps.setUpLamp(true);
+			}catch (NullPointerException e) {
+				System.out.println("floor tried to set a non existant button");
+			}
 		} else if (request.getDirection() == Direction.DOWN) {
-			activeDownRequests.add(request);
-			dirButtons.setDownFloorButton(true);
+			activeDownDestinations.add(request.getDestFloor());
+			try {
+				buttonLamps.setDownLamp(true);
+			}catch (NullPointerException e) {
+				System.out.println("floor tried to set a non existant button");
+			}
 		} else {
 			// INVALID Direction - ignore request
 		}
@@ -48,18 +71,34 @@ public class Floor {
 	 * 
 	 * @param directionLamp
 	 */
-	public void loadPassengers(Direction directionLamp) {
-		if (directionLamp == Direction.UP) {
-			dirButtons.setUpFloorButton(false);
-			System.out.println("Elevator has arrived going up");
-			activeUpRequests.clear();
-		} else if (directionLamp == Direction.DOWN) {
-			dirButtons.setDownFloorButton(false);
-			System.out.println("Elevator has arrived going down");
-			activeDownRequests.clear();
+	public ElevatorDestinationRequest loadPassengers(ElevatorArrivalRequest request ) {
+		ElevatorDestinationRequest buttonRequest = null;
+		if (request.getElevatorDirection().equals(Direction.UP)) {
+			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going up");
+			arrivalLamps.setUpLamp(true);
+			
+			if(!activeUpDestinations.isEmpty()) {
+				System.out.println("Passengers are being loaded onto elevator");
+				buttonLamps.setUpLamp(false);
+				buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
+				activeUpDestinations.clear();
+			}
+		} else if (request.getElevatorDirection().equals(Direction.DOWN)) {
+			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going down");
+			arrivalLamps.setDownLamp(true);
+			
+			if(!activeDownDestinations.isEmpty()) {
+				System.out.println("Passengers are being loaded onto elevator");
+				buttonLamps.setDownLamp(false);
+				buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
+				activeDownDestinations.clear();
+			}
 		} else {
+			System.out.println("Invalid Request");
 			// INVALID Direction - ignore request
 		}
+		
+		return buttonRequest;
 	}
 
 	/**
@@ -71,19 +110,27 @@ public class Floor {
 		return floorNumber;
 	}
 	
+	// ---- Methods are for testing only ----
 	/**
-	 * Get the list of going up messages from this floor
-	 * @return the list of messages
+	 * Get the list of going up destination messages from this floor
+	 * @return the list of going up destination messages
 	 */
-	public List<MessageRequest> getActiveUpRequests() {
-		return Collections.unmodifiableList(activeUpRequests);
+	public Set<Integer> getActiveUpDest() {
+		return Collections.unmodifiableSet(activeUpDestinations);
 	}
-
+	
+	/**
+	 * Get direction lamp
+	 */
+	public DirectionLamp getBtnLamp() {
+		return buttonLamps;
+	}
+	
 	/**
 	 * Get the list going down messages from this floor
 	 * @return the list of messages
 	 */
-	public List<MessageRequest> getActiveDownRequests() {
-		return Collections.unmodifiableList(activeDownRequests);
+	public Set<Integer> getActiveDownDest() {
+		return Collections.unmodifiableSet(activeDownDestinations);
 	}
 }

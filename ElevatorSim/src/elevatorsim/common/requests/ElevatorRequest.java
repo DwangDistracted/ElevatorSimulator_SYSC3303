@@ -1,8 +1,8 @@
-package elevatorsim.common;
+package elevatorsim.common.requests;
+
 
 import java.time.LocalTime;
-
-import elevatorsim.enums.Direction;
+import elevatorsim.constants.Direction;
 
 /**
  * This is the message object which is passed by the different subsystems in
@@ -11,11 +11,10 @@ import elevatorsim.enums.Direction;
  * @author Rahul Anilkumar
  *
  */
-public class MessageRequest implements Comparable<MessageRequest> {
+public class ElevatorRequest extends Request<ElevatorRequest> implements Comparable<ElevatorRequest> {
+	private static final long serialVersionUID = 950145307997619529L;
 
-	// private static final DateTimeFormatter format1 =
-	// DateTimeFormatter.ofPattern("hh:mm:ss:SSS");
-	private int startFloor;
+	private Integer startFloor;
 	private Direction direction;
 	private int destFloor;
 	private LocalTime timeStamp;
@@ -29,11 +28,28 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 * @param direction  the direction up/down that the requester is going
 	 * @param destFloor  the floor being traveled to
 	 */
-	public MessageRequest(String timeStamp, String startFloor, String direction, String destFloor) {
+	public ElevatorRequest(String timeStamp, String startFloor, String direction, String destFloor) {
 		this.timeStamp = LocalTime.parse(timeStamp);
 		this.startFloor = Integer.parseInt(startFloor);
 		this.direction = convertDirection(direction);
 		this.destFloor = Integer.parseInt(destFloor);
+	}
+	
+	/**
+	 * Default constructor to create a MessageRequest object
+	 * 
+	 * @param timeStamp  the input time for the request
+	 * @param startFloor the floor the request was made from
+	 * @param direction  the direction up/down that the requester is going
+	 * @param destFloor  the floor being traveled to
+	 */
+	public ElevatorRequest(LocalTime timeStamp, int destFloor) {
+		this.timeStamp = timeStamp;
+		this.destFloor = destFloor;
+	}
+
+	public ElevatorRequest() {
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -56,9 +72,9 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	/**
 	 * Getter Method for the starting floor number
 	 * 
-	 * @return the start floorNumber as an int value
+	 * @return the start floorNumber as an Integer value
 	 */
-	public int getStartFloor() {
+	public Integer getStartFloor() {
 		return startFloor;
 	}
 
@@ -67,7 +83,7 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 * 
 	 * @param startFloor The value for the starting floor
 	 */
-	public void setStartFloor(int startFloor) {
+	public void setStartFloor(Integer startFloor) {
 		this.startFloor = startFloor;
 	}
 
@@ -149,7 +165,7 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	 * @return the compared result
 	 */
 	@Override
-	public int compareTo(MessageRequest message) {
+	public int compareTo(ElevatorRequest message) {
 		return getTimeStamp().compareTo(message.getTimeStamp());
 	}
 
@@ -159,7 +175,7 @@ public class MessageRequest implements Comparable<MessageRequest> {
 	@Override
 	public String toString() {
 		String status = "RequestId: " + getRequestId() + " | Timestamp: " + getTimeStamp().toString()
-				+ " | StartFloor: " + getStartFloor() + " | Direction: " + getDirection().toString()
+				+ " | StartFloor: " + getStartFloor() + " | Direction: " + ( getDirection() == null ? "null" : getDirection().toString())
 				+ " | DestinationFloor: " + getDestFloor();
 		return status;
 	}

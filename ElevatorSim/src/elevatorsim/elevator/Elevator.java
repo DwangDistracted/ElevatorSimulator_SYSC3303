@@ -1,20 +1,21 @@
 package elevatorsim.elevator;
 
-import elevatorsim.common.MessageReciever;
-import elevatorsim.common.MessageRequest;
-import elevatorsim.enums.MessageDestination;
-import elevatorsim.scheduler.Scheduler;
+import elevatorsim.constants.ElevatorState;
+
+import java.net.SocketException;
 
 /**
  * The elevator class
- * Currently this is just used to receive messages from the scheduler
- * and redirect them to the floors
+ * stores information about an elevator
  * 
- * @author Trevor Bivi (101045460)
+ * @author Trevor Bivi
  */
-public class Elevator extends Thread implements MessageReciever {
-	private Scheduler scheduler;
+public class Elevator extends Thread {
+	private boolean isRunning = false;
 	private int floorAmount;
+	private int floor;
+	private ElevatorState elevatorState;
+	private boolean[] elevatorLampsOn;
 	
 	/**
 	 * Elevator constructor that stores the amount of floors and
@@ -22,8 +23,11 @@ public class Elevator extends Thread implements MessageReciever {
 	 * @param floorAmount The amount of floors the elevator can visit
 	 */
 	public Elevator ( int floorAmount ) {
+		super("Elevator");
 		this.floorAmount = floorAmount;
-		this.scheduler = Scheduler.getInstance();
+		this.elevatorLampsOn = new boolean[floorAmount];
+		this.floor = 1;
+		this.elevatorState = ElevatorState.DOOR_OPEN;
 	}
 
 	/**
@@ -32,25 +36,80 @@ public class Elevator extends Thread implements MessageReciever {
 	 * The thread just sleeps to allow other threads to run
 	 */
 	public void run() {
-		while (true) {
-			try {
-				Thread.sleep(0);
-			} catch (Exception e) {
-				e.printStackTrace();
+		ElevatorServer server = null;
+		isRunning = true;
+
+		try {
+			server = new ElevatorServer(this);
+			server.startServer();
+			
+			while (isRunning) {
+				Thread.sleep(100l);
+			}
+		} catch (SocketException | InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			if (server != null) {
+				System.out.println(this.getName() + " - INFO : Exiting");
+				server.stopServer();
 			}
 		}
 	}
+	
+	/**
+	 * get state of an elevator lamp
+	 * @param lampIndex the index of the floor represented by the lamp (floor# - 1)
+	 * @return whether or not the lamp is on
+	 */
+	public boolean getLampIsOn(int lampIndex) {
+		return this.elevatorLampsOn[lampIndex];
+	}
+	
+	/**
+	 * Sets the state of a lamp
+	 * @param lampIndex the index of the floor represented by the lamp (floor# - 1)
+	 * @param isOn
+	 */
+	public void setLampIsOn(int lampIndex, boolean isOn) {
+		this.elevatorLampsOn[lampIndex] = isOn;
+	}
 
 	/**
-	 * Receives message requests from the schedule and then
-	 * sends the messages back to the scheduler but
-	 * targeting floors instead of elevators
-	 * 
-	 * @param message The MessageRequest that should be redirected to floors
+	 * Initiates the stopping of the server
 	 */
-	@Override
-	public void recieve(MessageRequest message) {
-		System.out.println("Elevator received message: " + message.toString() );
-		scheduler.sendMessage(MessageDestination.FLOORS, message);
+	public void stopRunning() {
+		isRunning = false;
+	}
+	
+	/**
+	 * The floor number the elevator is currently on.
+	 * @return
+	 */
+	public int getFloor() {
+		return this.floor;
+	}
+	
+	/**
+	 * updates the floor the elevator is on
+	 * @param newFloor the new floor number
+	 */
+	public void setFloor(int newFloor) {
+		this.floor = newFloor;
+	}
+	
+	/**
+	 * Returns the state of the elevator state machine
+	 * @return the state
+	 */
+	public ElevatorState getElevatorState() {
+		return this.elevatorState;
+	}
+	
+	/**
+	 * Sets the state of the elevator state machine
+	 * @param elevatorState the new state
+	 */
+	public void setElevatorState(ElevatorState elevatorState) {
+		this.elevatorState = elevatorState;
 	}
 }
