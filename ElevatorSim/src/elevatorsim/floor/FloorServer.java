@@ -1,10 +1,12 @@
 package elevatorsim.floor;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
@@ -13,7 +15,10 @@ import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
 import elevatorsim.constants.TimeConstants;
+import elevatorsim.elevator.Elevator;
+import elevatorsim.scheduler.Scheduler;
 import elevatorsim.server.UDPServer;
+import elevatorsim.util.FileParser;
 
 /**
  * The Server that serves a FloorController Instance
@@ -105,5 +110,13 @@ public class FloorServer extends UDPServer {
 			System.out.println("FloorServer - ERROR: Failed to sleep thread");
 			e.printStackTrace();
 		}
+	}
+	
+	public static void main(String[] args) {
+		String path = new File("resources/test.txt").getAbsolutePath();
+		HashMap<Integer, ElevatorRequest> requestMap = FileParser.parseInputFile(path);
+		
+		FloorController floorController = new FloorController("floorController", 10, requestMap);
+		floorController.start();
 	}
 }

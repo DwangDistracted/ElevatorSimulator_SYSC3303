@@ -1,10 +1,12 @@
 package elevatorsim.elevator;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,7 +19,10 @@ import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
 import elevatorsim.constants.TimeConstants;
+import elevatorsim.floor.FloorController;
+import elevatorsim.scheduler.Scheduler;
 import elevatorsim.server.UDPServer;
+import elevatorsim.util.FileParser;
 
 /**
  * The Server that serves an Elevator instance
@@ -264,5 +269,10 @@ public class ElevatorServer extends UDPServer {
 		// TODO
 		//sender.send(MessagePackets.generateElevatorStatus( status ), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 
+	}
+	
+	public static void main(String[] args) {
+		Elevator elevator = new Elevator(10);
+		elevator.start();
 	}
 }

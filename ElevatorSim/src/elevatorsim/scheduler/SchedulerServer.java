@@ -1,8 +1,10 @@
 package elevatorsim.scheduler;
 
+import java.io.File;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,8 +20,11 @@ import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
+import elevatorsim.elevator.Elevator;
+import elevatorsim.floor.FloorController;
 import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;
+import elevatorsim.util.FileParser;
 
 /**
  * Creates a Server that Services the Scheduler.
@@ -314,5 +319,10 @@ public class SchedulerServer extends UDPServer {
 		System.out.println("Scheduler - INFO : Registered Floor SubSystem at " + address.toString());
 		floorSystem = address;
 		return true;
+	}
+
+	public static void main(String[] args) {
+		Scheduler scheduler = Scheduler.getInstance();
+		scheduler.start();
 	}
 }
