@@ -11,7 +11,7 @@ public class NetworkConstants {
 	/*
 	 * The IP of the host that the Scheduler SubSystem runs on 
 	 */
-	public static final String SCHEDULER_IP = "127.0.0.1";
+	public static final String SCHEDULER_IP = "192.168.1.101";
 	/*
 	 * The port that the Scheduler listens to 
 	 */
