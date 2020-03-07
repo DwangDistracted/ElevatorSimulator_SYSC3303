@@ -7,15 +7,10 @@ package elevatorsim.constants;
  */
 public class NetworkConstants {
 	// TODO - Set via configuration files
-
 	/*
 	 * The IP of the host that the Scheduler SubSystem runs on 
 	 */
 	public static final String SCHEDULER_IP = "127.0.0.1";
-	/*
-	 * The IP of the host that the Scheduler SubSystem runs on 
-	 */
-	public static final String ELEVATOR_IP = "127.0.0.1";
 	/*
 	 * The port that the Scheduler listens to 
 	 */

@@ -80,7 +80,7 @@ public class Scheduler extends Thread {
 			e.printStackTrace();
 		} finally {
 			if (server != null) {
-				System.out.println(this.getName() + " - INFO : Exiting");
+				System.out.println(this.getName() + " - INFO : Exiting due to " + (state == SchedulerState.STOPPED ? "Request" : "Error"));
 				server.stopServer();
 			}
 		}
