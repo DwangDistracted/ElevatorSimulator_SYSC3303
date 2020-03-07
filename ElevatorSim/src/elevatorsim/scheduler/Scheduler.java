@@ -115,7 +115,7 @@ public class Scheduler extends Thread {
 	}
 	
 	/**
-	 * Returns an elevator that is not set to move in a direction (note : this include elevators stopped at a floor that will then continue)
+	 * Returns an elevator that is not set to move in a direction (note : a elevator is considered to be moving in a direction if it is stopped at a floor but will then continue moving)
 	 * @param floor the start floor
 	 * @param callDirection the direction to travel
 	 * @return the address of the elevator if there is one otherwise null
