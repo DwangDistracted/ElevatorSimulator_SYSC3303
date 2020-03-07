@@ -37,6 +37,7 @@ public class ElevatorServer extends UDPServer {
 	public ElevatorServer(Elevator elevator) throws SocketException {
 		super(elevator.getName()); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
 		this.elevator = elevator;
+		timer = new Timer();
 	}
 
 	@Override
@@ -70,6 +71,10 @@ public class ElevatorServer extends UDPServer {
 		return MessagePackets.Responses.RESPONSE_FAILURE();
 	}
 	
+	public boolean uselessStateChange( ElevatorState currentState, ElevatorState newState) {
+		return ( (currentState == ElevatorState.DOOR_CLOSING && newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) || (currentState == ElevatorState.DOOR_OPENING && newState == ElevatorState.DOOR_OPEN));
+	}
+	
 	/**
 	 * Handles a request to change state. Some states will take time to transition to such as opening and closing doors. Some state changes will be reported 
 	 * back to the scheduler so it can perform the next needed action on the elevator.
@@ -83,10 +88,11 @@ public class ElevatorServer extends UDPServer {
 		ElevatorState currentState = elevator.getElevatorState();
 		ElevatorState newState = elevatorStateChange.getStateChange();
 
-		boolean error = false;
-		if (timer != null) {
-			timer.cancel();
+		if (uselessStateChange( currentState, newState)) {
+			return MessagePackets.Responses.RESPONSE_SUCCESS();
 		}
+		
+		boolean error = false;
 
 		if (timerTask != null) {
 			timerTask.cancel();
@@ -97,7 +103,7 @@ public class ElevatorServer extends UDPServer {
 			//Initiate door close if requests
 			if (newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 				elevator.setElevatorState( ElevatorState.DOOR_CLOSING);
-				timer = new Timer();
+				
 				timerTask = new java.util.TimerTask() {
 					@Override
 		            public void run() {
@@ -124,7 +130,6 @@ public class ElevatorServer extends UDPServer {
 			//initiate door open if requested
 			if (newState == ElevatorState.DOOR_OPEN) {
 				elevator.setElevatorState(ElevatorState.DOOR_OPENING);
-				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
 		            public void run() {
@@ -149,7 +154,6 @@ public class ElevatorServer extends UDPServer {
 			if (newState == ElevatorState.DOOR_OPEN) {
 				elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				elevator.setLampIsOn(elevator.getFloor()-1, false);
-				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
 		            public void run() {
@@ -168,7 +172,6 @@ public class ElevatorServer extends UDPServer {
 			// move up if requested
 			} else if (newState == ElevatorState.MOTOR_UP) {
 				elevator.setElevatorState(ElevatorState.MOTOR_UP);
-				timer = new Timer();
 				timerTask = new TimerTask() {
 		            @Override
 		            public void run() {
@@ -193,7 +196,6 @@ public class ElevatorServer extends UDPServer {
 			} else if(newState == ElevatorState.MOTOR_DOWN) {
 				
 				elevator.setElevatorState(ElevatorState.MOTOR_DOWN);
-				timer = new Timer();
 				timerTask = new TimerTask() {
 		            @Override
 		            public void run() {
