@@ -55,7 +55,7 @@ public class ElevatorServer extends UDPServer {
 		ElevatorRequest floorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print(elevator.getName()+" - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
 
-		if(this.elevator.getFloor() == floorRequest.getStartFloor() && this.elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
+		if(elevator.getFloor() == floorRequest.getStartFloor() && elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
 			
 			try {
@@ -76,9 +76,9 @@ public class ElevatorServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
-		System.out.print(elevator.getName() + " " +this.getReceiverPort()+" - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
+		System.out.print(elevator.getName() + " " + getReceiverPort()+" - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
 
-		ElevatorState currentState = this.elevator.getElevatorState();
+		ElevatorState currentState = elevator.getElevatorState();
 		ElevatorState newState = elevatorStateChange.getStateChange();
 
 		boolean error = false;
