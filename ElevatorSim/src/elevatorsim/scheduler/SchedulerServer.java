@@ -88,8 +88,10 @@ public class SchedulerServer extends UDPServer {
 			return;
 		}
 
-		int elevatorStartFloor = Scheduler.getInstance().getElevators().get(availableElevator).getFloor();
+		ElevatorStatus availableElevatorStatus = Scheduler.getInstance().getElevators().get(availableElevator);
+		int elevatorStartFloor = availableElevatorStatus.getFloor();
 		int boardFloor = elevatorRequest.getStartFloor();
+
 		int floorChange = boardFloor - elevatorStartFloor;
 		Direction direction;
 		if (floorChange < 0) {
@@ -99,6 +101,7 @@ public class SchedulerServer extends UDPServer {
 		} else {
 			direction = null;
 		}
+
 		if (direction == null) {
 			// send request to elevator so it can send back it's version
 			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator, elevators.get(availableElevator).receiverPort);
@@ -117,7 +120,7 @@ public class SchedulerServer extends UDPServer {
 
 		ElevatorRequest elevatorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator request " + elevatorRequest.toString() + "\n");
-		boolean success = true;
+
 		if (elevatorRequest.getStartFloor() == null) {
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(Scheduler.getInstance().findFirstElevator());
 
@@ -141,7 +144,7 @@ public class SchedulerServer extends UDPServer {
 		}
 
 		Scheduler.getInstance().stopProcessing();
-		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
+		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
 	/**
@@ -180,6 +183,7 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorStateChange(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
+
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator state change update "
 				+ elevatorStateChange.toString() + "\n");
