@@ -7,8 +7,8 @@ public class ElevatorProcess {
 	private static final int numOfFloors = 10;
 	
 	public static void main(String[] args) {
-		Elevator elevator = new Elevator(numOfFloors, "Elevator Server 1 ");
-		Elevator elevator2 = new Elevator(11, "Elevator Server 2 ");
+		Elevator elevator = new Elevator(numOfFloors, "ElevatorServer1");
+		Elevator elevator2 = new Elevator(numOfFloors, "ElevatorServer2");
 		elevator.start();
 		elevator2.start();
 	}
