@@ -24,10 +24,12 @@ public class Main {
 		HashMap<Integer, ElevatorRequest> requestMap = FileParser.parseInputFile(path);
 		
 		FloorController floorController = new FloorController("floorController", numOfFloors, requestMap);
-		Elevator elevator = new Elevator(numOfFloors);
+		Elevator elevator = new Elevator(numOfFloors, "Elevator Server 1 ");
+		Elevator elevator2 = new Elevator(11, "Elevator Server 2 ");
 		Scheduler scheduler = Scheduler.getInstance();
 		scheduler.start();
 		elevator.start();
+		elevator2.start();
 		floorController.start();
 	}
 }

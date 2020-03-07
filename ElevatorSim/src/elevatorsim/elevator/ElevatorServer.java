@@ -35,7 +35,7 @@ public class ElevatorServer extends UDPServer {
 	 * @throws SocketException
 	 */
 	public ElevatorServer(Elevator elevator) throws SocketException {
-		super("ElevatorServer"); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
+		super(elevator.getName()); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
 		this.elevator = elevator;
 	}
 
@@ -53,7 +53,7 @@ public class ElevatorServer extends UDPServer {
 		 * Passes the Elevator Request in the request message to the owning elevator 
 		 */
 		ElevatorRequest floorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
-		System.out.print("ElevatorServer - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
+		System.out.print(elevator.getName()+" - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
 
 		if(this.elevator.getFloor() == floorRequest.getStartFloor() && this.elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
@@ -76,7 +76,7 @@ public class ElevatorServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
-		System.out.print("ElevatorServer - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
+		System.out.print(elevator.getName() + " " +this.getReceiverPort()+" - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
 
 		ElevatorState currentState = this.elevator.getElevatorState();
 		ElevatorState newState = elevatorStateChange.getStateChange();
