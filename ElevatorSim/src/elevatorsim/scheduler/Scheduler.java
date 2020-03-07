@@ -129,28 +129,50 @@ public class Scheduler extends Thread {
 	 * @return the address of the elevator if there is one otherwise null
 	 */
 	public ElevatorContactInfo findAvailableElevator(int floor, Direction callDirection) {
+		ArrayList<ElevatorContactInfo> contacts = new ArrayList<>();
 		for (ElevatorContactInfo key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
 
+			//default
 			if(elevatorStatus.getDirection() == null && floor == elevatorStatus.getFloor()) {
-				return key;
+				contacts.add(key);
 			}
 			// If we want to go up and elevator is going up  and elevator floor is less than floor
-			if (elevatorStatus.getDirection() == Direction.UP && callDirection == Direction.UP && floor > elevatorStatus.getFloor()){
-				return key;
+			else if (elevatorStatus.getDirection() == Direction.UP && callDirection == Direction.UP && floor > elevatorStatus.getFloor()){
+				contacts.add(key);
 			// If we want to go down, elevator is going down and elevator is above the call floor	
 			}else if (elevatorStatus.getDirection() == Direction.DOWN && callDirection == Direction.DOWN && floor < elevatorStatus.getFloor()) {
-				return key;
+				contacts.add(key);
 			}
 			// if the elevator is stationary and there is a call up and floor up
 			else if(elevatorStatus.getDirection() == null && callDirection == Direction.UP && floor > elevatorStatus.getFloor()) {
-				return key;
+				contacts.add(key);
 			}
 			// If the elevator is stationary and we get a go down call and elevator is at an above floor than this
 			else if(elevatorStatus.getDirection() == null && callDirection == Direction.DOWN && floor < elevatorStatus.getFloor()) {
-				return key;
+				contacts.add(key);
 			}
 		}
+		
+		//Get the requests if multiple elevators can handle this
+		int contactSize = contacts.size();
+		int closeness = -1;
+		ElevatorContactInfo cont=null;
+		if(contactSize>0) {
+			for(ElevatorContactInfo x: contacts) {
+				int val = Math.abs((floor- elevators.get(x).getFloor()));
+				if(closeness == -1) {
+					closeness = val;
+					cont = x;
+				}
+				else if(val<closeness){
+					closeness = val;
+					cont = x;
+				}
+			}
+			return cont;
+		}
+		
 		return null;
 	}
 
