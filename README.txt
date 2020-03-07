@@ -53,12 +53,10 @@ elevatorsim.util - contains utility classes used in the systems to parse files, 
 
 UML Class and Sequence Diagrams
 ----------------------------------
-The UML diagrams can be found in the Diagrams/Iteration 2 directory
-
-Sequence_Diagram.PNG - The sequence diagram depicting the interactions between threads in all three subsystems
+The UML diagrams can be found in the Diagrams/Iteration 3 directory
 
 Class_Diagram.PNG - The class diagram depicting the structure of the ElevatorSim project
 
-State_Machine_Elevator.PNG - The class diagram depicting the state and state transitions for the Elevator
+Sequence and State Machine Diagrams are unchanged from Iteration 2 and can be viewed in the Diagrams/Iteration 2 directory
 
-State_Machine_Scheduler.PNG - The class diagram depicting the state and state transitions for the Scheduler
+Iteration 3 Concurrency Changes from Iteration 2.pdf - Describes the changes to scheduler re: concurrency between iteration 2 and 3

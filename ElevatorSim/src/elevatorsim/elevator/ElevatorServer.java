@@ -35,7 +35,7 @@ public class ElevatorServer extends UDPServer {
 	 * @throws SocketException
 	 */
 	public ElevatorServer(Elevator elevator) throws SocketException {
-		super(elevator.getName()); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
+		super(elevator.getName());
 		this.elevator = elevator;
 		timer = new Timer();
 	}
@@ -54,7 +54,7 @@ public class ElevatorServer extends UDPServer {
 		 * Passes the Elevator Request in the request message to the owning elevator 
 		 */
 		ElevatorRequest floorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
-		System.out.print(elevator.getName()+" - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
+		System.out.print(elevator.getName() + " - INFO : Received an Elevator Request " + floorRequest.toString() + "\n");
 
 		if(elevator.getFloor() == floorRequest.getStartFloor() && elevator.getElevatorState() == ElevatorState.DOOR_OPEN) {
 			ElevatorRequest destRequest = new ElevatorRequest( floorRequest.getTimeStamp().plusSeconds(1),  floorRequest.getDestFloor() );
@@ -71,8 +71,9 @@ public class ElevatorServer extends UDPServer {
 		return MessagePackets.Responses.RESPONSE_FAILURE();
 	}
 	
-	public boolean uselessStateChange( ElevatorState currentState, ElevatorState newState) {
-		return ( (currentState == ElevatorState.DOOR_CLOSING && newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) || (currentState == ElevatorState.DOOR_OPENING && newState == ElevatorState.DOOR_OPEN));
+	public boolean uselessStateChange(ElevatorState currentState, ElevatorState newState) {
+		return ((currentState == ElevatorState.DOOR_CLOSING && newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) || 
+				(currentState == ElevatorState.DOOR_OPENING && newState == ElevatorState.DOOR_OPEN));
 	}
 	
 	/**
