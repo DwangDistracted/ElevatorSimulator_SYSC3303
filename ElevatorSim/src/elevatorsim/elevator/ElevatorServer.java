@@ -14,6 +14,7 @@ import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStateChange;
 import elevatorsim.common.requests.ElevatorStatus;
+import elevatorsim.constants.ConfigConstants;
 import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
@@ -41,6 +42,16 @@ public class ElevatorServer extends UDPServer {
 	 */
 	public ElevatorServer(Elevator elevator) throws SocketException {
 		super("ElevatorServer"); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
+		this.elevator = elevator;
+	}
+	
+	/**
+	 * Creates a new Elevator Server
+	 * @param elevator the elevator instance this server belongs to
+	 * @throws SocketException
+	 */
+	public ElevatorServer(Elevator elevator, int serverNumber) throws SocketException {
+		super("ElevatorServer"+Integer.toString(serverNumber)); // TODO - number the elevators once we have many // Don't bind a fixed port. There will need to many of these.
 		this.elevator = elevator;
 	}
 
@@ -272,7 +283,7 @@ public class ElevatorServer extends UDPServer {
 	}
 	
 	public static void main(String[] args) {
-		Elevator elevator = new Elevator(10);
+		Elevator elevator = new Elevator(ConfigConstants.elevatorFloors);
 		elevator.start();
 	}
 }

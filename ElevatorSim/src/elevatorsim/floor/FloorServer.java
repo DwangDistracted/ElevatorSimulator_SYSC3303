@@ -11,6 +11,7 @@ import java.util.HashMap;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.constants.ConfigConstants;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
@@ -113,10 +114,8 @@ public class FloorServer extends UDPServer {
 	}
 	
 	public static void main(String[] args) {
-		String path = new File("resources/test.txt").getAbsolutePath();
-		HashMap<Integer, ElevatorRequest> requestMap = FileParser.parseInputFile(path);
-		
-		FloorController floorController = new FloorController("floorController", 10, requestMap);
+		HashMap<Integer, ElevatorRequest> requestMap = FileParser.parseInputFile(ConfigConstants.testFile);
+		FloorController floorController = new FloorController("floorController", ConfigConstants.elevatorFloors, requestMap);
 		floorController.start();
 	}
 }
