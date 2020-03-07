@@ -18,6 +18,7 @@ public class FloorEvents extends Thread implements MessageReciever {
 	
 	
 	public FloorEvents(FloorController controller){
+		super("FloorSystem");
 		this.controller = controller;
 		eventQueue = new ArrayDeque<Request<?>>();
 	}

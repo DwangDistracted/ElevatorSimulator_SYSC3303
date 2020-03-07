@@ -90,7 +90,7 @@ public class SenderSocket extends Thread {
 		try {
 			if (parentServer.getRole() == Role.FLOORS || parentServer.getRole() == Role.ELEVATORS) {
 				while (!registerWithScheduler());
-				System.out.println(this.getName() + " - Info: Registered With Scheduler");
+				System.out.println(this.getName() + " - INFO: Registered With Scheduler");
 			}
 
 			while(parentServer.isRunning()) {

@@ -104,15 +104,6 @@ public class Scheduler extends Thread {
 	public boolean updateElevator(ElevatorContactInfo elevatorAddress, ElevatorStatus elevatorStatus) {
 		return elevators.replace(elevatorAddress, elevatorStatus) != null;
 	}
-
-	/**
-	 * Finds the first elevator handled by this scheduler
-	 * @return The IP Address of an Elevator
-	 */
-	public ElevatorContactInfo findFirstElevator() {
-		// Iteration 2 - only one elevator, just return it
-		return elevators.keySet().stream().findFirst().orElseGet(() -> null);
-	}
 	
 	/**
 	 * Returns an elevator that is not set to move in a direction (note : a elevator is considered to be moving in a direction if it is stopped at a floor but will then continue moving)
@@ -123,7 +114,7 @@ public class Scheduler extends Thread {
 	public ElevatorContactInfo findStationaryElevator() {
 		for (ElevatorContactInfo key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
-			if( elevatorStatus.getDirection() == null  ) {
+			if (elevatorStatus.getDirection() == null) {
 				return key;
 			}
 		}
@@ -140,17 +131,31 @@ public class Scheduler extends Thread {
 	public ElevatorContactInfo findAvailableElevator(int floor, Direction callDirection) {
 		for (ElevatorContactInfo key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
-			if( (elevatorStatus.getDirection() == Direction.UP && callDirection == Direction.UP && floor > elevatorStatus.getFloor()) ||
-				(elevatorStatus.getDirection() == Direction.DOWN && callDirection == Direction.DOWN && floor < elevatorStatus.getFloor()) ||
-				elevatorStatus.getDirection() == null && floor == elevatorStatus.getFloor() ) {
+
+			if(elevatorStatus.getDirection() == null && floor == elevatorStatus.getFloor()) {
+				return key;
+			}
+			// If we want to go up and elevator is going up  and elevator floor is less than floor
+			if (elevatorStatus.getDirection() == Direction.UP && callDirection == Direction.UP && floor > elevatorStatus.getFloor()){
+				return key;
+			// If we want to go down, elevator is going down and elevator is above the call floor	
+			}else if (elevatorStatus.getDirection() == Direction.DOWN && callDirection == Direction.DOWN && floor < elevatorStatus.getFloor()) {
+				return key;
+			}
+			// if the elevator is stationary and there is a call up and floor up
+			else if(elevatorStatus.getDirection() == null && callDirection == Direction.UP && floor > elevatorStatus.getFloor()) {
+				return key;
+			}
+			// If the elevator is stationary and we get a go down call and elevator is at an above floor than this
+			else if(elevatorStatus.getDirection() == null && callDirection == Direction.DOWN && floor < elevatorStatus.getFloor()) {
 				return key;
 			}
 		}
 		return null;
 	}
-	
-	public ConcurrentMap<ElevatorContactInfo, ElevatorStatus> getElevators(){
-		return elevators;
+
+	public ElevatorStatus getElevatorStatus(ElevatorContactInfo elevator) {
+		return elevators.get(elevator);
 	}
 
 	/**
