@@ -113,6 +113,23 @@ public class Scheduler extends Thread {
 		// Iteration 2 - only one elevator, just return it
 		return elevators.keySet().stream().findFirst().orElseGet(() -> null);
 	}
+	
+	/**
+	 * Returns an elevator that is not set to move in a direction (note : this include elevators stopped at a floor that will then continue)
+	 * @param floor the start floor
+	 * @param callDirection the direction to travel
+	 * @return the address of the elevator if there is one otherwise null
+	 */
+	public ElevatorContactInfo findStationaryElevator() {
+		for (ElevatorContactInfo key : elevators.keySet()) {
+			ElevatorStatus elevatorStatus = elevators.get(key);
+			if( elevatorStatus.getDirection() == null  ) {
+				return key;
+			}
+		}
+		return null;
+	}
+
 
 	/**
 	 * Returns an elevator that could service a call
