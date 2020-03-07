@@ -66,22 +66,8 @@ public class SchedulerServer extends UDPServer {
 
 		// If an elevator isn't available, store the request and tell a stationary elevator to move to this floor
 		if (availableElevator == null) {
-			System.out.println(availableElevator == null ? "No Available Elevator - moving a stationary elevator to start floor" : 
-															"Telling moving elevator to stop at start floor");
-			Scheduler.getInstance().addStoredRequest(elevatorRequest);
-			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
-			
-			// we will take any stationary elevator
-			ElevatorContactInfo anyElevator = availableElevator == null ? 
-					Scheduler.getInstance().findStationaryElevator() : availableElevator;
-			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevatorStatus(anyElevator);
-			if (storedRequests.size() >= 1 && anyElevator != null) {
-				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
-				sender.send(
-						MessagePackets.generateElevatorStateChange(
-								new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-						anyElevator.address, anyElevator.receiverPort);
-			}
+			System.out.println("No Available Elevator - moving a stationary elevator to start floor");
+			saveRequestAndMoveElevatorToStartFloor(elevatorRequest, Scheduler.getInstance().findStationaryElevator());
 			return;
 		}
 
@@ -104,23 +90,28 @@ public class SchedulerServer extends UDPServer {
 			// send request to elevator so it can send back it's version
 			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator.address, availableElevator.receiverPort);
 		} else {
-			Scheduler.getInstance().addStoredRequest(elevatorRequest);
-			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
-			
 			// tell this moving elevator to stop at the request's start floor
-			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevatorStatus(availableElevator);
-			if (storedRequests.size() >= 1) {
-				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
-				sender.send(
-						MessagePackets.generateElevatorStateChange(
-								new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-						availableElevator.address, availableElevator.receiverPort);
-			}
+			saveRequestAndMoveElevatorToStartFloor(elevatorRequest, availableElevator);
 		}
 
 		return;
 	}
 
+	private void saveRequestAndMoveElevatorToStartFloor(ElevatorRequest elevatorRequest, ElevatorContactInfo servicingElevator) {
+		Scheduler.getInstance().addStoredRequest(elevatorRequest);
+		List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+		
+		// tell this moving elevator to stop at the request's start floor
+		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevatorStatus(servicingElevator);
+		if (storedRequests.size() >= 1) {
+			elevatorStatus.addFloor(elevatorRequest.getStartFloor());
+			sender.send(
+					MessagePackets.generateElevatorStateChange(
+							new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
+					servicingElevator.address, servicingElevator.receiverPort);
+		}
+	}
+	
 	/**
 	 * Accepting datagram packet request, extract the content and assign to an elevator if possible.
 	 * @param An elevator request in DatagraPack form.
