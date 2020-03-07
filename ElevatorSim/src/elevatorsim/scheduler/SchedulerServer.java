@@ -21,6 +21,7 @@ import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
 import elevatorsim.constants.TimeConstants;
+import elevatorsim.scheduler.Scheduler.SchedulerState;
 import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;
 
@@ -299,11 +300,13 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
 		System.out.print("SchedulerServer - INFO: Received exit request\n");
+		while (Scheduler.getInstance().getSchedulerState() == SchedulerState.PROCESSING);
+		
+		Scheduler.getInstance().stopRunning();
 		elevators.forEach((addr, contact) -> {
 			sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), contact.address, contact.receiverPort);
 		});
 		timer.cancel();
-		Scheduler.getInstance().stopRunning();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 

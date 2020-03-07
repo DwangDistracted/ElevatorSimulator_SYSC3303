@@ -21,8 +21,8 @@ public class Elevator extends Thread {
 	 * a reference to the scheduler singleton
 	 * @param floorAmount The amount of floors the elevator can visit
 	 */
-	public Elevator ( int floorAmount, String floorName) {
-		super(floorName);
+	public Elevator (int floorAmount, String elevatorName) {
+		super(elevatorName);
 		this.elevatorLampsOn = new boolean[floorAmount];
 		this.floor = 1;
 		this.elevatorState = ElevatorState.DOOR_OPEN;
