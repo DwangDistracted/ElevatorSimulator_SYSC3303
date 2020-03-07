@@ -6,17 +6,29 @@ To Run
 ----------------------------------
 ElevatorSim is an eclipse project. 
 
-To Run, import the project into Eclipse Java and run from elevatorsim.Main.
+To Run, import the project into Eclipse Java and run the programs in the following order.
+1. Run the SchedulerProcess.java
+2. Run the ElevatorProcess.java
+3. Run the FloorSystemProcess.java
+
+For running on three different computers Please do the following:
+1. Import the project into Eclipse on each computer 
+2. For each computer go into the elevatorsim.constants package and edit the SCHEDULER_IP constant value in the NetworkConstants.java file.
+   The value should be changed to the ip address of the computer which you will run the main for the SchedulerProcess.java class.
+3. After changing this value on each computer run the programs in the following order:
+	1. Run the SchedulerProcess.java on computer 1
+	2. Run the ElevatorProcess.java on computer 2
+	3. Run the FloorSystemProcess.java on computer 3
 
 The Unit Tests for the project are implemented in JUnit5. Run them by right clicking on the project and selecting Run As -> JUnit Test.
 
-Authors - Group 1
+Authors - Group 1 - Contributions this and previous iterations
 ----------------------------------
-* Rahul Anilkumar (101038785) - Worked on Unit Tests, Requests, Documentation
-* David Wang (101032271) - Worked on UDP Server, Scheduler State Machine, Sequence Diagram
-* Michael Patsula (101043663) - Worked on Floor System, Requests
-* Thomas Leung (101043255) - Worked on Unit Tests, UML Diagram, Requests
-* Trevor Bivi (101045460) - Worked on Elevator System, Elevator State Machine, Scheduler Logic.
+* Rahul Anilkumar (101038785) - Worked on Unit Tests, Requests, Documentation, Message Classes, File Parser, Scheduling
+* David Wang (101032271) - Worked on UDP Server, Scheduler State Machine, Scheduler, Sequence Diagram, Documentation, Startup Logic
+* Michael Patsula (101043663) - Worked on Floor System, Requests, Floor UDP Requests, Documentation
+* Thomas Leung (101043255) - Worked on Unit Tests, UML Diagram, Requests, Scheduler Class
+* Trevor Bivi (101045460) - Worked on Elevator System, Elevator State Machine, Scheduler Logic, Unit Test
 
 
 Packages
