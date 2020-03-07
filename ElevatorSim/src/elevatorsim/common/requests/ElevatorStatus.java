@@ -63,7 +63,7 @@ public class ElevatorStatus extends Request<ElevatorStatus> {
 	 * @param floor the floor to remove
 	 */
 	public void removeStop(Integer floor) {
-		if(this.stops.indexOf(floor) != -1) {
+		if(this.stops.contains(floor)){
 			this.stops.remove(floor);
 		}
 	}
@@ -81,7 +81,7 @@ public class ElevatorStatus extends Request<ElevatorStatus> {
 	 * @return
 	 */
 	public Direction addFloor(Integer floor) {
-		if (this.stops.indexOf(floor) != -1 ) {
+		if (this.stops.contains(floor)) {
 			return null;
 		}
 		this.stops.add(floor);

@@ -166,8 +166,7 @@ public class SchedulerServer extends UDPServer {
 		System.out.print("SchedulerServer - Info: Received elevator event " + elevatorEvent.toString() + "\n");
 
 		scheduler.getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
-		if (scheduler.getElevators().get(request.getAddress()).getStops()
-						.indexOf(elevatorEvent.getFloor()) != -1) {
+		if (scheduler.getElevators().get(request.getAddress()).getStops().contains(elevatorEvent.getFloor())) {
 			sender.send(
 					MessagePackets.generateElevatorStateChange(
 							new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
@@ -200,7 +199,7 @@ public class SchedulerServer extends UDPServer {
 												// request.getData() ));
 
 		if (elevatorState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
-			if (elevatorStatus.getStops().indexOf(elevatorStatus.getFloor()) != -1) {
+			if (elevatorStatus.getStops().contains(elevatorStatus.getFloor())) {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),
 						elevator, elevators.get(elevator));
