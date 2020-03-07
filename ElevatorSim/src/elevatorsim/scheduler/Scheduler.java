@@ -134,6 +134,10 @@ public class Scheduler extends Thread {
 	public ConcurrentMap<InetAddress, ElevatorStatus> getElevators(){
 		return elevators;
 	}
+	
+	public ElevatorStatus getElevator(InetAddress address) {
+		return elevators.get(address);
+	}
 
 	/**
 	 * Signals that this state machine has started processing a request

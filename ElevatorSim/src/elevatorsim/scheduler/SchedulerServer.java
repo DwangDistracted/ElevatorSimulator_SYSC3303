@@ -70,12 +70,12 @@ public class SchedulerServer extends UDPServer {
 		// If there is an available elevator but it's moving then ignore it too for now
 		// because it's not worth optimizing until there are multiple elevators
 		if (availableElevator == null
-				|| scheduler.getElevators().get(availableElevator).getDirection() != null) {
+				|| scheduler.getElevator(availableElevator).getDirection() != null) {
 			scheduler.addStoredRequest(elevatorRequest);
 			List<ElevatorRequest> storedRequests = scheduler.getStoredRequests();
 
 			InetAddress elevatorAddress = scheduler.findAvailableElevator();
-			ElevatorStatus elevatorStatus = scheduler.getElevators().get(elevatorAddress);
+			ElevatorStatus elevatorStatus = scheduler.getElevator(elevatorAddress);
 			if (storedRequests.size() == 1 && elevatorStatus.getDirection() == null) {
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
 
@@ -90,7 +90,7 @@ public class SchedulerServer extends UDPServer {
 			return;
 		}
 
-		int elevatorStartFloor = scheduler.getElevators().get(availableElevator).getFloor();
+		int elevatorStartFloor = scheduler.getElevator(availableElevator).getFloor();
 		int boardFloor = elevatorRequest.getStartFloor();
 		int floorChange = boardFloor - elevatorStartFloor;
 		Direction direction;
@@ -165,8 +165,8 @@ public class SchedulerServer extends UDPServer {
 		ElevatorEvent elevatorEvent = MessagePackets.deserializeElevatorEvent(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator event " + elevatorEvent.toString() + "\n");
 
-		scheduler.getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
-		if (scheduler.getElevators().get(request.getAddress()).getStops().contains(elevatorEvent.getFloor())) {
+		scheduler.getElevator(request.getAddress()).setFloor(elevatorEvent.getFloor());
+		if (scheduler.getElevator(request.getAddress()).getStops().contains(elevatorEvent.getFloor())) {
 			sender.send(
 					MessagePackets.generateElevatorStateChange(
 							new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
@@ -191,7 +191,7 @@ public class SchedulerServer extends UDPServer {
 		System.out.print("SchedulerServer - Info: Received elevator state change update "
 				+ elevatorStateChange.toString() + "\n");
 		InetAddress elevator = request.getAddress();
-		ElevatorStatus elevatorStatus = scheduler.getElevators().get(elevator);
+		ElevatorStatus elevatorStatus = scheduler.getElevator(elevator);
 		ElevatorState elevatorState = elevatorStateChange.getStateChange();
 		// TODO Fix how the elevator status is deserialized. Should it be deserializing
 		// a string? or the parsed byte array?
