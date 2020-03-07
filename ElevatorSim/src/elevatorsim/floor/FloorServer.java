@@ -1,6 +1,5 @@
 package elevatorsim.floor;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -84,9 +83,6 @@ public class FloorServer extends UDPServer {
 			sender.send(MessagePackets.generateDestinationRequest(request), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
 		} catch (UnknownHostException e) {
 			System.out.println("FloorServer - ERROR: Could not find Scheduler Host. Check Network Set Up");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println("FloorServer - ERROR: Could not find Request Message");
 			e.printStackTrace();
 		}
 	}
