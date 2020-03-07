@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 import elevatorsim.common.requests.ElevatorArrivalRequest;
@@ -21,6 +20,7 @@ import elevatorsim.constants.ElevatorState;
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
 import elevatorsim.constants.Role;
+import elevatorsim.constants.TimeConstants;
 import elevatorsim.server.UDPServer;
 import elevatorsim.util.DatagramPacketUtils;
 
@@ -34,7 +34,6 @@ public class SchedulerServer extends UDPServer {
 
 	/* Associates a remote port with an Elevator */
 	private final ConcurrentMap<Integer, ElevatorContactInfo> elevators;
-	private final ConcurrentLinkedQueue<ElevatorRequest> requestQueue;
 	private InetAddress floorSystem = null;
 
 	private Timer timer = new Timer();
@@ -42,7 +41,6 @@ public class SchedulerServer extends UDPServer {
 	private SchedulerServer() throws SocketException {
 		super("SchedulerServer", NetworkConstants.SCHEDULER_PORT);
 		this.elevators = new ConcurrentHashMap<>();
-		this.requestQueue = new ConcurrentLinkedQueue<>();
 	}
 
 	public static SchedulerServer getInstance() throws SocketException {
@@ -66,25 +64,18 @@ public class SchedulerServer extends UDPServer {
 		ElevatorContactInfo availableElevator = 
 				Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(), elevatorRequest.getDirection());
 
-		// Fix find AvailableElevator method so that it can handle the various cases. Right now it cant seem to handle everything.
-		
-		// If an elevator isn't available, store the request
+		// If an elevator isn't available, store the request and tell a stationary elevator to move to this floor
 		if (availableElevator == null) {
-			System.out.println("No Available Elevator");
+			System.out.println(availableElevator == null ? "No Available Elevator - moving a stationary elevator to start floor" : 
+															"Telling moving elevator to stop at start floor");
 			Scheduler.getInstance().addStoredRequest(elevatorRequest);
 			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
-			for(ElevatorRequest req: storedRequests) {
-				requestQueue.add(req);
-			}
-			// For ITERATION 2 - Single Elevator just use the first elevator
-			// FOR ITERATION 3 - We will need to queue this request to be handled by the first available elevator
-			// store requests in a concurrent queue then if the elevator is direction null then get it out of the queue.
 			
-			ElevatorContactInfo anyElevator = Scheduler.getInstance().findStationaryElevator();
+			// we will take any stationary elevator
+			ElevatorContactInfo anyElevator = availableElevator == null ? 
+					Scheduler.getInstance().findStationaryElevator() : availableElevator;
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevatorStatus(anyElevator);
-
-			if (storedRequests.size() == 1 && anyElevator != null) {
-				System.out.println("First Elevator Wasn't Moving");
+			if (storedRequests.size() >= 1 && anyElevator != null) {
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
 				sender.send(
 						MessagePackets.generateElevatorStateChange(
@@ -108,10 +99,25 @@ public class SchedulerServer extends UDPServer {
 			direction = null;
 		}
 
+		System.out.println("Sending to Elevator: " + availableElevator);
 		if (direction == null) {
 			// send request to elevator so it can send back it's version
 			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator.address, availableElevator.receiverPort);
+		} else {
+			Scheduler.getInstance().addStoredRequest(elevatorRequest);
+			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
+			
+			// tell this moving elevator to stop at the request's start floor
+			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevatorStatus(availableElevator);
+			if (storedRequests.size() >= 1) {
+				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
+				sender.send(
+						MessagePackets.generateElevatorStateChange(
+								new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
+						availableElevator.address, availableElevator.receiverPort);
+			}
 		}
+
 		return;
 	}
 
@@ -148,7 +154,7 @@ public class SchedulerServer extends UDPServer {
 
 						Scheduler.getInstance().stopProcessing();
 					}
-				}, 1000);
+				}, TimeConstants.changeDoorState);
 			}
 
 		} else {
@@ -250,7 +256,7 @@ public class SchedulerServer extends UDPServer {
 				                Scheduler.getInstance().stopProcessing();				                
 				            }
 				        }, 
-				        1000 
+				        TimeConstants.changeDoorState 
 				);
 			} else {
 				elevatorStatus.stopMovement();

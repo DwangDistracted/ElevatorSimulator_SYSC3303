@@ -51,14 +51,14 @@ public class Floor {
 			try {
 				buttonLamps.setUpLamp(true);
 			}catch (NullPointerException e) {
-				System.out.println("floor tried to set a non existant button");
+				System.out.println("FloorSystem - WARN: floor tried to set a non existant button");
 			}
 		} else if (request.getDirection() == Direction.DOWN) {
 			activeDownDestinations.add(request.getDestFloor());
 			try {
 				buttonLamps.setDownLamp(true);
 			}catch (NullPointerException e) {
-				System.out.println("floor tried to set a non existant button");
+				System.out.println("FloorSystem - WARN: floor tried to set a non existant button");
 			}
 		} else {
 			// INVALID Direction - ignore request
@@ -74,27 +74,27 @@ public class Floor {
 	public ElevatorDestinationRequest loadPassengers(ElevatorArrivalRequest request ) {
 		ElevatorDestinationRequest buttonRequest = null;
 		if (request.getElevatorDirection().equals(Direction.UP)) {
-			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going up");
+			System.out.println("FloorSystem - INFO: Elevator has arrived on floor " + this.getFloorNumber() + " going up");
 			arrivalLamps.setUpLamp(true);
 			
 			if(!activeUpDestinations.isEmpty()) {
-				System.out.println("Passengers are being loaded onto elevator");
+				System.out.println("FloorSystem - INFO: Passengers are being loaded onto elevator");
 				buttonLamps.setUpLamp(false);
 				buttonRequest = new ElevatorDestinationRequest(request.getArrivalFloor(), request.getElevatorId(), activeUpDestinations);
 				activeUpDestinations.clear();
 			}
 		} else if (request.getElevatorDirection().equals(Direction.DOWN)) {
-			System.out.println("Elevator has arrived on floor " + this.getFloorNumber() + " going down");
+			System.out.println("FloorSystem - INFO: Elevator has arrived on floor " + this.getFloorNumber() + " going down");
 			arrivalLamps.setDownLamp(true);
 			
 			if(!activeDownDestinations.isEmpty()) {
-				System.out.println("Passengers are being loaded onto elevator");
+				System.out.println("FloorSystem - INFO: Passengers are being loaded onto elevator");
 				buttonLamps.setDownLamp(false);
 				buttonRequest = new ElevatorDestinationRequest(request.getElevatorId(), request.getArrivalFloor(), activeUpDestinations);
 				activeDownDestinations.clear();
 			}
 		} else {
-			System.out.println("Invalid Request");
+			System.out.println("FloorSystem - WARN: Invalid Request");
 			// INVALID Direction - ignore request
 		}
 		

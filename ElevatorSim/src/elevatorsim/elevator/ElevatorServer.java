@@ -66,6 +66,7 @@ public class ElevatorServer extends UDPServer {
 			}
 			return MessagePackets.Responses.RESPONSE_SUCCESS();
 		}
+
 		return MessagePackets.Responses.RESPONSE_FAILURE();
 	}
 	
