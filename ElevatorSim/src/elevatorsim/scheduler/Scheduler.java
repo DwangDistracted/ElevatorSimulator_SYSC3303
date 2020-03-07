@@ -73,7 +73,7 @@ public class Scheduler extends Thread {
 		try {
 			server.startServer();
 			
-			while (state != SchedulerState.STOPPED && state != SchedulerState.INVALID) {
+			while (state != SchedulerState.STOPPED) {
 				Thread.sleep(100l);
 			}
 		} catch (InterruptedException e) {
@@ -184,21 +184,21 @@ public class Scheduler extends Thread {
 	 * Signals that this state machine has started processing a request
 	 */
 	public void startProcessing() {
-		state = (state == SchedulerState.LISTENING) ? SchedulerState.PROCESSING : SchedulerState.INVALID;
+		state = (state == SchedulerState.LISTENING || state == SchedulerState.PROCESSING) ? SchedulerState.PROCESSING : SchedulerState.INVALID;
 	}
 
 	/**
 	 * Signals that this state machine has finished processing a request
 	 */
 	public void stopProcessing() {
-		state = (state == SchedulerState.PROCESSING) ? SchedulerState.LISTENING : SchedulerState.INVALID;
+		state = (state == SchedulerState.PROCESSING || state == SchedulerState.LISTENING) ? SchedulerState.LISTENING : SchedulerState.INVALID;
 	}
 
 	/**
 	 * Signals that this state machine has stopped running
 	 */
 	public void stopRunning() {
-		state = (state == SchedulerState.LISTENING) ? SchedulerState.STOPPED : SchedulerState.INVALID;
+		state = (state == SchedulerState.LISTENING || state == SchedulerState.STOPPED) ? SchedulerState.STOPPED : SchedulerState.INVALID;
 	}
 
 	/**
