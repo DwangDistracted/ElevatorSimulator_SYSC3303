@@ -107,4 +107,8 @@ public abstract class UDPServer {
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
 		return MessagePackets.Responses.RESPONSE_NOT_APPLICABLE();
 	}
+
+	public int getReceiverPort() {
+		return receiver.getPort();
+	}
 }

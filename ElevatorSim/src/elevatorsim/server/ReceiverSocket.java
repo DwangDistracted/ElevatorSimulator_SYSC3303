@@ -1,15 +1,12 @@
 package elevatorsim.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 
 import elevatorsim.constants.MessagePackets;
 import elevatorsim.constants.NetworkConstants;
-import elevatorsim.constants.Role;
 import elevatorsim.util.DatagramPacketUtils;
 
 /**
@@ -95,46 +92,9 @@ public class ReceiverSocket extends Thread {
 			}
 		}).start();
 	}
-
-	/**
-	 * Registers this component's receive port with the Scheduler Server (and subsystem) so that the scheduler can contact this client.
-	 * @return if the registration was successful
-	 * @throws IOException
-	 */
-	private boolean registerWithScheduler() {
-		try {			
-			ByteArrayOutputStream message = new ByteArrayOutputStream();
-			message.write(NetworkConstants.MessageTypes.REGISTER.getMarker());
-			message.write(NetworkConstants.NULL_BYTE);
-			message.write(parentServer.getRole().name().getBytes());
-			message.write(NetworkConstants.NULL_BYTE);
-	
-			DatagramPacket request = new DatagramPacket(message.toByteArray(), message.size());
-			request.setAddress(InetAddress.getByName(NetworkConstants.SCHEDULER_IP));
-			request.setPort(NetworkConstants.SCHEDULER_PORT);
-			receivePort.send(request);
-
-			DatagramPacket response = MessagePackets.Responses.RESPONSE_PENDING(); 
-			try {
-				receivePort.receive(response);
-			} catch (IOException timeout) {
-				System.out.println(this.getName() + " - ERROR: Did Not Receive a Response");
-			}
-
-			return DatagramPacketUtils.isSuccessResponse(response);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
 	
 	@Override
 	public void run() {
-		if (parentServer.getRole() == Role.FLOORS || parentServer.getRole() == Role.ELEVATORS) {
-			while (!registerWithScheduler());
-			System.out.println(this.getName() + " - Info: Registered With Scheduler");
-		}
-
 		try {
 			while(parentServer.isRunning()) {
 				DatagramPacket request = new DatagramPacket(new byte[NetworkConstants.REQUEST_LENGTH],
@@ -149,5 +109,9 @@ public class ReceiverSocket extends Thread {
 		} finally {
 			receivePort.close();
 		}
+	}
+
+	public int getPort() {
+		return receivePort.getLocalPort();
 	}
 }

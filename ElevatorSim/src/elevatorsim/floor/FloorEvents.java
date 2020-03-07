@@ -5,7 +5,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import elevatorsim.common.requests.ElevatorArrivalRequest;
-import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.MessageReciever;
 import elevatorsim.common.requests.Request;

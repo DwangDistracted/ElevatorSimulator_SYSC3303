@@ -1,15 +1,15 @@
 package elevatorsim.scheduler;
 
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
@@ -31,7 +31,7 @@ import elevatorsim.util.DatagramPacketUtils;
 public class SchedulerServer extends UDPServer {
 	private static SchedulerServer instance;
 
-	private final ConcurrentMap<SocketAddress, Integer> elevators;
+	private final ConcurrentMap<InetAddress, ElevatorContactInfo> elevators;
 	private InetAddress floorSystem = null;
 	InetAddress elevatorIpAddress = null;
 
@@ -41,10 +41,7 @@ public class SchedulerServer extends UDPServer {
 		super("SchedulerServer", NetworkConstants.SCHEDULER_PORT);
 		this.elevators = new ConcurrentHashMap<>();
 		setElevatorAddress();
-
 	}
-
-	
 
 	public static SchedulerServer getInstance() throws SocketException {
 		if (instance == null) {
@@ -64,40 +61,37 @@ public class SchedulerServer extends UDPServer {
 	 * @param elevatorRequest The request to the elevator.
 	 */
 	public void handleElevatorCall(ElevatorRequest elevatorRequest) {
-		// + elevatorRequest. + "an elevator is requested at floor" +
-		// elevatorRequest.getStartFloor().toString() + ". (The passenger will travel "
-		// + elevatorRequest.getDirection().toString() + "to floor " +
-		// Integer.toString(elevatorRequest.getDestFloor()).toString() + ".");
-		SocketAddress availableElevator = Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(),
-				elevatorRequest.getDirection());
+		InetAddress availableElevator = 
+				Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(), elevatorRequest.getDirection());
 
 		// If an elevator isn't available, store the request
-		// If there is an available elevator but it's moving then ignore it too for now
-		// because it's not worth optimizing until there are multiple elevators
-		if (availableElevator == null
-				|| Scheduler.getInstance().getElevators().get(availableElevator).getDirection() != null) {
+		if (availableElevator == null) {
 			Scheduler.getInstance().addStoredRequest(elevatorRequest);
 			List<ElevatorRequest> storedRequests = Scheduler.getInstance().getStoredRequests();
 
-			SocketAddress elevatorAddress = Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(),
-					elevatorRequest.getDirection());
+			// For ITERATION 2 - Single Elevator just use the first elevator
+			// FOR ITERATION 3 - We will need to queue this request to be handled by the first available elevator
+			InetAddress elevatorAddress = Scheduler.getInstance().findFirstElevator();
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddress);
+
 			if (storedRequests.size() == 1 && elevatorStatus.getDirection() == null) {
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
+				elevatorStatus.setDirection(
+						elevatorRequest.getStartFloor() - elevatorStatus.getFloor() > 0 ? 
+								Direction.UP : Direction.DOWN);
 
-				elevatorStatus
-						.setDirection(elevatorRequest.getStartFloor() - elevatorStatus.getFloor() > 0 ? Direction.UP
-								: Direction.DOWN);
 				sender.send(
 						MessagePackets.generateElevatorStateChange(
 								new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-						elevatorIpAddress, elevators.get(elevatorAddress));
+						elevatorAddress, elevators.get(elevatorAddress).receiverPort);
 			}
 			return;
 		}
 
-		int elevatorStartFloor = Scheduler.getInstance().getElevators().get(availableElevator).getFloor();
+		ElevatorStatus availableElevatorStatus = Scheduler.getInstance().getElevators().get(availableElevator);
+		int elevatorStartFloor = availableElevatorStatus.getFloor();
 		int boardFloor = elevatorRequest.getStartFloor();
+
 		int floorChange = boardFloor - elevatorStartFloor;
 		Direction direction;
 		if (floorChange < 0) {
@@ -107,10 +101,10 @@ public class SchedulerServer extends UDPServer {
 		} else {
 			direction = null;
 		}
+
 		if (direction == null) {
 			// send request to elevator so it can send back it's version
-			Integer elevatorPort = elevators.get(availableElevator);
-			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), elevatorIpAddress, elevatorPort);
+			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator, elevators.get(availableElevator).receiverPort);
 		}
 		return;
 	}
@@ -123,15 +117,12 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorRequest(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
+
 		ElevatorRequest elevatorRequest = MessagePackets.deserializeElevatorRequest(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator request " + elevatorRequest.toString() + "\n");
-		boolean success = true;
-		if (elevatorRequest.getStartFloor() == null) {
 
-			// ugly way of adding floor request to only elevator - will improve in future
-			// iteration
-			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators()
-					.get(Scheduler.getInstance().findAvailableElevator());
+		if (elevatorRequest.getStartFloor() == null) {
+			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(Scheduler.getInstance().findFirstElevator());
 
 			Direction newDirection = elevatorStatus.addFloor(elevatorRequest.getDestFloor());
 			if (newDirection != null) {
@@ -142,7 +133,7 @@ public class SchedulerServer extends UDPServer {
 						sender.send(
 								MessagePackets.generateElevatorStateChange(
 										new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-								request.getAddress(), elevators.get(request.getSocketAddress()));
+								request.getAddress(), elevators.get(request.getAddress()).receiverPort);
 						Scheduler.getInstance().stopProcessing();
 					}
 				}, 1000);
@@ -151,8 +142,9 @@ public class SchedulerServer extends UDPServer {
 		} else {
 			handleElevatorCall(elevatorRequest);
 		}
+
 		Scheduler.getInstance().stopProcessing();
-		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
+		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
 	/**
@@ -171,16 +163,13 @@ public class SchedulerServer extends UDPServer {
 		ElevatorEvent elevatorEvent = MessagePackets.deserializeElevatorEvent(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator event " + elevatorEvent.toString() + "\n");
 
-		Scheduler.getInstance().getElevators().get(request.getSocketAddress()).setFloor(elevatorEvent.getFloor());
-		if (Scheduler.getInstance().getElevators().get(request.getSocketAddress()).getStops()
-				.indexOf(elevatorEvent.getFloor()) != -1) {
+		Scheduler.getInstance().getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
+		if (Scheduler.getInstance().getElevators().get(request.getAddress()).getStops().indexOf(elevatorEvent.getFloor()) != -1) {
 			sender.send(
 					MessagePackets.generateElevatorStateChange(
 							new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-					request.getAddress(), this.elevators.get(request.getSocketAddress()));
+					request.getAddress(), elevators.get(request.getAddress()).receiverPort);
 		}
-		// sender.send(DatagramPacketUtils.getCopyOf(request), floorSystem,
-		// NetworkConstants.FLOOR_RECIEVE_PORT);
 
 		Scheduler.getInstance().stopProcessing();
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
@@ -194,36 +183,38 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorStateChange(DatagramPacket request) {
 		Scheduler.getInstance().startProcessing();
+
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator state change update "
 				+ elevatorStateChange.toString() + "\n");
-		SocketAddress elevator = request.getSocketAddress();
-		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevator);
+
+		InetAddress elevatorAddr = request.getAddress();
+		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddr);
 		ElevatorState elevatorState = elevatorStateChange.getStateChange();
-		// TODO Fix how the elevator status is deserialized. Should it be deserializing
-		// a string? or the parsed byte array?
-		elevatorStatus.setState(elevatorState); // updateElevator(elevator, ElevatorStatus.deserialize(
-												// request.getData() ));
+
+		// TODO Fix how the elevator status is deserialized. Should it be deserializing a string? or the parsed byte array?
+		elevatorStatus.setState(elevatorState);
 
 		if (elevatorState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 			if (elevatorStatus.getStops().indexOf(elevatorStatus.getFloor()) != -1) {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),
-						elevatorIpAddress, elevators.get(elevator));
+						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
 			} else if (elevatorStatus.getDirection() == Direction.UP) {
 				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_UP)),
-						elevatorIpAddress, elevators.get(elevator));
+						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
 			} else if (elevatorStatus.getDirection() == Direction.DOWN) {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_DOWN)),
-						elevatorIpAddress, elevators.get(elevator));
+						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
 			}
 
 		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
-			DatagramPacket packet = MessagePackets.generateArrivalRequest(new ElevatorArrivalRequest(1, elevatorStatus.getFloor(), elevatorStatus.getDirection()));
+			DatagramPacket packet = MessagePackets.generateArrivalRequest(
+					new ElevatorArrivalRequest(1, elevatorStatus.getFloor(), elevatorStatus.getDirection()));
 			sender.send(packet, floorSystem, NetworkConstants.FLOOR_RECIEVE_PORT);
 			elevatorStatus.removeStop(elevatorStatus.getFloor());
-			
+
 			if(elevatorStatus.getStops().size() > 0) {
 				timer.schedule( 
 				        new java.util.TimerTask() {
@@ -231,7 +222,10 @@ public class SchedulerServer extends UDPServer {
 				            public void run() {
 				            	System.out.print("sending close\n");
 				            	Scheduler.getInstance().startProcessing();
-				                sender.send(DatagramPacketUtils.getCopyOf( MessagePackets.generateElevatorStateChange(new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED ))) , request.getAddress(), elevators.get(request.getSocketAddress()));
+				                sender.send(DatagramPacketUtils.getCopyOf(
+				                		MessagePackets.generateElevatorStateChange(
+				                				new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED ))) , 
+				                		elevatorAddr, elevators.get(elevatorAddr).receiverPort);
 				                Scheduler.getInstance().stopProcessing();
 				            }
 				        }, 
@@ -262,17 +256,19 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleRegisterRequest(DatagramPacket request) {
 		String requestBody = DatagramPacketUtils.getMessageBodyAsString(request);
-		Role requesterRole = Role.valueOf(requestBody);
+		Role requesterRole = requestBody.contains("FLOORS") ? Role.FLOORS : 
+								requestBody.contains("ELEVATORS") ? Role.ELEVATORS : Role.UNKNOWN;
 
 		boolean success = false;
 		switch (requesterRole) {
-		case FLOORS:
-			success = registerFloorSystem(request.getAddress());
-			break;
-		case ELEVATORS:
-			success = registerElevator(request.getSocketAddress(), request.getPort());
-			break;
-		default:
+			case FLOORS:
+				success = registerFloorSystem(request.getAddress());
+				break;
+			case ELEVATORS:
+				int receiverPort = new BigInteger(Arrays.copyOfRange(request.getData(), 4, request.getLength()-1)).intValue();
+				success = registerElevator(request.getAddress(), request.getPort(), receiverPort);
+				break;
+			default:
 		}
 
 		return success ? MessagePackets.Responses.RESPONSE_SUCCESS() : MessagePackets.Responses.RESPONSE_FAILURE();
@@ -287,8 +283,8 @@ public class SchedulerServer extends UDPServer {
 	@Override
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
 		System.out.print("SchedulerServer - Info: Received exit request\n");
-		elevators.forEach((addr, port) -> {
-			sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), request.getAddress(), port);
+		elevators.forEach((addr, contact) -> {
+			sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), addr, contact.receiverPort);
 		});
 		timer.cancel();
 		Scheduler.getInstance().stopRunning();
@@ -301,10 +297,10 @@ public class SchedulerServer extends UDPServer {
 	 * @param port IP address' port of the elevator.
 	 * @return True if the elevator is registered, false otherwise.
 	 */
-	private boolean registerElevator(SocketAddress address, int port) {
-		System.out.println("Scheduler - INFO : Registered Elevator at " + address.toString() + ":" + port);
+	private boolean registerElevator(InetAddress address, int senderPort, int receiverPort) {
+		System.out.println("Scheduler - INFO : Registered Elevator at " + address.toString());
 
-		elevators.put(address, port);
+		elevators.put(address, new ElevatorContactInfo(senderPort, receiverPort));
 		Scheduler.getInstance().addElevator(address);
 		return true;
 	}
@@ -329,6 +325,16 @@ public class SchedulerServer extends UDPServer {
 			 elevatorIpAddress = InetAddress.getByName(NetworkConstants.ELEVATOR_IP);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private class ElevatorContactInfo {
+		final int senderPort;
+		final int receiverPort;
+		
+		ElevatorContactInfo(int senderPort, int receiverPort) {
+			this.senderPort = senderPort;
+			this.receiverPort = receiverPort;
 		}
 	}
 }
