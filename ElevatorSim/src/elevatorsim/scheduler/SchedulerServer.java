@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -31,16 +30,15 @@ import elevatorsim.util.DatagramPacketUtils;
 public class SchedulerServer extends UDPServer {
 	private static SchedulerServer instance;
 
-	private final ConcurrentMap<InetAddress, ElevatorContactInfo> elevators;
+	/* Associates a remote port with an Elevator */
+	private final ConcurrentMap<Integer, ElevatorContactInfo> elevators;
 	private InetAddress floorSystem = null;
-	InetAddress elevatorIpAddress = null;
 
 	private Timer timer = new Timer();
 
 	private SchedulerServer() throws SocketException {
 		super("SchedulerServer", NetworkConstants.SCHEDULER_PORT);
 		this.elevators = new ConcurrentHashMap<>();
-		setElevatorAddress();
 	}
 
 	public static SchedulerServer getInstance() throws SocketException {
@@ -61,7 +59,7 @@ public class SchedulerServer extends UDPServer {
 	 * @param elevatorRequest The request to the elevator.
 	 */
 	public void handleElevatorCall(ElevatorRequest elevatorRequest) {
-		InetAddress availableElevator = 
+		ElevatorContactInfo availableElevator = 
 				Scheduler.getInstance().findAvailableElevator(elevatorRequest.getStartFloor(), elevatorRequest.getDirection());
 
 		// If an elevator isn't available, store the request
@@ -71,8 +69,8 @@ public class SchedulerServer extends UDPServer {
 
 			// For ITERATION 2 - Single Elevator just use the first elevator
 			// FOR ITERATION 3 - We will need to queue this request to be handled by the first available elevator
-			InetAddress elevatorAddress = Scheduler.getInstance().findFirstElevator();
-			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddress);
+			ElevatorContactInfo anyElevator = Scheduler.getInstance().findFirstElevator();
+			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(anyElevator);
 
 			if (storedRequests.size() == 1 && elevatorStatus.getDirection() == null) {
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
@@ -83,7 +81,7 @@ public class SchedulerServer extends UDPServer {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(
 								new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-						elevatorAddress, elevators.get(elevatorAddress).receiverPort);
+						anyElevator.address, anyElevator.receiverPort);
 			}
 			return;
 		}
@@ -104,7 +102,7 @@ public class SchedulerServer extends UDPServer {
 
 		if (direction == null) {
 			// send request to elevator so it can send back it's version
-			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator, elevators.get(availableElevator).receiverPort);
+			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator.address, availableElevator.receiverPort);
 		}
 		return;
 	}
@@ -130,10 +128,13 @@ public class SchedulerServer extends UDPServer {
 					@Override
 					public void run() {
 						Scheduler.getInstance().startProcessing();
+
+						ElevatorContactInfo elevatorContactInfo = elevators.get(request.getPort());
 						sender.send(
 								MessagePackets.generateElevatorStateChange(
 										new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-								request.getAddress(), elevators.get(request.getAddress()).receiverPort);
+								elevatorContactInfo.address, elevatorContactInfo.receiverPort);
+
 						Scheduler.getInstance().stopProcessing();
 					}
 				}, 1000);
@@ -163,12 +164,16 @@ public class SchedulerServer extends UDPServer {
 		ElevatorEvent elevatorEvent = MessagePackets.deserializeElevatorEvent(request.getData());
 		System.out.print("SchedulerServer - Info: Received elevator event " + elevatorEvent.toString() + "\n");
 
-		Scheduler.getInstance().getElevators().get(request.getAddress()).setFloor(elevatorEvent.getFloor());
-		if (Scheduler.getInstance().getElevators().get(request.getAddress()).getStops().indexOf(elevatorEvent.getFloor()) != -1) {
+		ElevatorContactInfo requesterContactInfo = elevators.get(request.getPort());
+		ElevatorStatus requesterStatus = Scheduler.getInstance().getElevators().get(requesterContactInfo);
+
+		requesterStatus.setFloor(elevatorEvent.getFloor());
+		if (requesterStatus.getStops().indexOf(elevatorEvent.getFloor()) != -1) {
+			ElevatorContactInfo elevatorContactInfo = elevators.get(request.getPort());
 			sender.send(
 					MessagePackets.generateElevatorStateChange(
 							new ElevatorStateChange(ElevatorState.STATIONARY_AND_DOOR_CLOSED)),
-					request.getAddress(), elevators.get(request.getAddress()).receiverPort);
+					elevatorContactInfo.address, elevatorContactInfo.receiverPort);
 		}
 
 		Scheduler.getInstance().stopProcessing();
@@ -188,8 +193,8 @@ public class SchedulerServer extends UDPServer {
 		System.out.print("SchedulerServer - Info: Received elevator state change update "
 				+ elevatorStateChange.toString() + "\n");
 
-		InetAddress elevatorAddr = request.getAddress();
-		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorAddr);
+		ElevatorContactInfo elevatorContactInfo = elevators.get(request.getPort());
+		ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(elevatorContactInfo);
 		ElevatorState elevatorState = elevatorStateChange.getStateChange();
 
 		// TODO Fix how the elevator status is deserialized. Should it be deserializing a string? or the parsed byte array?
@@ -199,14 +204,14 @@ public class SchedulerServer extends UDPServer {
 			if (elevatorStatus.getStops().indexOf(elevatorStatus.getFloor()) != -1) {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.DOOR_OPEN)),
-						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
+						elevatorContactInfo.address, elevatorContactInfo.receiverPort);
 			} else if (elevatorStatus.getDirection() == Direction.UP) {
 				sender.send(MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_UP)),
-						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
+						elevatorContactInfo.address, elevatorContactInfo.receiverPort);
 			} else if (elevatorStatus.getDirection() == Direction.DOWN) {
 				sender.send(
 						MessagePackets.generateElevatorStateChange(new ElevatorStateChange(ElevatorState.MOTOR_DOWN)),
-						elevatorAddr, elevators.get(elevatorAddr).receiverPort);
+						elevatorContactInfo.address, elevatorContactInfo.receiverPort);
 			}
 
 		} else if(elevatorState == ElevatorState.DOOR_OPEN) {
@@ -225,7 +230,7 @@ public class SchedulerServer extends UDPServer {
 				                sender.send(DatagramPacketUtils.getCopyOf(
 				                		MessagePackets.generateElevatorStateChange(
 				                				new ElevatorStateChange( ElevatorState.STATIONARY_AND_DOOR_CLOSED ))) , 
-				                		elevatorAddr, elevators.get(elevatorAddr).receiverPort);
+				                		elevatorContactInfo.address, elevatorContactInfo.receiverPort);
 				                Scheduler.getInstance().stopProcessing();
 				            }
 				        }, 
@@ -284,7 +289,7 @@ public class SchedulerServer extends UDPServer {
 	public DatagramPacket handleExitRequest(DatagramPacket request) {
 		System.out.print("SchedulerServer - Info: Received exit request\n");
 		elevators.forEach((addr, contact) -> {
-			sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), addr, contact.receiverPort);
+			sender.send(MessagePackets.REQUEST_SYSTEM_EXIT(), contact.address, contact.receiverPort);
 		});
 		timer.cancel();
 		Scheduler.getInstance().stopRunning();
@@ -300,8 +305,9 @@ public class SchedulerServer extends UDPServer {
 	private boolean registerElevator(InetAddress address, int senderPort, int receiverPort) {
 		System.out.println("Scheduler - INFO : Registered Elevator at " + address.toString());
 
-		elevators.put(address, new ElevatorContactInfo(senderPort, receiverPort));
-		Scheduler.getInstance().addElevator(address);
+		ElevatorContactInfo contact = new ElevatorContactInfo(address, receiverPort);
+		elevators.put(senderPort, contact);
+		Scheduler.getInstance().addElevator(contact);
 		return true;
 	}
 
@@ -318,23 +324,5 @@ public class SchedulerServer extends UDPServer {
 		System.out.println("Scheduler - INFO : Registered Floor SubSystem at " + address.toString());
 		floorSystem = address;
 		return true;
-	}
-	
-	private void setElevatorAddress() {
-		try {
-			 elevatorIpAddress = InetAddress.getByName(NetworkConstants.ELEVATOR_IP);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private class ElevatorContactInfo {
-		final int senderPort;
-		final int receiverPort;
-		
-		ElevatorContactInfo(int senderPort, int receiverPort) {
-			this.senderPort = senderPort;
-			this.receiverPort = receiverPort;
-		}
 	}
 }
