@@ -6,8 +6,8 @@ import elevatorsim.constants.Direction;
 import elevatorsim.constants.ElevatorState;
 
 /**
- * This class contains information that the scheduler can use to determine which elevator to service an elevator request.
- * This should be send to the scheduler from the elevator. (TODO - discuss when/how)
+ * This class contains information that the scheduler can
+ * use to determine which elevator to service an elevator request.
  *  
  * @author David Wang, Trevor Bivi
  */

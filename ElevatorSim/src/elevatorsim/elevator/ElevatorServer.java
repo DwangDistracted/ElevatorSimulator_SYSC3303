@@ -247,22 +247,4 @@ public class ElevatorServer extends UDPServer {
 		return MessagePackets.Responses.RESPONSE_SUCCESS();
 	}
 
-	/**
-	 * Sends an Event Message to the Scheduler
-	 * @param event the type of event to send
-	 */
-	public void sendEventMessage(ElevatorEvent event) {
-		// TODO
-	}
-
-	/**
-	 * Sends a Status Update to the Scheduler
-	 * @param status the status to send
-	 * @throws UnknownHostException 
-	 */
-	public void sendStatusMessage(ElevatorStatus status) throws UnknownHostException {
-		// TODO
-		//sender.send(MessagePackets.generateElevatorStatus( status ), InetAddress.getByName(NetworkConstants.SCHEDULER_IP), NetworkConstants.SCHEDULER_PORT);
-
-	}
 }
