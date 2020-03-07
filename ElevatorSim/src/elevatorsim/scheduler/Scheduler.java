@@ -1,6 +1,7 @@
 package elevatorsim.scheduler;
 
-import java.net.InetAddress;
+//import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class Scheduler extends Thread {
 	
 	private static Scheduler instance;
 	
-	private final ConcurrentMap<InetAddress, ElevatorStatus> elevators = new ConcurrentHashMap<>();
+	private final ConcurrentMap<SocketAddress, ElevatorStatus> elevators = new ConcurrentHashMap<>();
 	
 	
 	private final SchedulerServer server;
@@ -89,7 +90,7 @@ public class Scheduler extends Thread {
 	 * Adds an elevator to the Scheduler System, allowing it to be tracked and considered for elevator requests
 	 * @param elevatorAddress the IP address of the elevator system
 	 */
-	public void addElevator(InetAddress elevatorAddress) {
+	public void addElevator(SocketAddress elevatorAddress) {
 		elevators.put(elevatorAddress, ElevatorStatus.empty());
 	}
 
@@ -100,7 +101,7 @@ public class Scheduler extends Thread {
 	 * @param elevatorStatus the new status of the elevator
 	 * @return true if the elevator status is updated, false if the elevator is not being tracked
 	 */
-	public boolean updateElevator(InetAddress elevatorAddress, ElevatorStatus elevatorStatus) {
+	public boolean updateElevator(SocketAddress elevatorAddress, ElevatorStatus elevatorStatus) {
 		return elevators.replace(elevatorAddress, elevatorStatus) != null;
 	}
 
@@ -108,7 +109,7 @@ public class Scheduler extends Thread {
 	 * Finds an available elevator that can service an Elevator Request
 	 * @return an Available Elevator
 	 */
-	public InetAddress findAvailableElevator() {
+	public SocketAddress findAvailableElevator() {
 		// Iteration 2 - only one elevator, just return it
 		return elevators.keySet().stream().findFirst().orElseGet(()->null);
 	}
@@ -119,8 +120,8 @@ public class Scheduler extends Thread {
 	 * @param direction the direction to travel
 	 * @return the address of the elevator if there is one otherwise null
 	 */
-	public InetAddress findAvailableElevator(int floor, Direction direction) {
-		for (InetAddress key : elevators.keySet()) {
+	public SocketAddress findAvailableElevator(int floor, Direction direction) {
+		for (SocketAddress key : elevators.keySet()) {
 			ElevatorStatus elevatorStatus = elevators.get(key);
 			if( (elevatorStatus.getDirection() == Direction.UP && direction == Direction.UP && floor > elevatorStatus.getFloor()) ||
 				(elevatorStatus.getDirection() == Direction.DOWN && direction == Direction.DOWN && floor < elevatorStatus.getFloor()) ||
@@ -131,7 +132,7 @@ public class Scheduler extends Thread {
 		return null;
 	}
 	
-	public ConcurrentMap<InetAddress, ElevatorStatus> getElevators(){
+	public ConcurrentMap<SocketAddress, ElevatorStatus> getElevators(){
 		return elevators;
 	}
 
