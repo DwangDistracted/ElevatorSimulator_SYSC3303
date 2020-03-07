@@ -81,10 +81,10 @@ public class SchedulerServer extends UDPServer {
 			// store requests in a concurrent queue then if the elevator is direction null then get it out of the queue.
 			
 			
-			ElevatorContactInfo anyElevator = Scheduler.getInstance().findFirstElevator();
+			ElevatorContactInfo anyElevator = Scheduler.getInstance().findStationaryElevator();
 			ElevatorStatus elevatorStatus = Scheduler.getInstance().getElevators().get(anyElevator);
 
-			if (storedRequests.size() == 1 && elevatorStatus.getDirection() == null) {
+			if (storedRequests.size() == 1 && anyElevator != null) {
 				System.out.println("Im in loop 2");
 				elevatorStatus.addFloor(elevatorRequest.getStartFloor());
 				elevatorStatus.setDirection(
