@@ -77,25 +77,25 @@ public class ElevatorServer extends UDPServer {
 	@Override
 	public DatagramPacket handleElevatorStateChange( DatagramPacket stateChange) {
 		ElevatorStateChange elevatorStateChange = MessagePackets.deserializeElevatorStateChange(stateChange.getData());
-		System.out.print(elevator.getName() + " " + getReceiverPort()+" - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
+		System.out.print(elevator.getName() + " " + getReceiverPort() + " - INFO : Received an state change request " + elevatorStateChange.toString() + "\n");
 
 		ElevatorState currentState = elevator.getElevatorState();
 		ElevatorState newState = elevatorStateChange.getStateChange();
 
 		boolean error = false;
-		if(timer != null) {
+		if (timer != null) {
 			timer.cancel();
 		}
 
-		if(timerTask != null) {
+		if (timerTask != null) {
 			timerTask.cancel();
 		}
 		
 		//If door is currently open or opening
-		if ( currentState == ElevatorState.DOOR_OPEN || currentState == ElevatorState.DOOR_OPENING ) {
+		if (currentState == ElevatorState.DOOR_OPEN || currentState == ElevatorState.DOOR_OPENING) {
 			//Initiate door close if requests
-			if( newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED ) {
-				this.elevator.setElevatorState( ElevatorState.DOOR_CLOSING );
+			if (newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
+				elevator.setElevatorState( ElevatorState.DOOR_CLOSING);
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 					@Override
@@ -114,14 +114,14 @@ public class ElevatorServer extends UDPServer {
 				       timerTask, 
 				        TimeConstants.changeDoorState 
 				);
-			} else if( newState != ElevatorState.DOOR_OPEN) {
+			} else {
 				error = true;
 			}
 		//If door is currently closing
-		}else if (currentState == ElevatorState.DOOR_CLOSING) {
+		} else if (currentState == ElevatorState.DOOR_CLOSING) {
 			//initiate door open if requested
-			if(newState == ElevatorState.DOOR_OPEN ) {
-				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
+			if (newState == ElevatorState.DOOR_OPEN) {
+				elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				timer = new Timer();
 				timerTask = new java.util.TimerTask() {
 		            @Override
@@ -139,13 +139,13 @@ public class ElevatorServer extends UDPServer {
 				timer.schedule( 
 				timerTask, 
 				TimeConstants.changeDoorState );
-			} else if (newState != ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
+			} else {
 				error = true;
 			}
 		//If door is currently closed
 		} else if (currentState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 			//Initiate door open if requested
-			if(newState == ElevatorState.DOOR_OPEN ) {
+			if (newState == ElevatorState.DOOR_OPEN) {
 				this.elevator.setElevatorState(ElevatorState.DOOR_OPENING);
 				this.elevator.setLampIsOn(elevator.getFloor()-1, false);
 				timer = new Timer();
@@ -216,11 +216,11 @@ public class ElevatorServer extends UDPServer {
 				timerTask, 
 		        TimeConstants.moveOneFloor,TimeConstants.moveOneFloor );
 				
-			}else if (newState != ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
+			} else {
 				error = true;
 			}
 		//If currently moving
-		}else if (currentState == ElevatorState.MOTOR_UP || currentState == ElevatorState.MOTOR_DOWN) {
+		} else if (currentState == ElevatorState.MOTOR_UP || currentState == ElevatorState.MOTOR_DOWN) {
 			//Stop elevator if requested
 			if(newState == ElevatorState.STATIONARY_AND_DOOR_CLOSED) {
 				this.elevator.setElevatorState(ElevatorState.STATIONARY_AND_DOOR_CLOSED);
@@ -229,13 +229,12 @@ public class ElevatorServer extends UDPServer {
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				}
-			} else if (newState != currentState) {
+			} else {
 				error = true;
 			}
 		}
 		
 		return error ? MessagePackets.Responses.RESPONSE_FAILURE() : MessagePackets.Responses.RESPONSE_SUCCESS();
-		
 	}
 
 	/**

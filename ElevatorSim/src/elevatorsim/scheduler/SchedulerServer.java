@@ -66,7 +66,6 @@ public class SchedulerServer extends UDPServer {
 
 		// If an elevator isn't available, store the request and tell a stationary elevator to move to this floor
 		if (availableElevator == null) {
-			System.out.println("No Available Elevator - moving a stationary elevator to start floor");
 			saveRequestAndMoveElevatorToStartFloor(elevatorRequest, Scheduler.getInstance().findStationaryElevator());
 			return;
 		}
@@ -85,7 +84,6 @@ public class SchedulerServer extends UDPServer {
 			direction = null;
 		}
 
-		System.out.println("Sending to Elevator: " + availableElevator);
 		if (direction == null) {
 			// send request to elevator so it can send back it's version
 			sender.send(MessagePackets.generateElevatorRequest(elevatorRequest), availableElevator.address, availableElevator.receiverPort);

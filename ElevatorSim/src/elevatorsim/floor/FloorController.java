@@ -59,7 +59,7 @@ public class FloorController extends Thread {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
-//			floorEvents.stopEventPolling();
+			floorEvents.stopEventPolling();
 		}
 	}
 	

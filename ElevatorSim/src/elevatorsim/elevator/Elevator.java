@@ -12,7 +12,6 @@ import java.net.SocketException;
  */
 public class Elevator extends Thread {
 	private boolean isRunning = false;
-	private int floorAmount;
 	private int floor;
 	private ElevatorState elevatorState;
 	private boolean[] elevatorLampsOn;
@@ -24,7 +23,6 @@ public class Elevator extends Thread {
 	 */
 	public Elevator ( int floorAmount, String floorName) {
 		super(floorName);
-		this.floorAmount = floorAmount;
 		this.elevatorLampsOn = new boolean[floorAmount];
 		this.floor = 1;
 		this.elevatorState = ElevatorState.DOOR_OPEN;
