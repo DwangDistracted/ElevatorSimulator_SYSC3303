@@ -12,7 +12,6 @@ import java.net.SocketException;
  */
 public class Elevator extends Thread {
 	private boolean isRunning = false;
-	private int floorAmount;
 	private int floor;
 	private ElevatorState elevatorState;
 	private boolean[] elevatorLampsOn;
@@ -22,9 +21,8 @@ public class Elevator extends Thread {
 	 * a reference to the scheduler singleton
 	 * @param floorAmount The amount of floors the elevator can visit
 	 */
-	public Elevator ( int floorAmount ) {
-		super("Elevator");
-		this.floorAmount = floorAmount;
+	public Elevator (int floorAmount, String elevatorName) {
+		super(elevatorName);
 		this.elevatorLampsOn = new boolean[floorAmount];
 		this.floor = 1;
 		this.elevatorState = ElevatorState.DOOR_OPEN;

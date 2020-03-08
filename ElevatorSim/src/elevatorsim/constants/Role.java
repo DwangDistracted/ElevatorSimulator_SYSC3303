@@ -9,5 +9,6 @@ package elevatorsim.constants;
 public enum Role {
 	ELEVATORS,
 	FLOORS,
-	SCHEDULER
+	SCHEDULER,
+	UNKNOWN
 }
