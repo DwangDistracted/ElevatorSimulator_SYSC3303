@@ -34,10 +34,6 @@ public class ElevatorStatus extends Request<ElevatorStatus> {
 		return this.direction;
 	}
 	
-	public void setDirection(Direction direction) {
-		this.direction = direction;
-	}
-	
 	public int getFloor() {
 		return this.floor;
 	}
@@ -81,23 +77,27 @@ public class ElevatorStatus extends Request<ElevatorStatus> {
 	 * @return
 	 */
 	public Direction addFloor(Integer floor) {
-		if (this.stops.indexOf(floor) != -1 ) {
+		if (stops.indexOf(floor) != -1 ) {
 			return null;
 		}
-		this.stops.add(floor);
-		if (this.stops.size() == 1) {
+		stops.add(floor);
+		if (stops.size() == 1) {
 			if (floor - this.floor > 0) {
-				this.direction = Direction.UP;
-				return this.direction;
+				direction = Direction.UP;
+				return direction;
 			} else if (floor - this.floor < 0) {
-				this.direction = Direction.DOWN;
-				return this.direction;
+				direction = Direction.DOWN;
+				return direction;
 			}
 		}
 		return null;
 	}
 
 	public String toString() {
-		return "Status: " + this.state.getStringValue();
+		return "Status: " + state.getStringValue() + "; Direction: " + direction + "; Floor: " + floor;
+	}
+
+	public void stopMovement() {
+		direction = null;
 	}
 }

@@ -27,7 +27,7 @@ class ElevatorTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		elevator = new Elevator(7);
+		elevator = new Elevator(7, "Elevator1");
 		es = new ElevatorServer(elevator);
 	}
 

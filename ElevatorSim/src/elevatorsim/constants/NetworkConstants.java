@@ -7,7 +7,6 @@ package elevatorsim.constants;
  */
 public class NetworkConstants {
 	// TODO - Set via configuration files
-
 	/*
 	 * The IP of the host that the Scheduler SubSystem runs on 
 	 */

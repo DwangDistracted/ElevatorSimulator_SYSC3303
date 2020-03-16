@@ -2,11 +2,9 @@ package elevatorsim.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.scheduler.Scheduler;
 import elevatorsim.scheduler.Scheduler.SchedulerState;
 
