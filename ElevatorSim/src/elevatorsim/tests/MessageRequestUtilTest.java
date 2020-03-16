@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.util.MessageRequestUtil;
+import elevatorsim.common.util.MessageRequestUtil;
 
 /**
  * Test class for the MessageRequestUtil class

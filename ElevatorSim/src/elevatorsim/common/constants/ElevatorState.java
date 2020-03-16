@@ -1,4 +1,4 @@
-package elevatorsim.constants;
+package elevatorsim.common.constants;
 
 /**
  * Represents the different states the elevator can be in

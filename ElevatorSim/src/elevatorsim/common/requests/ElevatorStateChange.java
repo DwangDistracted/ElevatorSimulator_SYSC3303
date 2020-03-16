@@ -1,6 +1,6 @@
 package elevatorsim.common.requests;
 
-import elevatorsim.constants.ElevatorState;
+import elevatorsim.common.constants.ElevatorState;
 
 /**
  * Stores information about a elevator state change

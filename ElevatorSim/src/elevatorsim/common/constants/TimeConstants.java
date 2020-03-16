@@ -1,4 +1,4 @@
-package elevatorsim.constants;
+package elevatorsim.common.constants;
 
 /**
  * Stores times in milliseconds to wait to simulate time taking place before events

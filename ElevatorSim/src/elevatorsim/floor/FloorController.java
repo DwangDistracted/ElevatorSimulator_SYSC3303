@@ -4,8 +4,8 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import elevatorsim.common.constants.TimeConstants;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.constants.TimeConstants;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 

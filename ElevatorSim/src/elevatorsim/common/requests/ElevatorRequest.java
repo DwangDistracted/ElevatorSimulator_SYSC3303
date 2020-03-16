@@ -2,7 +2,8 @@ package elevatorsim.common.requests;
 
 
 import java.time.LocalTime;
-import elevatorsim.constants.Direction;
+
+import elevatorsim.common.constants.Direction;
 
 /**
  * This is the message object which is passed by the different subsystems in

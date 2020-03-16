@@ -1,6 +1,6 @@
 package elevatorsim.common.requests;
 
-import elevatorsim.constants.Direction;
+import elevatorsim.common.constants.Direction;
 
 /**
  * A request sent when the arrival sensor notifies the system that an elevator is

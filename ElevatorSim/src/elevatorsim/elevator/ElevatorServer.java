@@ -8,15 +8,15 @@ import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import elevatorsim.common.constants.ElevatorState;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.constants.Role;
+import elevatorsim.common.constants.TimeConstants;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStateChange;
 import elevatorsim.common.requests.ElevatorStatus;
-import elevatorsim.constants.ElevatorState;
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.constants.Role;
-import elevatorsim.constants.TimeConstants;
 import elevatorsim.server.UDPServer;
 
 /**

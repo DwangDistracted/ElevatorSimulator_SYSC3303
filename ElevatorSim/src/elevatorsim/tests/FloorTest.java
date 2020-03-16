@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import elevatorsim.common.constants.Direction;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.constants.Direction;
 import elevatorsim.floor.Floor;
 
 /**

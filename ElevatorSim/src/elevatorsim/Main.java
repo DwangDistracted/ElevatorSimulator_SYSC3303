@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.HashMap;
 
 import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.util.FileParser;
 import elevatorsim.elevator.Elevator;
 import elevatorsim.floor.FloorController;
 import elevatorsim.scheduler.Scheduler;
-import elevatorsim.util.FileParser;
 
 public class Main {
 	//Change to user input/ config file later
