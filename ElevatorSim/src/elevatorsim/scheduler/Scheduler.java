@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import elevatorsim.common.constants.Direction;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStatus;
-import elevatorsim.constants.Direction;
 import elevatorsim.scheduler.ElevatorContactInfo;
 
 /**

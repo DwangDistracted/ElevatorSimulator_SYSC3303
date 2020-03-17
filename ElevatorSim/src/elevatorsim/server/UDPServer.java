@@ -3,8 +3,8 @@ package elevatorsim.server;
 import java.net.DatagramPacket;
 import java.net.SocketException;
 
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.Role;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.Role;
 
 /**
  * This abstract class lays the groundwork for the Datagram based server used in all three subsystems.

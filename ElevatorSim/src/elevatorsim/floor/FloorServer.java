@@ -5,13 +5,13 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.constants.Role;
+import elevatorsim.common.constants.TimeConstants;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.constants.Role;
-import elevatorsim.constants.TimeConstants;
 import elevatorsim.server.UDPServer;
 
 /**

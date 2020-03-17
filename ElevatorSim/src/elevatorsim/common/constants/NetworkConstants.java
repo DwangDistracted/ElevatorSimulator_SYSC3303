@@ -1,4 +1,4 @@
-package elevatorsim.constants;
+package elevatorsim.common.constants;
 
 /**
  * Constants used in the Communications System for Elevator Simulator 

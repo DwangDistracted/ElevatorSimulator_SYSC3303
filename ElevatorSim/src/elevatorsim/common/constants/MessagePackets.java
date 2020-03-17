@@ -1,4 +1,4 @@
-package elevatorsim.constants;
+package elevatorsim.common.constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

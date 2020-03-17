@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import elevatorsim.common.constants.Direction;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorDestinationRequest;
 import elevatorsim.common.requests.ElevatorRequest;
-import elevatorsim.constants.Direction;
 
 /**
  * A floor object to model the individual floors of a building

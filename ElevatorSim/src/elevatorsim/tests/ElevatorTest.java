@@ -9,9 +9,9 @@ import java.net.DatagramPacket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import elevatorsim.common.constants.ElevatorState;
+import elevatorsim.common.constants.NetworkConstants;
 import elevatorsim.common.requests.ElevatorStateChange;
-import elevatorsim.constants.ElevatorState;
-import elevatorsim.constants.NetworkConstants;
 import elevatorsim.elevator.Elevator;
 import elevatorsim.elevator.ElevatorServer;
 

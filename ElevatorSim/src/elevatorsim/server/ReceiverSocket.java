@@ -5,9 +5,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.util.DatagramPacketUtils;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.util.DatagramPacketUtils;
 
 /**
  * This class contains the basic logic for the Receiver Portion of the Server present in the Elevator and Floor Subsystems

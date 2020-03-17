@@ -1,4 +1,4 @@
-package elevatorsim.constants;
+package elevatorsim.common.constants;
 
 /**
  * Enum to model the roles of each server/system

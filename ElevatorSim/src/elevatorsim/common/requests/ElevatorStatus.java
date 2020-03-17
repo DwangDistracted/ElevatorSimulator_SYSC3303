@@ -2,8 +2,8 @@ package elevatorsim.common.requests;
 import java.util.ArrayList;
 import java.util.List;
 
-import elevatorsim.constants.Direction;
-import elevatorsim.constants.ElevatorState;
+import elevatorsim.common.constants.Direction;
+import elevatorsim.common.constants.ElevatorState;
 
 /**
  * This class contains information that the scheduler can use to determine which elevator to service an elevator request.

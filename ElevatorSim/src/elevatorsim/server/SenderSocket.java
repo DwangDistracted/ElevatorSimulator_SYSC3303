@@ -11,10 +11,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.constants.Role;
-import elevatorsim.util.DatagramPacketUtils;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.constants.Role;
+import elevatorsim.common.util.DatagramPacketUtils;
 
 /**
  * This class contains the logic for the Sender Portion of the Server present in the Elevator and Floor Subsystems.

@@ -4,11 +4,11 @@ import java.net.SocketException;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import elevatorsim.common.constants.NetworkConstants;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.MessageReciever;
 import elevatorsim.common.requests.Request;
-import elevatorsim.constants.NetworkConstants;
 
 public class FloorEvents extends Thread implements MessageReciever {
 	private Queue<Request<?>> eventQueue;

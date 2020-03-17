@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 
 import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.util.FileParser;
 import elevatorsim.floor.FloorController;
-import elevatorsim.util.FileParser;
 
 public class FloorSystemProcess {
 	//Change to user input/ config file later

@@ -1,4 +1,4 @@
-package elevatorsim.util;
+package elevatorsim.common.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
