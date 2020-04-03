@@ -9,7 +9,7 @@ import elevatorsim.floor.FloorController;
 
 public class FloorSystemProcess {
 	//Change to user input/ config file later
-	private static final int numOfFloors = 10;
+	private static final int numOfFloors = 22;
 	//Change to user input/ config file later
 	private static final String inputFilePath = "resources/test.txt";
 	
