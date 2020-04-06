@@ -8,8 +8,8 @@ import java.net.DatagramPacket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.util.DatagramPacketUtils;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.util.DatagramPacketUtils;
 
 /**
  * Test class for DatagramPacketUtils class

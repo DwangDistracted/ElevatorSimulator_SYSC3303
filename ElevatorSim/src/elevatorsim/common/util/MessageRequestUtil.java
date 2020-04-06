@@ -1,4 +1,4 @@
-package elevatorsim.util;
+package elevatorsim.common.util;
 
 import java.util.ArrayList;
 import java.util.Collections;

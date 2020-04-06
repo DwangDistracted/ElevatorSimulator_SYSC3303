@@ -1,8 +1,8 @@
 package elevatorsim.elevator;
 
-import elevatorsim.constants.ElevatorState;
-
 import java.net.SocketException;
+
+import elevatorsim.common.constants.ElevatorState;
 
 /**
  * The elevator class

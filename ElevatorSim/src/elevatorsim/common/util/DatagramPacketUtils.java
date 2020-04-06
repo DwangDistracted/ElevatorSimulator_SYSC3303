@@ -1,9 +1,9 @@
-package elevatorsim.util;
+package elevatorsim.common.util;
 
 import java.net.DatagramPacket;
 
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
 
 /**
  * This Class contains some methods to facilitate the manipulation of DatagramPackets

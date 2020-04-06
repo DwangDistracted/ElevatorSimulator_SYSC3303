@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.HashMap;
 
 import elevatorsim.common.requests.ElevatorRequest;
+import elevatorsim.common.util.FileParser;
 import elevatorsim.floor.FloorController;
-import elevatorsim.util.FileParser;
 
 public class FloorSystemProcess {
 	//Change to user input/ config file later
-	private static final int numOfFloors = 10;
+	private static final int numOfFloors = 22;
 	//Change to user input/ config file later
 	private static final String inputFilePath = "resources/test.txt";
 	

@@ -10,20 +10,20 @@ import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import elevatorsim.common.constants.Direction;
+import elevatorsim.common.constants.ElevatorState;
+import elevatorsim.common.constants.MessagePackets;
+import elevatorsim.common.constants.NetworkConstants;
+import elevatorsim.common.constants.Role;
+import elevatorsim.common.constants.TimeConstants;
 import elevatorsim.common.requests.ElevatorArrivalRequest;
 import elevatorsim.common.requests.ElevatorEvent;
 import elevatorsim.common.requests.ElevatorRequest;
 import elevatorsim.common.requests.ElevatorStateChange;
 import elevatorsim.common.requests.ElevatorStatus;
-import elevatorsim.constants.Direction;
-import elevatorsim.constants.ElevatorState;
-import elevatorsim.constants.MessagePackets;
-import elevatorsim.constants.NetworkConstants;
-import elevatorsim.constants.Role;
-import elevatorsim.constants.TimeConstants;
+import elevatorsim.common.util.DatagramPacketUtils;
 import elevatorsim.scheduler.Scheduler.SchedulerState;
 import elevatorsim.server.UDPServer;
-import elevatorsim.util.DatagramPacketUtils;
 
 /**
  * Creates a Server that Services the Scheduler.
